@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">Truyện Hay</string>
+    <!--  Bottom Navigation  -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_list">Danh sách</string>
+    <string name="nav_search">Tìm kiếm</string>
+    <string name="nav_profile">Cá nhân</string>
+    <!--  Home Screen  -->
+    <string name="home_banner_title">Đọc Truyện Hay</string>
+    <string name="home_banner_subtitle">Kho truyện tranh phong phú</string>
+    <string name="home_section_featured">Truyện Nổi Bật</string>
+    <string name="home_section_latest">Mới Cập Nhật</string>
+    <string name="home_section_ranking">Bảng Xếp Hạng</string>
+    <string name="home_see_all">Xem tất cả</string>
+    <!--  List Screen  -->
+    <string name="list_title">Danh Sách Truyện</string>
+    <string name="list_search_hint">Tìm tên truyện, tác giả...</string>
+    <string name="list_filter_all">Tất cả</string>
+    <string name="list_sort_new">Mới nhất</string>
+    <string name="list_sort_hot">Xem nhiều</string>
+    <string name="list_sort_name">A - Z</string>
+    <!--  Detail Screen  -->
+    <string name="detail_author">Tác giả</string>
+    <string name="detail_genre">Thể loại</string>
+    <string name="detail_views">lượt xem</string>
+    <string name="detail_chapters">chương</string>
+    <string name="detail_read_now">Đọc ngay</string>
+    <string name="detail_chapter_list">Danh sách chương</string>
+    <string name="detail_description">Nội dung</string>
+    <string name="detail_status_ongoing">Đang ra</string>
+    <string name="detail_status_completed">Hoàn thành</string>
+    <!--  Read Screen  -->
+    <string name="read_prev_chapter">Chương trước</string>
+    <string name="read_next_chapter">Chương sau</string>
+    <string name="read_chapter_list">Danh sách chương</string>
+    <!--  Auth  -->
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_subtitle">Chào mừng bạn trở lại!</string>
+    <string name="login_username">Tên đăng nhập</string>
+    <string name="login_password">Mật khẩu</string>
+    <string name="login_btn">Đăng nhập</string>
+    <string name="login_register">Chưa có tài khoản? Đăng ký ngay</string>
+    <string name="register_title">Đăng ký</string>
+    <string name="register_btn">Tạo tài khoản</string>
+    <!--  Common  -->
+    <string name="loading">Đang tải...</string>
+    <string name="error_no_data">Không có dữ liệu</string>
+    <string name="error_network">Lỗi kết nối mạng</string>
+    <string name="btn_retry">Thử lại</string>
+    <string name="chapter_prefix">Chương</string>
+    <string name="views_suffix">lượt xem</string>
+    <!--  Theme  -->
+    <string name="theme_dark">Chế độ tối</string>
+    <string name="theme_light">Chế độ sáng</string>
+</resources>
