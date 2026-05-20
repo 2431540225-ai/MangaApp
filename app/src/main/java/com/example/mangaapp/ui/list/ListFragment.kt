@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mangaapp.R
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.repository.MangaRepository
+import com.example.mangaapp.ui.detail.DetailFragment
 
 class ListFragment : Fragment() {
 
@@ -228,11 +229,10 @@ class ListFragment : Fragment() {
     }
 
     private fun navigateToDetail(manga: Manga) {
-        // TODO: Người 3 implement DetailFragment
-        // val fragment = DetailFragment.newInstance(manga.id)
-        // parentFragmentManager.beginTransaction()
-        //     .replace(R.id.container, fragment)
-        //     .addToBackStack(null)
-        //     .commit()
+        val fragment = DetailFragment.newInstance(manga.id)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

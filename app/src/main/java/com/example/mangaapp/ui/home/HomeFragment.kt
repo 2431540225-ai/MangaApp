@@ -14,7 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.mangaapp.R
 import com.example.mangaapp.repository.MangaRepository
 import com.example.mangaapp.utils.ThemeManager
-
+import com.example.mangaapp.ui.detail.DetailFragment
 class HomeFragment : Fragment() {
 
     private lateinit var vpBanner: ViewPager2
@@ -56,11 +56,11 @@ class HomeFragment : Fragment() {
     private fun setupBanner() {
         val featuredList = MangaRepository.getFeaturedManga()
         val bannerAdapter = BannerAdapter(featuredList) { manga ->
-            // Mở DetailActivity khi click banner
-            // TODO: Người 3 sẽ implement DetailActivity
-            // val intent = Intent(requireContext(), DetailActivity::class.java)
-            // intent.putExtra("manga_id", manga.id)
-            // startActivity(intent)
+            val fragment = DetailFragment.newInstance(manga.id)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit()
         }
         vpBanner.adapter = bannerAdapter
 
@@ -107,10 +107,11 @@ class HomeFragment : Fragment() {
     private fun setupLatestManga() {
         val latestList = MangaRepository.getLatestManga()
         val adapter = MangaCardAdapter(latestList) { manga ->
-            // TODO: Người 3 sẽ implement
-            // startActivity(Intent(requireContext(), DetailActivity::class.java).apply {
-            //     putExtra("manga_id", manga.id)
-            // })
+            val fragment = DetailFragment.newInstance(manga.id)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit()
         }
         rvLatest.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
@@ -121,7 +122,11 @@ class HomeFragment : Fragment() {
     private fun setupRanking() {
         val rankingList = MangaRepository.getRankingManga()
         val adapter = RankingAdapter(rankingList) { manga ->
-            // TODO: Navigate to detail
+            val fragment = DetailFragment.newInstance(manga.id)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit()
         }
         rvRanking.layoutManager = LinearLayoutManager(requireContext())
         rvRanking.isNestedScrollingEnabled = false
