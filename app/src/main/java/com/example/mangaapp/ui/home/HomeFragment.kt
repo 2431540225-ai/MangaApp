@@ -1,6 +1,8 @@
 package com.example.mangaapp.ui.home
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +18,8 @@ import com.example.mangaapp.repository.MangaRepository
 import com.example.mangaapp.utils.ThemeManager
 import com.example.mangaapp.ui.detail.DetailFragment
 class HomeFragment : Fragment() {
-
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
     private lateinit var vpBanner: ViewPager2
     private lateinit var llDots: LinearLayout
     private lateinit var rvLatest: RecyclerView
@@ -72,6 +75,20 @@ class HomeFragment : Fragment() {
                 updateDots(position, featuredList.size)
             }
         })
+
+        handler = Handler(Looper.getMainLooper())
+        runnable = object : Runnable {
+            override fun run() {
+                val nextItem = if (vpBanner.currentItem == bannerAdapter.itemCount - 1) {
+                    0
+                } else {
+                    vpBanner.currentItem + 1
+                }
+                vpBanner.setCurrentItem(nextItem, true)
+                handler.postDelayed(this, 3000)
+            }
+        }
+        handler.postDelayed(runnable, 3000)
     }
 
     private fun setupDots(count: Int) {

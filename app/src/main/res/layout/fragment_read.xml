@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_background">
+
+    <!-- ===== TOOLBAR TRÊN ===== -->
+    <LinearLayout
+        android:id="@+id/toolbar_top"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#CC000000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Nút back -->
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/ic_media_previous"
+            android:background="@android:color/transparent"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Tên truyện + Chương -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_manga_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tên truyện"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tv_chapter_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chương 1"
+                android:textSize="12sp"
+                android:textColor="#CCFFFFFF" />
+
+        </LinearLayout>
+
+        <!-- Nút cỡ chữ -->
+        <ImageButton
+            android:id="@+id/btn_font_size"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/ic_menu_zoom"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+    <!-- ===== NỘI DUNG TRUYỆN ===== -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_top"
+        app:layout_constraintBottom_toTopOf="@id/toolbar_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Tiêu đề chương -->
+            <TextView
+                android:id="@+id/tv_chapter_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chương 1: Tiêu đề"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:padding="16dp" />
+
+            <!-- Ảnh truyện (manga dạng ảnh) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_pages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Nội dung text (truyện chữ) -->
+            <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp"
+                android:textColor="#DDDDDD"
+                android:lineSpacingMultiplier="1.8"
+                android:padding="16dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ===== TOOLBAR DƯỚI ===== -->
+    <LinearLayout
+        android:id="@+id/toolbar_bottom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#CC000000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Chương trước -->
+        <Button
+            android:id="@+id/btn_prev_chapter"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="◀ Trước"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:backgroundTint="#555555"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Chọn chương -->
+        <Spinner
+            android:id="@+id/spinner_chapter"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="2"
+            android:background="#333333"
+            android:popupBackground="#222222" />
+
+        <!-- Chương sau -->
+        <Button
+            android:id="@+id/btn_next_chapter"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="Sau ▶"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/primary"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

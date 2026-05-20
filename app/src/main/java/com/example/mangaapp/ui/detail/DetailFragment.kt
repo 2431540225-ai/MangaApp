@@ -15,6 +15,7 @@ import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.repository.MangaRepository
 import java.text.NumberFormat
 import java.util.Locale
+import com.example.mangaapp.ui.read.ReadFragment
 
 class DetailFragment : Fragment() {
 
@@ -178,11 +179,10 @@ class DetailFragment : Fragment() {
     }
 
     private fun navigateToRead(manga: Manga, chapterNumber: Int) {
-        // TODO: Người 4 implement ReadFragment
-        // val fragment = ReadFragment.newInstance(manga.id, chapterNumber)
-        // parentFragmentManager.beginTransaction()
-        //     .replace(R.id.container, fragment)
-        //     .addToBackStack(null)
-        //     .commit()
+        val fragment = ReadFragment.newInstance(manga.id, chapterNumber)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
