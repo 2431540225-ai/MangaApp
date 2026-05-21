@@ -1,8 +1,6 @@
 package com.example.mangaapp.ui.list
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,14 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mangaapp.R
 import com.example.mangaapp.models.Manga
+import com.example.mangaapp.models.MangaCategory
 import com.example.mangaapp.repository.MangaRepository
-import com.example.mangaapp.ui.detail.DetailFragment
+import com.google.android.material.tabs.TabLayout
 
 class ListFragment : Fragment() {
 
-    // Views
-    private lateinit var etSearch: EditText
-    private lateinit var btnClearSearch: ImageButton
+    private lateinit var tabLayout: TabLayout
     private lateinit var spinnerSort: Spinner
     private lateinit var llGenreTags: LinearLayout
     private lateinit var rvMangaList: RecyclerView
@@ -29,18 +26,13 @@ class ListFragment : Fragment() {
     private lateinit var btnViewGrid: ImageButton
     private lateinit var btnViewList: ImageButton
 
-    // State
     private var isGridMode = true
+    private var selectedCategory = MangaCategory.TRUYEN_TRANH
     private var selectedGenre = "Tất cả"
     private var selectedSort = "Mới nhất"
-    private var currentQuery = ""
 
-    // Adapters
     private lateinit var gridAdapter: MangaGridAdapter
     private lateinit var listAdapter: MangaListAdapter
-
-    // Data
-    private var allManga = MangaRepository.getAllManga()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,53 +44,51 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initViews(view)
+        setupTabs()
         setupAdapters()
-        setupSearch()
         setupSort()
         setupGenreTags()
         setupViewModeToggle()
-        loadManga()
+        applyFilters()
     }
 
     private fun initViews(view: View) {
-        etSearch       = view.findViewById(R.id.et_search)
-        btnClearSearch = view.findViewById(R.id.btn_clear_search)
-        spinnerSort    = view.findViewById(R.id.spinner_sort)
-        llGenreTags    = view.findViewById(R.id.ll_genre_tags)
-        rvMangaList    = view.findViewById(R.id.rv_manga_list)
-        layoutEmpty    = view.findViewById(R.id.layout_empty)
-        tvResultCount  = view.findViewById(R.id.tv_result_count)
-        btnViewGrid    = view.findViewById(R.id.btn_view_grid)
-        btnViewList    = view.findViewById(R.id.btn_view_list)
+        tabLayout     = view.findViewById(R.id.tab_layout)
+        spinnerSort   = view.findViewById(R.id.spinner_sort)
+        llGenreTags   = view.findViewById(R.id.ll_genre_tags)
+        rvMangaList   = view.findViewById(R.id.rv_manga_list)
+        layoutEmpty   = view.findViewById(R.id.layout_empty)
+        tvResultCount = view.findViewById(R.id.tv_result_count)
+        btnViewGrid   = view.findViewById(R.id.btn_view_grid)
+        btnViewList   = view.findViewById(R.id.btn_view_list)
+    }
+
+    private fun setupTabs() {
+        tabLayout.addTab(tabLayout.newTab().setText("Truyện Tranh"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tiểu Thuyết"))
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                selectedCategory = when (tab?.position) {
+                    1    -> MangaCategory.TIEU_THUYET
+                    else -> MangaCategory.TRUYEN_TRANH
+                }
+                selectedGenre = "Tất cả"
+                setupGenreTags()
+                applyFilters()
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
     }
 
     private fun setupAdapters() {
-        gridAdapter = MangaGridAdapter(allManga) { manga -> navigateToDetail(manga) }
-        listAdapter = MangaListAdapter(allManga) { manga -> navigateToDetail(manga) }
-
-        // Mặc định dạng grid 2 cột
+        val initialList = MangaRepository.getMangaByCategory(selectedCategory)
+        gridAdapter = MangaGridAdapter(initialList) { manga -> navigateToDetail(manga) }
+        listAdapter = MangaListAdapter(initialList) { manga -> navigateToDetail(manga) }
         rvMangaList.layoutManager = GridLayoutManager(requireContext(), 2)
         rvMangaList.adapter = gridAdapter
-    }
-
-    private fun setupSearch() {
-        etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                currentQuery = s.toString()
-                btnClearSearch.visibility = if (currentQuery.isNotEmpty()) View.VISIBLE else View.GONE
-                applyFilters()
-            }
-        })
-
-        btnClearSearch.setOnClickListener {
-            etSearch.setText("")
-            currentQuery = ""
-            btnClearSearch.visibility = View.GONE
-        }
     }
 
     private fun setupSort() {
@@ -122,13 +112,11 @@ class ListFragment : Fragment() {
 
     private fun setupGenreTags() {
         llGenreTags.removeAllViews()
-        val genres = MangaRepository.genres
-
-        genres.forEach { genre ->
+        MangaRepository.genres.forEach { genre ->
             val tag = TextView(requireContext()).apply {
                 text = genre
-                textSize = 13f
-                setPadding(28, 12, 28, 12)
+                textSize = 12f
+                setPadding(24, 10, 24, 10)
                 setTextColor(
                     if (genre == selectedGenre)
                         resources.getColor(R.color.white, null)
@@ -139,16 +127,15 @@ class ListFragment : Fragment() {
                     if (genre == selectedGenre)
                         resources.getColor(R.color.primary, null)
                     else
-                        resources.getColor(R.color.light_surface, null)
+                        resources.getColor(R.color.light_background, null)
                 )
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.marginEnd = 8 }
-
                 setOnClickListener {
                     selectedGenre = genre
-                    setupGenreTags() // Refresh tags
+                    setupGenreTags()
                     applyFilters()
                 }
             }
@@ -164,7 +151,6 @@ class ListFragment : Fragment() {
             btnViewGrid.setBackgroundColor(resources.getColor(R.color.primary, null))
             btnViewList.setBackgroundColor(resources.getColor(R.color.light_surface, null))
         }
-
         btnViewList.setOnClickListener {
             isGridMode = false
             rvMangaList.layoutManager = LinearLayoutManager(requireContext())
@@ -175,19 +161,12 @@ class ListFragment : Fragment() {
     }
 
     private fun applyFilters() {
-        var filtered = allManga
+        // Lọc theo loại (tab)
+        var filtered = MangaRepository.getMangaByCategory(selectedCategory)
 
         // Lọc theo thể loại
         if (selectedGenre != "Tất cả") {
             filtered = filtered.filter { it.genres.contains(selectedGenre) }
-        }
-
-        // Lọc theo tìm kiếm
-        if (currentQuery.isNotBlank()) {
-            filtered = filtered.filter {
-                it.name.contains(currentQuery, ignoreCase = true) ||
-                        it.author.contains(currentQuery, ignoreCase = true)
-            }
         }
 
         // Sắp xếp
@@ -198,38 +177,23 @@ class ListFragment : Fragment() {
         }
 
         // Cập nhật UI
-        updateResultCount(filtered.size)
-        showEmptyOrList(filtered)
+        tvResultCount.visibility = if (selectedGenre != "Tất cả") View.VISIBLE else View.GONE
+        tvResultCount.text = "Tìm thấy ${filtered.size} kết quả"
 
-        if (isGridMode) gridAdapter.updateList(filtered)
-        else listAdapter.updateList(filtered)
-    }
-
-    private fun updateResultCount(count: Int) {
-        if (currentQuery.isNotBlank() || selectedGenre != "Tất cả") {
-            tvResultCount.visibility = View.VISIBLE
-            tvResultCount.text = "Tìm thấy $count kết quả"
-        } else {
-            tvResultCount.visibility = View.GONE
-        }
-    }
-
-    private fun showEmptyOrList(list: List<Manga>) {
-        if (list.isEmpty()) {
+        if (filtered.isEmpty()) {
             rvMangaList.visibility = View.GONE
             layoutEmpty.visibility = View.VISIBLE
         } else {
             rvMangaList.visibility = View.VISIBLE
             layoutEmpty.visibility = View.GONE
         }
-    }
 
-    private fun loadManga() {
-        applyFilters()
+        if (isGridMode) gridAdapter.updateList(filtered)
+        else listAdapter.updateList(filtered)
     }
 
     private fun navigateToDetail(manga: Manga) {
-        val fragment = DetailFragment.newInstance(manga.id)
+        val fragment = com.example.mangaapp.ui.detail.DetailFragment.newInstance(manga.id)
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
             .addToBackStack(null)

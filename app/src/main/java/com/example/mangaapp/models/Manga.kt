@@ -12,10 +12,16 @@ data class Manga(
     val totalViews: Int,
     val status: MangaStatus = MangaStatus.ONGOING,
     val isPaid: Boolean = false,
-    val createdAt: String = ""
+    val createdAt: String = "",
+    val category: MangaCategory = MangaCategory.TRUYEN_TRANH
 )
 
 enum class MangaStatus {
-    ONGOING,    // Đang ra
-    COMPLETED   // Hoàn thành
+    ONGOING,
+    COMPLETED
+}
+
+enum class MangaCategory {
+    TRUYEN_TRANH,
+    TIEU_THUYET
 }

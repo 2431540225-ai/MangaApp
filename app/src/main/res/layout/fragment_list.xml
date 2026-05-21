@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@color/light_surface"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="10dp"
+        android:paddingVertical="12dp"
         android:elevation="4dp">
 
         <TextView
@@ -30,52 +30,20 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- ===== SEARCH BAR ===== -->
-    <androidx.cardview.widget.CardView
+    <!-- ===== TAB PHÂN LOẠI ===== -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="3dp"
-        app:cardBackgroundColor="@color/light_surface">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_search"
-                android:layout_marginEnd="8dp" />
-
-            <EditText
-                android:id="@+id/et_search"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:hint="Tìm tên truyện, tác giả..."
-                android:background="@android:color/transparent"
-                android:textSize="14sp"
-                android:maxLines="1"
-                android:imeOptions="actionSearch"
-                android:inputType="text" />
-
-            <ImageButton
-                android:id="@+id/btn_clear_search"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:background="@android:color/transparent"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+        android:background="@color/light_surface"
+        app:tabTextColor="@color/light_text_secondary"
+        app:tabSelectedTextColor="@color/primary"
+        app:tabIndicatorColor="@color/primary"
+        app:tabIndicatorHeight="3dp"
+        app:tabMode="scrollable"
+        app:tabPaddingStart="8dp"
+        app:tabPaddingEnd="8dp"
+        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget" />
 
     <!-- ===== FILTER ROW ===== -->
     <LinearLayout
@@ -85,9 +53,9 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="10dp"
         android:paddingBottom="6dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:background="@color/light_surface">
 
-        <!-- Sort -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,11 +69,11 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
-            app:cardBackgroundColor="@color/light_surface">
+            app:cardBackgroundColor="@color/light_background">
 
             <Spinner
                 android:id="@+id/spinner_sort"
-                android:layout_width="120dp"
+                android:layout_width="130dp"
                 android:layout_height="36dp"
                 android:paddingHorizontal="10dp" />
 
@@ -116,7 +84,7 @@
             android:layout_height="1dp"
             android:layout_weight="1" />
 
-        <!-- View mode toggle -->
+        <!-- Toggle Grid/List -->
         <ImageButton
             android:id="@+id/btn_view_grid"
             android:layout_width="36dp"
@@ -136,13 +104,14 @@
 
     </LinearLayout>
 
-    <!-- ===== GENRE TAGS ===== -->
+    <!-- ===== THỂ LOẠI TAGS ===== -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
         android:paddingHorizontal="16dp"
-        android:paddingBottom="8dp">
+        android:paddingVertical="8dp"
+        android:background="@color/light_surface">
 
         <LinearLayout
             android:id="@+id/ll_genre_tags"
@@ -152,16 +121,22 @@
 
     </HorizontalScrollView>
 
-    <!-- ===== KẾT QUẢ TÌM KIẾM ===== -->
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_divider" />
+
+    <!-- ===== KẾT QUẢ ===== -->
     <TextView
         android:id="@+id/tv_result_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tất cả truyện"
         android:textSize="13sp"
         android:textColor="@color/light_text_secondary"
         android:paddingHorizontal="16dp"
-        android:paddingBottom="6dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:visibility="gone" />
 
     <!-- ===== DANH SÁCH TRUYỆN ===== -->
@@ -170,13 +145,13 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_manga_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingHorizontal="12dp"
+            android:paddingTop="8dp"
             android:paddingBottom="16dp" />
 
         <!-- Empty state -->
@@ -197,19 +172,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Không tìm thấy truyện nào"
+                android:text="Không có truyện nào"
                 android:textSize="16sp"
                 android:textColor="@color/light_text_secondary"
                 android:layout_marginTop="12dp" />
-
-            <TextView
-                android:id="@+id/tv_empty_sub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thử tìm kiếm với từ khóa khác"
-                android:textSize="13sp"
-                android:textColor="@color/light_text_secondary"
-                android:layout_marginTop="6dp" />
 
         </LinearLayout>
 

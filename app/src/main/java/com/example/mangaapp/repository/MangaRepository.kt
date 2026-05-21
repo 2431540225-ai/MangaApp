@@ -2,23 +2,26 @@ package com.example.mangaapp.repository
 
 import com.example.mangaapp.models.Chapter
 import com.example.mangaapp.models.Manga
+import com.example.mangaapp.models.MangaCategory
 import com.example.mangaapp.models.MangaStatus
 
 object MangaRepository {
 
-    // Dữ liệu mẫu
     private val fakeMangas = listOf(
+
+        // ===== TRUYỆN TRANH =====
         Manga(
             id = 1,
             name = "Naruto",
             slug = "naruto",
             author = "Masashi Kishimoto",
             description = "Câu chuyện về ninja Naruto Uzumaki với ước mơ trở thành Hokage vĩ đại nhất làng Lá.",
-            coverUrl = "https://picsum.photos/seed/naruto/200/280",
+            coverUrl = "https://m.media-amazon.com/images/M/MV5BZTNjOWI0ZTAtOGY1OS00ZGU0LWEyOWYtMjhkYjdlYmVjMDk2XkEyXkFqcGc@._V1_.jpg",
             genres = listOf("Hành Động", "Phiêu Lưu"),
             totalChapters = 700,
             totalViews = 850000,
-            status = MangaStatus.COMPLETED
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TRUYEN_TRANH
         ),
         Manga(
             id = 2,
@@ -26,11 +29,12 @@ object MangaRepository {
             slug = "one-piece",
             author = "Eiichiro Oda",
             description = "Hành trình của Monkey D. Luffy cùng băng hải tặc Mũ Rơm tìm kho báu One Piece.",
-            coverUrl = "https://picsum.photos/seed/onepiece/200/280",
+            coverUrl = "https://nipponclass.jp/wp-content/uploads/2024/07/MV5BM2YwYTkwNjItNGQzNy00MWE1LWE1M2ItOTMzOGI1OWQyYjA0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_FMjpg_UX1000_-723x1024.jpg",
             genres = listOf("Hành Động", "Phiêu Lưu", "Hài Hước"),
             totalChapters = 1100,
             totalViews = 1200000,
-            status = MangaStatus.ONGOING
+            status = MangaStatus.ONGOING,
+            category = MangaCategory.TRUYEN_TRANH
         ),
         Manga(
             id = 3,
@@ -38,11 +42,12 @@ object MangaRepository {
             slug = "demon-slayer",
             author = "Koyoharu Gotouge",
             description = "Tanjiro chiến đấu với ác quỷ để cứu em gái Nezuko đã bị biến thành quỷ.",
-            coverUrl = "https://picsum.photos/seed/demonslayer/200/280",
+            coverUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT02RDGhWInPbkReQzO7qcdT-l6V0fwKwnmXQ&s",
             genres = listOf("Hành Động"),
             totalChapters = 205,
             totalViews = 700000,
-            status = MangaStatus.COMPLETED
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TRUYEN_TRANH
         ),
         Manga(
             id = 4,
@@ -50,11 +55,12 @@ object MangaRepository {
             slug = "doraemon",
             author = "Fujiko F. Fujio",
             description = "Chú mèo máy đến từ tương lai với chiếc túi thần kỳ giúp đỡ cậu bé Nobita.",
-            coverUrl = "https://picsum.photos/seed/doraemon/200/280",
+            coverUrl = "https://m.media-amazon.com/images/M/MV5BNTRjMDA5ZTQtNWVkMy00OTAwLWI2NmMtYjQxYWM4MTIxYWFhXkEyXkFqcGc@._V1_.jpg",
             genres = listOf("Hài Hước"),
             totalChapters = 1344,
             totalViews = 950000,
-            status = MangaStatus.COMPLETED
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TRUYEN_TRANH
         ),
         Manga(
             id = 5,
@@ -62,11 +68,12 @@ object MangaRepository {
             slug = "attack-on-titan",
             author = "Hajime Isayama",
             description = "Nhân loại chiến đấu sinh tồn chống lại những người khổng lồ Titan tàn bạo.",
-            coverUrl = "https://picsum.photos/seed/aot/200/280",
+            coverUrl = "https://static.elle.vn/img/3k5af-aNCsR5kn13ROxp3kUv1IfN3YoglkPVXHarfjU/rs:fit:0:0/min-height:300/plain/http://www.elle.vn/app/uploads/2025/01/13/632092/poster-Dai-Chien-Nguoi-Khong-Lo-Lan-Tan-Cong-Cuoi-Cung.jpg@webp",
             genres = listOf("Hành Động", "Kinh Dị"),
             totalChapters = 139,
             totalViews = 600000,
-            status = MangaStatus.COMPLETED
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TRUYEN_TRANH
         ),
         Manga(
             id = 6,
@@ -74,11 +81,40 @@ object MangaRepository {
             slug = "dragon-ball",
             author = "Akira Toriyama",
             description = "Hành trình của Son Goku từ nhỏ đến khi trở thành chiến binh mạnh nhất vũ trụ.",
-            coverUrl = "https://picsum.photos/seed/dragonball/200/280",
+            coverUrl = "https://m.media-amazon.com/images/M/MV5BMGQ0ZWE4NDYtYWY0Mi00MjE0LWI1MzctZDA1NGExYzE3N2FiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
             genres = listOf("Hành Động", "Phiêu Lưu"),
             totalChapters = 519,
             totalViews = 800000,
-            status = MangaStatus.COMPLETED
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TRUYEN_TRANH
+        ),
+
+        // ===== TIỂU THUYẾT =====
+        Manga(
+            id = 7,
+            name = "Đắc Nhân Tâm",
+            slug = "dac-nhan-tam",
+            author = "Dale Carnegie",
+            description = "Cuốn sách kinh điển về nghệ thuật giao tiếp và xây dựng mối quan hệ, giúp bạn chinh phục lòng người và thành công trong cuộc sống.",
+            coverUrl = "https://bizweb.dktcdn.net/thumb/grande/100/567/082/products/dacnhantam-biacung-108k-01.jpg?v=1747113724337",
+            genres = listOf("Tình Cảm"),
+            totalChapters = 30,
+            totalViews = 500000,
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TIEU_THUYET
+        ),
+        Manga(
+            id = 8,
+            name = "Nhà Giả Kim",
+            slug = "nha-gia-kim",
+            author = "Paulo Coelho",
+            description = "Câu chuyện về chàng chăn cừu Santiago theo đuổi giấc mơ tìm kho báu, khám phá ý nghĩa cuộc sống và lắng nghe tiếng gọi của trái tim.",
+            coverUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c4/TheAlchemist.jpg",
+            genres = listOf("Phiêu Lưu", "Tình Cảm"),
+            totalChapters = 25,
+            totalViews = 420000,
+            status = MangaStatus.COMPLETED,
+            category = MangaCategory.TIEU_THUYET
         )
     )
 
@@ -108,28 +144,43 @@ object MangaRepository {
         4 to listOf(
             Chapter(7, 4, 1, "Doraemon đến!",
                 listOf("https://picsum.photos/seed/dr1p1/800/1200"))
+        ),
+        7 to listOf(
+            Chapter(8, 7, 1, "Phần 1: Kỹ thuật cơ bản",
+                content = "Santiago là một chàng chăn cừu người Tây Ban Nha, đêm nào cũng nằm mơ thấy một kho báu ở Kim Tự Tháp Ai Cập..."),
+            Chapter(9, 7, 2, "Phần 2: Nghệ thuật lắng nghe",
+                content = "Một trong những bí quyết quan trọng nhất để chinh phục lòng người là biết lắng nghe một cách chân thành..."),
+            Chapter(10, 7, 3, "Phần 3: Tạo ấn tượng đầu tiên",
+                content = "Ấn tượng đầu tiên được tạo ra trong vài giây đầu tiên gặp gỡ. Hãy mỉm cười chân thành và gọi tên người đối diện...")
+        ),
+        8 to listOf(
+            Chapter(11, 8, 1, "Chương 1: Giấc mơ tái hiện",
+                content = "Santiago nằm mơ thấy một đứa trẻ dẫn anh đến Kim Tự Tháp Ai Cập và chỉ cho anh thấy kho báu chôn giấu ở đó..."),
+            Chapter(12, 8, 2, "Chương 2: Nhà tiên tri",
+                content = "Ở thị trấn Tarifa, Santiago gặp một bà lão tự xưng là người có thể giải mã giấc mơ. Bà nói kho báu thật sự nằm ở Ai Cập..."),
+            Chapter(13, 8, 3, "Chương 3: Hành trình bắt đầu",
+                content = "Santiago quyết định bán đàn cừu để lấy tiền lên đường. Đây là bước ngoặt lớn nhất trong cuộc đời chàng trai trẻ...")
         )
     )
 
     val genres = listOf("Tất cả", "Hành Động", "Tình Cảm", "Hài Hước", "Phiêu Lưu", "Kinh Dị")
 
-    // ===================== PUBLIC API =====================
-    // Các hàm bên dưới là interface dùng chung cho toàn app.
-    // Khi có backend thật, chỉ sửa phần thân hàm, không sửa chữ ký hàm.
+    // ===== PUBLIC API =====
 
-    /** Lấy toàn bộ danh sách truyện */
     fun getAllManga(): List<Manga> = fakeMangas
 
-    /** Lấy truyện nổi bật (top views) cho banner/featured */
-    fun getFeaturedManga(): List<Manga> = fakeMangas.sortedByDescending { it.totalViews }.take(4)
+    /** Lấy truyện theo loại — Truyện Tranh hoặc Tiểu Thuyết */
+    fun getMangaByCategory(category: MangaCategory): List<Manga> =
+        fakeMangas.filter { it.category == category }
 
-    /** Lấy truyện mới cập nhật */
+    fun getFeaturedManga(): List<Manga> =
+        fakeMangas.sortedByDescending { it.totalViews }.take(4)
+
     fun getLatestManga(): List<Manga> = fakeMangas.take(6)
 
-    /** Lấy bảng xếp hạng top 10 */
-    fun getRankingManga(): List<Manga> = fakeMangas.sortedByDescending { it.totalViews }
+    fun getRankingManga(): List<Manga> =
+        fakeMangas.sortedByDescending { it.totalViews }
 
-    /** Tìm kiếm truyện theo tên hoặc tác giả */
     fun searchManga(query: String): List<Manga> {
         if (query.isBlank()) return fakeMangas
         return fakeMangas.filter {
@@ -138,20 +189,16 @@ object MangaRepository {
         }
     }
 
-    /** Lọc theo thể loại */
     fun getMangaByGenre(genre: String): List<Manga> {
         if (genre == "Tất cả" || genre.isBlank()) return fakeMangas
         return fakeMangas.filter { it.genres.contains(genre) }
     }
 
-    /** Lấy chi tiết một truyện theo id */
     fun getMangaById(id: Int): Manga? = fakeMangas.find { it.id == id }
 
-    /** Lấy danh sách chương của một truyện */
     fun getChaptersByMangaId(mangaId: Int): List<Chapter> =
         fakeChapters[mangaId] ?: emptyList()
 
-    /** Lấy nội dung một chương */
     fun getChapter(mangaId: Int, chapterNumber: Int): Chapter? =
         fakeChapters[mangaId]?.find { it.chapterNumber == chapterNumber }
 }
