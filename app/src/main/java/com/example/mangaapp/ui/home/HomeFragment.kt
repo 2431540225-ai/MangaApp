@@ -167,4 +167,8 @@ class HomeFragment : Fragment() {
             // TODO: Chuyển sang tab danh sách
         }
     }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacks(runnable)
+    }
 }
