@@ -7,6 +7,7 @@ import com.example.mangaapp.ui.home.HomeFragment
 import com.example.mangaapp.utils.ThemeManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.mangaapp.ui.list.ListFragment
+import com.example.mangaapp.ui.profile.ProfileFragment
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
@@ -37,11 +38,10 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_search -> {
-                    // TODO: Người 2 tạo SearchFragment
                     true
                 }
                 R.id.nav_profile -> {
-                    // TODO: Người 5 tạo ProfileFragment
+                    loadFragment(ProfileFragment())
                     true
                 }
                 else -> false

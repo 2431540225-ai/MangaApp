@@ -110,14 +110,27 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateDots(selected: Int, count: Int) {
+
+        if (!isAdded) return
+
         for (i in 0 until llDots.childCount) {
+
             val dot = llDots.getChildAt(i)
-            val color = if (i == selected) R.color.primary else R.color.light_text_secondary
-            dot.setBackgroundColor(resources.getColor(color, null))
-            val size = if (i == selected) 24 else 16
-            dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).also {
-                it.width = size
+
+            val color =
+                if (i == selected) R.color.primary
+                else R.color.light_text_secondary
+
+            context?.let {
+                dot.setBackgroundColor(resources.getColor(color, null))
             }
+
+            val size = if (i == selected) 24 else 16
+
+            dot.layoutParams =
+                (dot.layoutParams as LinearLayout.LayoutParams).also {
+                    it.width = size
+                }
         }
     }
 
@@ -169,6 +182,8 @@ class HomeFragment : Fragment() {
     }
     override fun onDestroyView() {
         super.onDestroyView()
-        handler.removeCallbacks(runnable)
+        if (::handler.isInitialized && ::runnable.isInitialized) {
+            handler.removeCallbacks(runnable)
+        }
     }
 }

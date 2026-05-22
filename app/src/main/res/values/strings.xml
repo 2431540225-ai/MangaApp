@@ -52,4 +52,46 @@
     <!--  Theme  -->
     <string name="theme_dark">Chế độ tối</string>
     <string name="theme_light">Chế độ sáng</string>
+    <!-- Profile Fragment -->
+    <string name="profile_title">Trang Cá Nhân</string>
+    <string name="profile_avatar_desc">Avatar người dùng</string>
+    <string name="profile_login_prompt">Nhấn để Đăng nhập</string>
+    <string name="profile_login_sub">Đăng nhập để lưu tiến độ đọc truyện</string>
+    <string name="profile_btn_login">Đăng nhập</string>
+    <string name="profile_btn_register">Đăng ký</string>
+
+    <!-- Thống kê -->
+    <string name="profile_stat_default">0</string>
+    <string name="profile_stat_reading">Đang đọc</string>
+    <string name="profile_stat_done">Hoàn thành</string>
+    <string name="profile_stat_fav">Yêu thích</string>
+
+    <!-- Nhóm Cài đặt -->
+    <string name="profile_section_settings">CÀI ĐẶT</string>
+    <string name="profile_item_reading_mode">Chế độ đọc</string>
+    <string name="profile_item_reading_mode_value">Cuộn dọc</string>
+    <string name="profile_item_notification">Thông báo</string>
+    <string name="profile_item_language">Ngôn ngữ</string>
+    <string name="profile_item_language_value">Tiếng Việt</string>
+
+    <!-- Nhóm Liên hệ -->
+    <string name="profile_section_contact">LIÊN HỆ &amp; HỖ TRỢ</string>
+    <string name="profile_item_admin">Liên hệ Admin</string>
+    <string name="profile_item_privacy">Chính sách bảo mật</string>
+    <string name="profile_item_privacy_badge">WebView</string>
+    <string name="profile_item_rate">Đánh giá ứng dụng</string>
+    <string name="profile_item_share">Chia sẻ ứng dụng</string>
+
+    <!-- Icon contentDescription -->
+    <string name="desc_arrow">Xem thêm</string>
+    <string name="desc_icon_reading">Icon chế độ đọc</string>
+    <string name="desc_icon_notification">Icon thông báo</string>
+    <string name="desc_icon_language">Icon ngôn ngữ</string>
+    <string name="desc_icon_admin">Icon liên hệ admin</string>
+    <string name="desc_icon_privacy">Icon bảo mật</string>
+    <string name="desc_icon_rate">Icon đánh giá</string>
+    <string name="desc_icon_share">Icon chia sẻ</string>
+
+    <!-- Phiên bản -->
+    <string name="profile_version">MangaApp v1.0.0</string>
 </resources>
