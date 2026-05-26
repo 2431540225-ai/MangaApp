@@ -1,34 +1,29 @@
 <resources>
-    <!--  Spacing  -->
     <dimen name="spacing_xs">4dp</dimen>
-    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_sm">12dp</dimen>
     <dimen name="spacing_md">16dp</dimen>
-    <dimen name="spacing_lg">24dp</dimen>
-    <dimen name="spacing_xl">32dp</dimen>
-    <!--  Card  -->
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">48dp</dimen>
+
     <dimen name="card_corner_radius">12dp</dimen>
-    <dimen name="card_elevation">4dp</dimen>
-    <!--  Manga Card  -->
-    <dimen name="manga_card_width">140dp</dimen>
-    <dimen name="manga_card_height">200dp</dimen>
-    <dimen name="manga_cover_height">180dp</dimen>
-    <dimen name="manga_grid_cover_height">200dp</dimen>
-    <!--  Bottom Nav  -->
-    <dimen name="bottom_nav_height">60dp</dimen>
-    <!--  Text Sizes  -->
+    <dimen name="card_corner_radius_lg">16dp</dimen>
+    <dimen name="card_elevation">0dp</dimen>
+
+    <dimen name="manga_card_width">110dp</dimen>
+    <dimen name="manga_card_height">190dp</dimen>
+    <dimen name="manga_cover_height">148dp</dimen>
+    <dimen name="manga_grid_cover_height">180dp</dimen>
+
+    <dimen name="bottom_nav_height">64dp</dimen>
+    <dimen name="floating_dock_margin">16dp</dimen>
+
     <dimen name="text_xs">10sp</dimen>
     <dimen name="text_sm">12sp</dimen>
     <dimen name="text_md">14sp</dimen>
-    <dimen name="text_lg">16sp</dimen>
-    <dimen name="text_xl">18sp</dimen>
-    <dimen name="text_xxl">22sp</dimen>
-    <dimen name="text_title">26sp</dimen>
-    <!--  Icon  -->
-    <dimen name="icon_sm">16dp</dimen>
-    <dimen name="icon_md">24dp</dimen>
-    <dimen name="icon_lg">32dp</dimen>
-    <!--  Banner  -->
-    <dimen name="banner_height">200dp</dimen>
-    <!--  Avatar  -->
-    <dimen name="avatar_size">40dp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">20sp</dimen>
+    <dimen name="text_xxl">24sp</dimen>
+    <dimen name="text_title">28sp</dimen>
+
+    <dimen name="banner_height">210dp</dimen>
 </resources>

@@ -1,130 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Item dạng GRID (2 cột) -->
-<androidx.cardview.widget.CardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="@dimen/manga_card_width"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/light_card">
+    android:layout_marginEnd="10dp"
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
 
-    <LinearLayout
+    <!-- Ảnh bìa + trạng thái -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/manga_cover_height"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="@color/color_surface">
+
+        <ImageView
+            android:id="@+id/iv_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="6dp"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/white"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_badge_full" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Tên manga -->
+    <TextView
+        android:id="@+id/tv_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginTop="6dp"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/color_text_primary"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
+    <!-- Thể loại -->
+    <TextView
+        android:id="@+id/tv_genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:textColor="@color/color_text_secondary"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="2dp"/>
 
-            <!-- Ảnh bìa -->
-            <ImageView
-                android:id="@+id/iv_cover"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery" />
+    <!-- Lượt xem -->
+    <TextView
+        android:id="@+id/tv_views"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@color/color_text_secondary"
+        android:layout_marginTop="2dp"/>
 
-            <!-- Badge trạng thái -->
-            <TextView
-                android:id="@+id/tv_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|start"
-                android:layout_margin="6dp"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:text="Đang ra"
-                android:textColor="@color/white"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:background="#CC4CAF50" />
+    <!-- Số chương -->
+    <TextView
+        android:id="@+id/tv_chapters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@color/color_text_secondary"
+        android:layout_marginTop="2dp"/>
 
-            <!-- Badge trả phí -->
-            <TextView
-                android:id="@+id/tv_paid_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:layout_margin="6dp"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:text="💎 VIP"
-                android:textColor="@color/white"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:background="#CCE53935"
-                android:visibility="gone" />
-
-            <!-- Gradient overlay dưới -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_gravity="bottom"
-                android:background="@color/overlay_dark" />
-
-            <!-- Số chương -->
-            <TextView
-                android:id="@+id/tv_chapters"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="6dp"
-                android:text="100 ch"
-                android:textColor="@color/white"
-                android:textSize="11sp" />
-
-        </FrameLayout>
-
-        <!-- Info -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tên truyện"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/light_text_primary"
-                android:maxLines="2"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/tv_genre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Thể loại"
-                android:textSize="11sp"
-                android:textColor="@color/primary"
-                android:layout_marginTop="2dp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp">
-
-                <TextView
-                    android:id="@+id/tv_views"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="👁 0"
-                    android:textSize="11sp"
-                    android:textColor="@color/light_text_secondary" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</androidx.cardview.widget.CardView>
+    <!-- Badge VIP -->
+    <TextView
+        android:id="@+id/tv_paid_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VIP"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_badge_full"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"/>
+</LinearLayout>

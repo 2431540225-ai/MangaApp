@@ -17,10 +17,10 @@ class MangaCardAdapter(
 ) : RecyclerView.Adapter<MangaCardAdapter.CardViewHolder>() {
 
     inner class CardViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val ivCover: ImageView     = view.findViewById(R.id.iv_cover)
-        val tvName: TextView       = view.findViewById(R.id.tv_manga_name)
-        val tvChapters: TextView   = view.findViewById(R.id.tv_chapter_count)
-        val tvBadge: TextView      = view.findViewById(R.id.tv_status_badge)
+        val ivCover: ImageView   = view.findViewById(R.id.iv_cover)
+        val tvName: TextView     = view.findViewById(R.id.tv_manga_name)
+        val tvChapters: TextView = view.findViewById(R.id.tv_chapter_count)
+        val tvBadge: TextView    = view.findViewById(R.id.tv_status_badge)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -33,19 +33,16 @@ class MangaCardAdapter(
         val manga = items[position]
 
         holder.tvName.text     = manga.name
-        holder.tvChapters.text = "${manga.totalChapters} chương"
+        // Hiển thị dạng "700+ chapters"
+        holder.tvChapters.text = "${manga.totalChapters}+ chapters"
 
-        // Badge trạng thái
+        // Badge
         if (manga.status == MangaStatus.ONGOING) {
             holder.tvBadge.text = "Đang ra"
-            holder.tvBadge.setBackgroundColor(
-                holder.itemView.context.getColor(R.color.badge_new)
-            )
+            holder.tvBadge.setBackgroundResource(R.drawable.bg_badge_hot)
         } else {
             holder.tvBadge.text = "Hoàn thành"
-            holder.tvBadge.setBackgroundColor(
-                holder.itemView.context.getColor(R.color.badge_full)
-            )
+            holder.tvBadge.setBackgroundResource(R.drawable.bg_badge_full)
         }
 
         Glide.with(holder.itemView.context)

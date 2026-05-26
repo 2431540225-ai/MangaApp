@@ -1,5 +1,7 @@
 package com.example.mangaapp.ui.home
 
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,6 +19,7 @@ import com.example.mangaapp.R
 import com.example.mangaapp.repository.MangaRepository
 import com.example.mangaapp.utils.ThemeManager
 import com.example.mangaapp.ui.detail.DetailFragment
+
 class HomeFragment : Fragment() {
     private lateinit var handler: Handler
     private lateinit var runnable: Runnable
@@ -28,6 +31,8 @@ class HomeFragment : Fragment() {
     private lateinit var tvLatestSeeAll: TextView
     private lateinit var tvRankingSeeAll: TextView
 
+    private var realBannerCount = 0
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,7 +43,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initViews(view)
         setupBanner()
         setupLatestManga()
@@ -58,33 +62,55 @@ class HomeFragment : Fragment() {
 
     private fun setupBanner() {
         val featuredList = MangaRepository.getFeaturedManga()
-        val bannerAdapter = BannerAdapter(featuredList) { manga ->
+        realBannerCount = featuredList.size
+
+        val LOOP_MULTIPLIER = 100
+        val infiniteList = MutableList(realBannerCount * LOOP_MULTIPLIER) { i ->
+            featuredList[i % realBannerCount]
+        }
+
+        val bannerAdapter = BannerAdapter(infiniteList) { manga ->
             val fragment = DetailFragment.newInstance(manga.id)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit()
         }
+
+        vpBanner.offscreenPageLimit = 3
+
+        vpBanner.setPageTransformer { page, position ->
+            val absPos = Math.abs(position)
+            val scale = 1f - (absPos * 0.12f)
+            page.scaleX = scale
+            page.scaleY = scale
+            page.alpha = 1f - (absPos * 0.4f)
+        }
+
         vpBanner.adapter = bannerAdapter
 
-        // Tạo dots indicator
-        setupDots(featuredList.size)
+        val startPosition = (LOOP_MULTIPLIER / 2) * realBannerCount
+        vpBanner.setCurrentItem(startPosition, false)
+
+        setupDots(realBannerCount)
+        updateDots(0, realBannerCount)
 
         vpBanner.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                updateDots(position, featuredList.size)
+                updateDots(position % realBannerCount, realBannerCount)
             }
         })
 
         handler = Handler(Looper.getMainLooper())
         runnable = object : Runnable {
             override fun run() {
-                val nextItem = if (vpBanner.currentItem == bannerAdapter.itemCount - 1) {
-                    0
+                if (!isAdded) return
+                val next = vpBanner.currentItem + 1
+                if (next >= realBannerCount * LOOP_MULTIPLIER - realBannerCount) {
+                    vpBanner.setCurrentItem((LOOP_MULTIPLIER / 2) * realBannerCount, false)
                 } else {
-                    vpBanner.currentItem + 1
+                    vpBanner.setCurrentItem(next, true)
                 }
-                vpBanner.setCurrentItem(nextItem, true)
                 handler.postDelayed(this, 3000)
             }
         }
@@ -95,14 +121,13 @@ class HomeFragment : Fragment() {
         llDots.removeAllViews()
         repeat(count) { i ->
             val dot = View(requireContext()).apply {
-                val size = if (i == 0) 24 else 16
-                val params = LinearLayout.LayoutParams(size, 8).also {
-                    it.marginEnd = 6
-                }
-                layoutParams = params
-                setBackgroundColor(
-                    if (i == 0) resources.getColor(R.color.primary, null)
-                    else resources.getColor(R.color.light_text_secondary, null)
+                val width = if (i == 0) 24 else 8
+                layoutParams = LinearLayout.LayoutParams(
+                    (width * resources.displayMetrics.density).toInt(),
+                    (8 * resources.displayMetrics.density).toInt()
+                ).also { it.marginEnd = (6 * resources.displayMetrics.density).toInt() }
+                setBackgroundResource(
+                    if (i == 0) R.drawable.bg_dot_active else R.drawable.bg_dot_inactive
                 )
             }
             llDots.addView(dot)
@@ -110,27 +135,32 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateDots(selected: Int, count: Int) {
-
         if (!isAdded) return
-
         for (i in 0 until llDots.childCount) {
-
             val dot = llDots.getChildAt(i)
-
-            val color =
-                if (i == selected) R.color.primary
-                else R.color.light_text_secondary
-
-            context?.let {
-                dot.setBackgroundColor(resources.getColor(color, null))
+            val isActive = (i == selected)
+            dot.setBackgroundResource(
+                if (isActive) R.drawable.bg_dot_active else R.drawable.bg_dot_inactive
+            )
+            val width = if (isActive) 24 else 8
+            dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).also {
+                it.width = (width * resources.displayMetrics.density).toInt()
             }
+        }
+    }
 
-            val size = if (i == selected) 24 else 16
-
-            dot.layoutParams =
-                (dot.layoutParams as LinearLayout.LayoutParams).also {
-                    it.width = size
-                }
+    fun applyGradientToTitle(textView: TextView) {
+        textView.post {
+            val width = textView.width.toFloat()
+            if (width <= 0f) return@post
+            val colorStart = requireContext().getColor(R.color.primary)
+            val colorEnd   = requireContext().getColor(R.color.gradient_end)
+            textView.paint.shader = LinearGradient(
+                0f, 0f, width, 0f,
+                colorStart, colorEnd,
+                Shader.TileMode.CLAMP
+            )
+            textView.invalidate()
         }
     }
 
@@ -164,22 +194,25 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Toggle Dark/Light mode
+        updateThemeIcon()
+
         btnThemeToggle.setOnClickListener {
             ThemeManager.toggle()
             requireActivity().recreate()
         }
-
-        // Xem tất cả mới cập nhật → chuyển sang tab List
-        tvLatestSeeAll.setOnClickListener {
-            // TODO: Chuyển sang tab danh sách
-            // (requireActivity() as MainActivity).navigateTo(R.id.nav_list)
-        }
-
-        tvRankingSeeAll.setOnClickListener {
-            // TODO: Chuyển sang tab danh sách
-        }
+        tvLatestSeeAll.setOnClickListener { }
+        tvRankingSeeAll.setOnClickListener { }
     }
+
+    private fun updateThemeIcon() {
+        val iconRes = if (ThemeManager.isDarkMode()) {
+            R.drawable.ic_light_mode
+        } else {
+            R.drawable.ic_dark_mode
+        }
+        btnThemeToggle.setImageResource(iconRes)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         if (::handler.isInitialized && ::runnable.isInitialized) {

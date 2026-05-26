@@ -1,5 +1,7 @@
 package com.example.mangaapp.ui.home
 
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +34,21 @@ class BannerAdapter(
 
         holder.tvName.text  = manga.name
         holder.tvGenre.text = manga.genres.joinToString(" • ")
+
+        // Apply gradient shader to title text
+        holder.tvName.post {
+            val width = holder.tvName.width.toFloat()
+            if (width > 0f) {
+                val colorStart = holder.itemView.context.getColor(R.color.primary)      // #A78BFA
+                val colorEnd   = holder.itemView.context.getColor(R.color.gradient_end) // #60A5FA
+                holder.tvName.paint.shader = LinearGradient(
+                    0f, 0f, width, 0f,
+                    colorStart, colorEnd,
+                    Shader.TileMode.CLAMP
+                )
+                holder.tvName.invalidate()
+            }
+        }
 
         Glide.with(holder.itemView.context)
             .load(manga.coverUrl)

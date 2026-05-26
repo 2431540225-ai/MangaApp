@@ -1,36 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Colors -->
-    <color name="primary">#E53935</color>
-    <color name="primary_dark">#B71C1C</color>
-    <color name="primary_light">#FF6F6F</color>
-    <color name="accent">#FF6F00</color>
 
-    <!-- Dark Theme -->
-    <color name="dark_background">#121212</color>
-    <color name="dark_surface">#1E1E1E</color>
-    <color name="dark_card">#2C2C2C</color>
+    <!-- ════════════════════════════════════════════════
+         FIXED COLORS — không đổi theo theme
+         ════════════════════════════════════════════════ -->
+
+    <!-- Brand -->
+    <color name="primary">#A78BFA</color>
+    <color name="primary_dark">#7C3AED</color>
+    <color name="accent">#A78BFA</color>
+    <color name="gradient_start">#A78BFA</color>
+    <color name="gradient_end">#60A5FA</color>
+    <color name="gradient_primary_start">#A78BFA</color>
+    <color name="gradient_primary_end">#60A5FA</color>
+
+    <!-- Badges -->
+    <color name="badge_new">#10B981</color>
+    <color name="badge_full">#F59E0B</color>
+
+    <!-- Utility -->
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+    <color name="overlay_dark">#80000000</color>
+    <color name="glass_badge_bg">#80000000</color>
+
+    <!-- ════════════════════════════════════════════════
+         DARK MODE RAW COLORS
+         ════════════════════════════════════════════════ -->
+    <color name="dark_background">#12121F</color>
+    <color name="dark_bottom_nav">#0D0D1A</color>
+    <color name="dark_surface">#1E1B2E</color>
+    <color name="dark_card">#1E1B2E</color>
     <color name="dark_text_primary">#FFFFFF</color>
-    <color name="dark_text_secondary">#B3B3B3</color>
-    <color name="dark_divider">#3A3A3A</color>
-    <color name="dark_bottom_nav">#1A1A1A</color>
+    <color name="dark_text_secondary">#9CA3AF</color>
+    <color name="inactive_icon">#6B7280</color>
+    <color name="dark_ripple">#26A78BFA</color>
+    <color name="dark_divider">#1AFFFFFF</color>
+    <color name="glass_border">#33FFFFFF</color>
+    <color name="dock_glass">#CC0D0D1A</color>
+    <color name="glass_surface">#1AFFFFFF</color>
+    <color name="skeleton_bg">#1EFFFFFF</color>
 
-    <!-- Light Theme -->
-    <color name="light_background">#F5F5F5</color>
+    <!-- ════════════════════════════════════════════════
+         LIGHT MODE RAW COLORS
+         ════════════════════════════════════════════════ -->
+    <color name="light_background">#F0F0F7</color>
+    <color name="light_bottom_nav">#FFFFFF</color>
     <color name="light_surface">#FFFFFF</color>
     <color name="light_card">#FFFFFF</color>
-    <color name="light_text_primary">#1A1A1A</color>
-    <color name="light_text_secondary">#757575</color>
-    <color name="light_divider">#E0E0E0</color>
-    <color name="light_bottom_nav">#FFFFFF</color>
+    <color name="light_text_primary">#1A1A2E</color>
+    <color name="light_text_secondary">#6B7280</color>
+    <color name="light_ripple">#1AA78BFA</color>
+    <color name="light_divider">#1A000000</color>
+    <color name="light_inactive_icon">#9CA3AF</color>
+    <color name="light_skeleton_bg">#1E000000</color>
+    <color name="light_glass_border">#22000000</color>
 
-    <!-- Common -->
-    <color name="star_color">#FFB300</color>
-    <color name="badge_new">#4CAF50</color>
-    <color name="badge_hot">#FF5722</color>
-    <color name="badge_full">#2196F3</color>
-    <color name="overlay_dark">#99000000</color>
-    <color name="transparent">#00000000</color>
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
+    <!-- ════════════════════════════════════════════════
+         ADAPTIVE COLORS — dùng trong layout XML
+         Giá trị ở đây = Light Mode
+         Giá trị night = Dark Mode (xem values-night/colors.xml)
+         ════════════════════════════════════════════════ -->
+
+    <!-- Backgrounds -->
+    <color name="color_background">@color/light_background</color>
+    <color name="color_surface">@color/light_surface</color>
+    <color name="color_card">@color/light_card</color>
+    <color name="color_bottom_nav">@color/light_bottom_nav</color>
+
+    <!-- Text -->
+    <color name="color_text_primary">@color/light_text_primary</color>
+    <color name="color_text_secondary">@color/light_text_secondary</color>
+
+    <!-- Icon & divider -->
+    <color name="color_icon">@color/light_text_primary</color>
+    <color name="color_inactive_icon">@color/light_inactive_icon</color>
+    <color name="color_divider">@color/light_divider</color>
+    <color name="color_ripple">@color/light_ripple</color>
+    <color name="color_skeleton">@color/light_skeleton_bg</color>
+    <color name="color_glass_border">@color/light_glass_border</color>
+
 </resources>

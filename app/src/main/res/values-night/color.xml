@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    res/values-night/colors.xml
+    Tạo folder: res > values-night > colors.xml
+    Các màu này tự động được dùng khi Dark Mode bật
+-->
+<resources>
+
+    <!-- Backgrounds -->
+    <color name="color_background">@color/dark_background</color>
+    <color name="color_surface">@color/dark_surface</color>
+    <color name="color_card">@color/dark_card</color>
+    <color name="color_bottom_nav">@color/dark_bottom_nav</color>
+
+    <!-- Text -->
+    <color name="color_text_primary">@color/dark_text_primary</color>
+    <color name="color_text_secondary">@color/dark_text_secondary</color>
+
+    <!-- Icon & divider -->
+    <color name="color_icon">@color/white</color>
+    <color name="color_inactive_icon">@color/inactive_icon</color>
+    <color name="color_divider">@color/dark_divider</color>
+    <color name="color_ripple">@color/dark_ripple</color>
+    <color name="color_skeleton">@color/skeleton_bg</color>
+    <color name="color_glass_border">@color/glass_border</color>
+
+</resources>

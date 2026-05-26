@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+         Bottom scrim — used on:
+           1. Fragment container edge above the floating dock
+           2. Inside manga card cover images (bottom 72dp)
+
+         3-stop: transparent → 60% → 90% dark background colour
+         Makes floating dock appear to "lift" out of the content.
+    -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#000A0A0C"
+                android:centerColor="#990A0A0C"
+                android:endColor="#F00A0A0C" />
+        </shape>
+    </item>
+</layer-list>
