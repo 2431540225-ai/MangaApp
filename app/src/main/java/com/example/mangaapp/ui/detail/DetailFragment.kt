@@ -179,7 +179,11 @@ class DetailFragment : Fragment() {
     }
 
     private fun navigateToRead(manga: Manga, chapterNumber: Int) {
-        val fragment = ReadFragment.newInstance(manga.id, chapterNumber)
+        val fragment = ReadFragment.newInstance(
+            mangaId          = manga.id,
+            chapterNumber    = chapterNumber,
+            firestoreStoryId = manga.firestoreId
+        )
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
             .addToBackStack(null)

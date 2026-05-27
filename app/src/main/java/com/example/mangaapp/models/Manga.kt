@@ -13,7 +13,8 @@ data class Manga(
     val status: MangaStatus = MangaStatus.ONGOING,
     val isPaid: Boolean = false,
     val createdAt: String = "",
-    val category: MangaCategory = MangaCategory.TRUYEN_TRANH
+    val category: MangaCategory = MangaCategory.TRUYEN_TRANH,
+    val firestoreId: String = ""
 )
 
 enum class MangaStatus {
