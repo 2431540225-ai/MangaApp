@@ -31,6 +31,9 @@ class ListFragment : Fragment() {
     private var selectedGenre = "Tất cả"
     private var selectedSort = "Mới nhất"
 
+    // Cache toàn bộ list để filter local (tránh gọi Firestore liên tục)
+    private var allMangaList: List<Manga> = emptyList()
+
     private lateinit var gridAdapter: MangaGridAdapter
     private lateinit var listAdapter: MangaListAdapter
 
@@ -45,12 +48,12 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
-        setupTabs()
         setupAdapters()
+        setupTabs()
         setupSort()
         setupGenreTags()
         setupViewModeToggle()
-        applyFilters()
+        loadMangaFromFirestore()
     }
 
     private fun initViews(view: View) {
@@ -62,6 +65,17 @@ class ListFragment : Fragment() {
         tvResultCount = view.findViewById(R.id.tv_result_count)
         btnViewGrid   = view.findViewById(R.id.btn_view_grid)
         btnViewList   = view.findViewById(R.id.btn_view_list)
+    }
+
+    private fun loadMangaFromFirestore() {
+        MangaRepository.getAllManga(
+            onSuccess = { list ->
+                if (!isAdded) return@getAllManga
+                allMangaList = list
+                applyFilters()
+            },
+            onError = { applyFilters() }
+        )
     }
 
     private fun setupTabs() {
@@ -84,20 +98,15 @@ class ListFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        val initialList = MangaRepository.getMangaByCategory(selectedCategory)
-        gridAdapter = MangaGridAdapter(initialList) { manga -> navigateToDetail(manga) }
-        listAdapter = MangaListAdapter(initialList) { manga -> navigateToDetail(manga) }
+        gridAdapter = MangaGridAdapter(emptyList()) { manga -> navigateToDetail(manga) }
+        listAdapter = MangaListAdapter(emptyList()) { manga -> navigateToDetail(manga) }
         rvMangaList.layoutManager = GridLayoutManager(requireContext(), 2)
         rvMangaList.adapter = gridAdapter
     }
 
     private fun setupSort() {
         val sortOptions = arrayOf("Mới nhất", "Xem nhiều", "Tên A-Z")
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            sortOptions
-        )
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sortOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerSort.adapter = adapter
 
@@ -118,16 +127,12 @@ class ListFragment : Fragment() {
                 textSize = 12f
                 setPadding(24, 10, 24, 10)
                 setTextColor(
-                    if (genre == selectedGenre)
-                        resources.getColor(R.color.white, null)
-                    else
-                        resources.getColor(R.color.light_text_primary, null)
+                    if (genre == selectedGenre) resources.getColor(R.color.white, null)
+                    else resources.getColor(R.color.light_text_primary, null)
                 )
                 setBackgroundColor(
-                    if (genre == selectedGenre)
-                        resources.getColor(R.color.primary, null)
-                    else
-                        resources.getColor(R.color.light_background, null)
+                    if (genre == selectedGenre) resources.getColor(R.color.primary, null)
+                    else resources.getColor(R.color.light_background, null)
                 )
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -161,8 +166,10 @@ class ListFragment : Fragment() {
     }
 
     private fun applyFilters() {
-        // Lọc theo loại (tab)
-        var filtered = MangaRepository.getMangaByCategory(selectedCategory)
+        if (!isAdded) return
+
+        // Lọc theo category
+        var filtered = allMangaList.filter { it.category == selectedCategory }
 
         // Lọc theo thể loại
         if (selectedGenre != "Tất cả") {
@@ -176,7 +183,6 @@ class ListFragment : Fragment() {
             else        -> filtered.sortedByDescending { it.createdAt }
         }
 
-        // Cập nhật UI
         tvResultCount.visibility = if (selectedGenre != "Tất cả") View.VISIBLE else View.GONE
         tvResultCount.text = "Tìm thấy ${filtered.size} kết quả"
 
@@ -193,7 +199,7 @@ class ListFragment : Fragment() {
     }
 
     private fun navigateToDetail(manga: Manga) {
-        val fragment = com.example.mangaapp.ui.detail.DetailFragment.newInstance(manga.id)
+        val fragment = com.example.mangaapp.ui.detail.DetailFragment.newInstance(manga.firestoreId)
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
             .addToBackStack(null)

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mangaapp.R
+import com.example.mangaapp.models.Chapter
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.repository.MangaRepository
@@ -19,11 +20,11 @@ import com.example.mangaapp.ui.read.ReadFragment
 
 class DetailFragment : Fragment() {
 
-    private var mangaId: Int = -1
+    private var firestoreId: String = ""
     private var isDescExpanded = false
     private var isChapterReversed = false
+    private var chapterList: List<Chapter> = emptyList()
 
-    // Views
     private lateinit var ivBackdrop: android.widget.ImageView
     private lateinit var ivCover: android.widget.ImageView
     private lateinit var btnBack: ImageButton
@@ -39,14 +40,16 @@ class DetailFragment : Fragment() {
     private lateinit var tvReadMore: TextView
     private lateinit var rvChapters: RecyclerView
     private lateinit var tvSortChapter: TextView
+    private lateinit var progressLoading: ProgressBar
 
     private lateinit var chapterAdapter: ChapterAdapter
 
     companion object {
-        fun newInstance(mangaId: Int): DetailFragment {
+        // Dùng firestoreId (String) thay vì Int
+        fun newInstance(firestoreId: String): DetailFragment {
             val fragment = DetailFragment()
             val args = Bundle()
-            args.putInt("manga_id", mangaId)
+            args.putString("firestore_id", firestoreId)
             fragment.arguments = args
             return fragment
         }
@@ -54,7 +57,7 @@ class DetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mangaId = arguments?.getInt("manga_id") ?: -1
+        firestoreId = arguments?.getString("firestore_id") ?: ""
     }
 
     override fun onCreateView(
@@ -87,25 +90,44 @@ class DetailFragment : Fragment() {
         tvReadMore      = view.findViewById(R.id.tv_read_more)
         rvChapters      = view.findViewById(R.id.rv_chapters)
         tvSortChapter   = view.findViewById(R.id.tv_sort_chapter)
+        // Nếu layout có ProgressBar thì dùng, không thì bỏ qua
+        progressLoading = view.findViewById(R.id.progress_loading) ?: return
+
+        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
     private fun loadMangaDetail() {
-        val manga = MangaRepository.getMangaById(mangaId) ?: return
-        val chapters = MangaRepository.getChaptersByMangaId(mangaId)
+        if (firestoreId.isEmpty()) return
+        if (::progressLoading.isInitialized) progressLoading.visibility = View.VISIBLE
+
+        MangaRepository.getMangaById(
+            firestoreId = firestoreId,
+            onSuccess = { manga ->
+                if (!isAdded || manga == null) return@getMangaById
+                if (::progressLoading.isInitialized) progressLoading.visibility = View.GONE
+                bindMangaInfo(manga)
+                loadChapters(manga)
+            },
+            onError = {
+                if (!isAdded) return@getMangaById
+                if (::progressLoading.isInitialized) progressLoading.visibility = View.GONE
+                Toast.makeText(requireContext(), "Không tải được thông tin truyện", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    private fun bindMangaInfo(manga: Manga) {
         val format = NumberFormat.getNumberInstance(Locale("vi", "VN"))
 
-        // Ảnh
         Glide.with(this).load(manga.coverUrl).centerCrop().into(ivCover)
         Glide.with(this).load(manga.coverUrl).centerCrop().into(ivBackdrop)
 
-        // Thông tin
         tvName.text         = manga.name
         tvAuthor.text       = "✍️ ${manga.author}"
         tvViews.text        = format.format(manga.totalViews)
         tvChapterCount.text = manga.totalChapters.toString()
         tvDescription.text  = manga.description
 
-        // Trạng thái
         if (manga.status == MangaStatus.ONGOING) {
             tvStatus.text = "Đang ra"
             tvStatus.setBackgroundColor(resources.getColor(R.color.badge_new, null))
@@ -114,50 +136,53 @@ class DetailFragment : Fragment() {
             tvStatus.setBackgroundColor(resources.getColor(R.color.badge_full, null))
         }
 
-        // Thể loại tags
         setupGenreTags(manga)
 
-        // Nút đọc
-        btnReadFirst.setOnClickListener {
-            chapters.firstOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
-        }
-        btnReadLatest.setOnClickListener {
-            chapters.lastOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
-        }
-
-        // Xem thêm mô tả
         tvReadMore.setOnClickListener {
             isDescExpanded = !isDescExpanded
-            if (isDescExpanded) {
-                tvDescription.maxLines = Int.MAX_VALUE
-                tvReadMore.text = "Thu gọn ‹"
-            } else {
-                tvDescription.maxLines = 4
-                tvReadMore.text = "Xem thêm ›"
+            tvDescription.maxLines = if (isDescExpanded) Int.MAX_VALUE else 4
+            tvReadMore.text = if (isDescExpanded) "Thu gọn ‹" else "Xem thêm ›"
+        }
+    }
+
+    private fun loadChapters(manga: Manga) {
+        MangaRepository.getChaptersByMangaId(
+            firestoreId = firestoreId,
+            onSuccess = { chapters ->
+                if (!isAdded) return@getChaptersByMangaId
+                chapterList = chapters
+                tvChapterCount.text = chapters.size.toString()
+
+                // Nút đọc
+                btnReadFirst.setOnClickListener {
+                    chapters.firstOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
+                }
+                btnReadLatest.setOnClickListener {
+                    chapters.lastOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
+                }
+
+                // Danh sách chương
+                chapterAdapter = ChapterAdapter(chapters) { chapter ->
+                    navigateToRead(manga, chapter.chapterNumber)
+                }
+                rvChapters.layoutManager = LinearLayoutManager(requireContext())
+                rvChapters.isNestedScrollingEnabled = false
+                rvChapters.adapter = chapterAdapter
+
+                // Sắp xếp
+                tvSortChapter.setOnClickListener {
+                    isChapterReversed = !isChapterReversed
+                    val sorted = if (isChapterReversed) chapters.sortedBy { it.chapterNumber }
+                    else chapters.sortedByDescending { it.chapterNumber }
+                    tvSortChapter.text = if (isChapterReversed) "Cũ nhất ↑" else "Mới nhất ↓"
+                    chapterAdapter.updateList(sorted)
+                }
+            },
+            onError = {
+                if (!isAdded) return@getChaptersByMangaId
+                Toast.makeText(requireContext(), "Không tải được danh sách chương", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        // Danh sách chương
-        chapterAdapter = ChapterAdapter(chapters) { chapter ->
-            navigateToRead(manga, chapter.chapterNumber)
-        }
-        rvChapters.layoutManager = LinearLayoutManager(requireContext())
-        rvChapters.isNestedScrollingEnabled = false
-        rvChapters.adapter = chapterAdapter
-
-        // Sắp xếp chương
-        tvSortChapter.setOnClickListener {
-            isChapterReversed = !isChapterReversed
-            val sorted = if (isChapterReversed) chapters.sortedBy { it.chapterNumber }
-            else chapters.sortedByDescending { it.chapterNumber }
-            tvSortChapter.text = if (isChapterReversed) "Cũ nhất ↑" else "Mới nhất ↓"
-            chapterAdapter.updateList(sorted)
-        }
-
-        // Nút back
-        btnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+        )
     }
 
     private fun setupGenreTags(manga: Manga) {

@@ -61,60 +61,64 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupBanner() {
-        val featuredList = MangaRepository.getFeaturedManga()
-        realBannerCount = featuredList.size
+        MangaRepository.getFeaturedManga(
+            onSuccess = { featuredList ->
+                if (!isAdded) return@getFeaturedManga
+                realBannerCount = featuredList.size
+                if (realBannerCount == 0) return@getFeaturedManga
 
-        val LOOP_MULTIPLIER = 100
-        val infiniteList = MutableList(realBannerCount * LOOP_MULTIPLIER) { i ->
-            featuredList[i % realBannerCount]
-        }
-
-        val bannerAdapter = BannerAdapter(infiniteList) { manga ->
-            val fragment = DetailFragment.newInstance(manga.id)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
-
-        vpBanner.offscreenPageLimit = 3
-
-        vpBanner.setPageTransformer { page, position ->
-            val absPos = Math.abs(position)
-            val scale = 1f - (absPos * 0.12f)
-            page.scaleX = scale
-            page.scaleY = scale
-            page.alpha = 1f - (absPos * 0.4f)
-        }
-
-        vpBanner.adapter = bannerAdapter
-
-        val startPosition = (LOOP_MULTIPLIER / 2) * realBannerCount
-        vpBanner.setCurrentItem(startPosition, false)
-
-        setupDots(realBannerCount)
-        updateDots(0, realBannerCount)
-
-        vpBanner.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                updateDots(position % realBannerCount, realBannerCount)
-            }
-        })
-
-        handler = Handler(Looper.getMainLooper())
-        runnable = object : Runnable {
-            override fun run() {
-                if (!isAdded) return
-                val next = vpBanner.currentItem + 1
-                if (next >= realBannerCount * LOOP_MULTIPLIER - realBannerCount) {
-                    vpBanner.setCurrentItem((LOOP_MULTIPLIER / 2) * realBannerCount, false)
-                } else {
-                    vpBanner.setCurrentItem(next, true)
+                val LOOP_MULTIPLIER = 100
+                val infiniteList = MutableList(realBannerCount * LOOP_MULTIPLIER) { i ->
+                    featuredList[i % realBannerCount]
                 }
-                handler.postDelayed(this, 3000)
-            }
-        }
-        handler.postDelayed(runnable, 3000)
+
+                val bannerAdapter = BannerAdapter(infiniteList) { manga ->
+                    val fragment = DetailFragment.newInstance(manga.firestoreId)
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+
+                vpBanner.offscreenPageLimit = 3
+                vpBanner.setPageTransformer { page, position ->
+                    val absPos = Math.abs(position)
+                    val scale = 1f - (absPos * 0.12f)
+                    page.scaleX = scale
+                    page.scaleY = scale
+                    page.alpha = 1f - (absPos * 0.4f)
+                }
+                vpBanner.adapter = bannerAdapter
+
+                val startPosition = (LOOP_MULTIPLIER / 2) * realBannerCount
+                vpBanner.setCurrentItem(startPosition, false)
+
+                setupDots(realBannerCount)
+                updateDots(0, realBannerCount)
+
+                vpBanner.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        updateDots(position % realBannerCount, realBannerCount)
+                    }
+                })
+
+                handler = Handler(Looper.getMainLooper())
+                runnable = object : Runnable {
+                    override fun run() {
+                        if (!isAdded) return
+                        val next = vpBanner.currentItem + 1
+                        if (next >= realBannerCount * LOOP_MULTIPLIER - realBannerCount) {
+                            vpBanner.setCurrentItem((LOOP_MULTIPLIER / 2) * realBannerCount, false)
+                        } else {
+                            vpBanner.setCurrentItem(next, true)
+                        }
+                        handler.postDelayed(this, 3000)
+                    }
+                }
+                handler.postDelayed(runnable, 3000)
+            },
+            onError = { /* banner trống nếu lỗi */ }
+        )
     }
 
     private fun setupDots(count: Int) {
@@ -165,37 +169,46 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupLatestManga() {
-        val latestList = MangaRepository.getLatestManga()
-        val adapter = MangaCardAdapter(latestList) { manga ->
-            val fragment = DetailFragment.newInstance(manga.id)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
-        rvLatest.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
+        MangaRepository.getLatestManga(
+            onSuccess = { latestList ->
+                if (!isAdded) return@getLatestManga
+                val adapter = MangaCardAdapter(latestList) { manga ->
+                    val fragment = DetailFragment.newInstance(manga.firestoreId)
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+                rvLatest.layoutManager = LinearLayoutManager(
+                    requireContext(), LinearLayoutManager.HORIZONTAL, false
+                )
+                rvLatest.adapter = adapter
+            },
+            onError = { }
         )
-        rvLatest.adapter = adapter
     }
 
     private fun setupRanking() {
-        val rankingList = MangaRepository.getRankingManga()
-        val adapter = RankingAdapter(rankingList) { manga ->
-            val fragment = DetailFragment.newInstance(manga.id)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
-        rvRanking.layoutManager = LinearLayoutManager(requireContext())
-        rvRanking.isNestedScrollingEnabled = false
-        rvRanking.adapter = adapter
+        MangaRepository.getRankingManga(
+            onSuccess = { rankingList ->
+                if (!isAdded) return@getRankingManga
+                val adapter = RankingAdapter(rankingList) { manga ->
+                    val fragment = DetailFragment.newInstance(manga.firestoreId)
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+                rvRanking.layoutManager = LinearLayoutManager(requireContext())
+                rvRanking.isNestedScrollingEnabled = false
+                rvRanking.adapter = adapter
+            },
+            onError = { }
+        )
     }
 
     private fun setupClickListeners() {
         updateThemeIcon()
-
         btnThemeToggle.setOnClickListener {
             ThemeManager.toggle()
             requireActivity().recreate()
@@ -205,11 +218,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateThemeIcon() {
-        val iconRes = if (ThemeManager.isDarkMode()) {
-            R.drawable.ic_light_mode
-        } else {
-            R.drawable.ic_dark_mode
-        }
+        val iconRes = if (ThemeManager.isDarkMode()) R.drawable.ic_light_mode
+        else R.drawable.ic_dark_mode
         btnThemeToggle.setImageResource(iconRes)
     }
 

@@ -10,15 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mangaapp.R
+import com.example.mangaapp.models.Chapter
 import com.example.mangaapp.repository.MangaRepository
 
 class ReadFragment : Fragment() {
 
-    private var mangaId: Int = -1
+    private var firestoreStoryId: String = ""
     private var chapterNumber: Int = 1
     private var fontSize: Int = 16
 
-    private var firestoreStoryId: String = ""
+    // Cache chapters để dùng cho prev/next/spinner
+    private var chapterList: List<Chapter> = emptyList()
 
     private lateinit var viewModel: ReaderViewModel
 
@@ -46,7 +48,6 @@ class ReadFragment : Fragment() {
         ): ReadFragment {
             val fragment = ReadFragment()
             val args = Bundle()
-            args.putInt("manga_id", mangaId)
             args.putInt("chapter_number", chapterNumber)
             args.putString("firestore_story_id", firestoreStoryId)
             fragment.arguments = args
@@ -56,12 +57,13 @@ class ReadFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mangaId          = arguments?.getInt("manga_id") ?: -1
         chapterNumber    = arguments?.getInt("chapter_number") ?: 1
         firestoreStoryId = arguments?.getString("firestore_story_id") ?: ""
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_read, container, false)
     }
 
@@ -70,9 +72,8 @@ class ReadFragment : Fragment() {
         viewModel = ViewModelProvider(this)[ReaderViewModel::class.java]
         initViews(view)
         setupObservers()
-        setupSpinner()
-        loadChapter(chapterNumber)
         setupClickListeners()
+        loadChapterList()
     }
 
     private fun initViews(view: View) {
@@ -89,10 +90,44 @@ class ReadFragment : Fragment() {
         progressLoading = view.findViewById(R.id.progress_loading)
     }
 
+    // ─── LOAD CHAPTER LIST ────────────────────────────────────────────────────
+
+    private fun loadChapterList() {
+        if (firestoreStoryId.isEmpty()) return
+
+        // Load thông tin truyện (tên) từ Firestore
+        MangaRepository.getMangaById(
+            firestoreId = firestoreStoryId,
+            onSuccess = { manga ->
+                if (!isAdded) return@getMangaById
+                tvMangaName.text = manga?.name ?: ""
+            },
+            onError = { }
+        )
+
+        // Load danh sách chapter
+        MangaRepository.getChaptersByMangaId(
+            firestoreId = firestoreStoryId,
+            onSuccess = { chapters ->
+                if (!isAdded) return@getChaptersByMangaId
+                chapterList = chapters
+                setupSpinner()
+                loadChapter(chapterNumber)
+            },
+            onError = {
+                if (!isAdded) return@getChaptersByMangaId
+                Toast.makeText(requireContext(), "Không tải được danh sách chương", Toast.LENGTH_SHORT).show()
+                loadChapter(chapterNumber)
+            }
+        )
+    }
+
+    // ─── OBSERVERS ───────────────────────────────────────────────────────────
+
     private fun setupObservers() {
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
+            if (!isAdded) return@observe
             if (pages.isNotEmpty()) {
-                // Firestore trả về ảnh → hiện RecyclerView
                 rvPages.visibility   = View.VISIBLE
                 tvContent.visibility = View.GONE
                 rvPages.layoutManager = LinearLayoutManager(requireContext())
@@ -102,14 +137,11 @@ class ReadFragment : Fragment() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         val lm = rvPages.layoutManager as LinearLayoutManager
                         val lastVisible = lm.findLastVisibleItemPosition()
-                        if (lastVisible >= pages.size - 2) {
-                            prefetchNextChapter()
-                        }
+                        if (lastVisible >= pages.size - 2) prefetchNextChapter()
                     }
                 })
             } else {
-                // Firestore trả rỗng → fallback fake data
-                loadFallbackChapter(chapterNumber)
+                showNoContent()
             }
         }
 
@@ -119,106 +151,106 @@ class ReadFragment : Fragment() {
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(requireContext(), "Không tải được từ cloud, dùng dữ liệu local", Toast.LENGTH_SHORT).show()
-                loadFallbackChapter(chapterNumber)
+                if (!isAdded) return@let
+                Toast.makeText(requireContext(), "Không tải được ảnh từ cloud", Toast.LENGTH_SHORT).show()
+                showNoContent()
             }
         }
     }
 
-    private fun loadFallbackChapter(chapNum: Int) {
-        val chapter = MangaRepository.getChapter(mangaId, chapNum) ?: return
-        if (chapter.imageUrls.isNotEmpty()) {
-            rvPages.visibility   = View.VISIBLE
-            tvContent.visibility = View.GONE
-            rvPages.layoutManager = LinearLayoutManager(requireContext())
-            rvPages.adapter = PageAdapter(chapter.imageUrls)
-        } else if (chapter.content.isNotEmpty()) {
-            rvPages.visibility   = View.GONE
-            tvContent.visibility = View.VISIBLE
-            tvContent.text = chapter.content
-        } else {
-            rvPages.visibility   = View.GONE
-            tvContent.visibility = View.VISIBLE
-            tvContent.text = "Chương này chưa có nội dung."
-        }
+    private fun showNoContent() {
+        rvPages.visibility   = View.GONE
+        tvContent.visibility = View.VISIBLE
+        tvContent.text       = "Chương này chưa có nội dung."
     }
 
-    private fun prefetchNextChapter() {
-        if (firestoreStoryId.isEmpty()) return
-        val chapters = MangaRepository.getChaptersByMangaId(mangaId)
-        val nextChap = chapters.filter { it.chapterNumber > chapterNumber }
-            .minByOrNull { it.chapterNumber }
-        nextChap?.let {
-            MangaRepository.getChapterPagesFromFirestore(
-                storyId = firestoreStoryId,
-                chapterId = "chapter_${it.chapterNumber}",
-                onSuccess = {},
-                onError = {}
-            )
-        }
-    }
+    // ─── SPINNER ─────────────────────────────────────────────────────────────
 
     private fun setupSpinner() {
-        val chapters = MangaRepository.getChaptersByMangaId(mangaId)
-        val chapterLabels = chapters.map { "Chương ${it.chapterNumber}: ${it.title}" }
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, chapterLabels)
+        if (!isAdded) return
+        val labels = chapterList.map { "Chương ${it.chapterNumber}: ${it.title}" }
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, labels)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerChapter.adapter = adapter
 
-        val currentIndex = chapters.indexOfFirst { it.chapterNumber == chapterNumber }
-        if (currentIndex >= 0) spinnerChapter.setSelection(currentIndex)
+        val idx = chapterList.indexOfFirst { it.chapterNumber == chapterNumber }
+        if (idx >= 0) spinnerChapter.setSelection(idx)
 
         spinnerChapter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selected = chapters[position].chapterNumber
+                val selected = chapterList[position].chapterNumber
                 if (selected != chapterNumber) loadChapter(selected)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
 
+    // ─── LOAD CHAPTER ────────────────────────────────────────────────────────
+
     private fun loadChapter(chapNum: Int) {
         chapterNumber = chapNum
-        val manga    = MangaRepository.getMangaById(mangaId) ?: return
-        val chapter  = MangaRepository.getChapter(mangaId, chapNum) ?: return
-        val chapters = MangaRepository.getChaptersByMangaId(mangaId)
 
-        tvMangaName.text    = manga.name
-        tvChapterInfo.text  = "Chương $chapNum / ${chapters.size}"
-        tvChapterTitle.text = "Chương $chapNum: ${chapter.title}"
+        // Cập nhật UI header
+        val total = chapterList.size
+        tvChapterInfo.text = "Chương $chapNum${if (total > 0) " / $total" else ""}"
 
-        // Ưu tiên firestoreStoryId truyền vào, nếu rỗng thì dùng firestoreId từ Manga
-        val effectiveStoryId = firestoreStoryId.ifEmpty { manga.firestoreId }
+        val chapTitle = chapterList.find { it.chapterNumber == chapNum }?.title ?: ""
+        tvChapterTitle.text = "Chương $chapNum${if (chapTitle.isNotEmpty()) ": $chapTitle" else ""}"
 
-        if (effectiveStoryId.isNotEmpty()) {
-            viewModel.loadChapterFromFirestore(effectiveStoryId, "chapter_$chapNum")
-        } else {
-            loadFallbackChapter(chapNum)
+        // Cập nhật nút prev/next
+        updateNavButtons()
+
+        // Cập nhật spinner
+        val idx = chapterList.indexOfFirst { it.chapterNumber == chapNum }
+        if (idx >= 0 && spinnerChapter.selectedItemPosition != idx) {
+            spinnerChapter.setSelection(idx)
         }
 
-        val prevChap = chapters.filter { it.chapterNumber < chapNum }.maxByOrNull { it.chapterNumber }
-        val nextChap = chapters.filter { it.chapterNumber > chapNum }.minByOrNull { it.chapterNumber }
+        // Load pages từ Firestore
+        if (firestoreStoryId.isNotEmpty()) {
+            viewModel.loadChapterFromFirestore(firestoreStoryId, "chapter_$chapNum")
+        } else {
+            showNoContent()
+        }
+    }
+
+    private fun updateNavButtons() {
+        val prevChap = chapterList.filter { it.chapterNumber < chapterNumber }.maxByOrNull { it.chapterNumber }
+        val nextChap = chapterList.filter { it.chapterNumber > chapterNumber }.minByOrNull { it.chapterNumber }
         btnPrev.isEnabled = prevChap != null
         btnPrev.alpha     = if (prevChap != null) 1f else 0.4f
         btnNext.isEnabled = nextChap != null
         btnNext.alpha     = if (nextChap != null) 1f else 0.4f
-
-        val index = chapters.indexOfFirst { it.chapterNumber == chapNum }
-        if (index >= 0) spinnerChapter.setSelection(index)
     }
 
-    private fun setupClickListeners() {
-        val chapters = MangaRepository.getChaptersByMangaId(mangaId)
+    // ─── PREFETCH ────────────────────────────────────────────────────────────
 
+    private fun prefetchNextChapter() {
+        if (firestoreStoryId.isEmpty()) return
+        val nextChap = chapterList
+            .filter { it.chapterNumber > chapterNumber }
+            .minByOrNull { it.chapterNumber } ?: return
+
+        MangaRepository.getChapterPagesFromFirestore(
+            storyId   = firestoreStoryId,
+            chapterId = "chapter_${nextChap.chapterNumber}",
+            onSuccess = {},
+            onError   = {}
+        )
+    }
+
+    // ─── CLICK LISTENERS ─────────────────────────────────────────────────────
+
+    private fun setupClickListeners() {
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
         btnPrev.setOnClickListener {
-            chapters.filter { it.chapterNumber < chapterNumber }
+            chapterList.filter { it.chapterNumber < chapterNumber }
                 .maxByOrNull { it.chapterNumber }?.let { loadChapter(it.chapterNumber) }
         }
 
         btnNext.setOnClickListener {
-            chapters.filter { it.chapterNumber > chapterNumber }
+            chapterList.filter { it.chapterNumber > chapterNumber }
                 .minByOrNull { it.chapterNumber }?.let { loadChapter(it.chapterNumber) }
         }
 
