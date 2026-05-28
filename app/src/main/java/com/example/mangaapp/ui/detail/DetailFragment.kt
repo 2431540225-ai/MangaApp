@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mangaapp.MainActivity
 import com.example.mangaapp.R
 import com.example.mangaapp.models.Chapter
+import com.example.mangaapp.models.Comment
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.repository.MangaRepository
@@ -42,10 +44,16 @@ class DetailFragment : Fragment() {
     private lateinit var tvSortChapter: TextView
     private lateinit var progressLoading: ProgressBar
 
+    // ── Comment views ──
+    private lateinit var etComment: EditText
+    private lateinit var btnSendComment: Button
+    private lateinit var rvComments: RecyclerView
+    private lateinit var tvCommentCount: TextView
+    private lateinit var commentAdapter: CommentAdapter
+
     private lateinit var chapterAdapter: ChapterAdapter
 
     companion object {
-        // Dùng firestoreId (String) thay vì Int
         fun newInstance(firestoreId: String): DetailFragment {
             val fragment = DetailFragment()
             val args = Bundle()
@@ -74,6 +82,16 @@ class DetailFragment : Fragment() {
         loadMangaDetail()
     }
 
+    override fun onResume() {
+        super.onResume()
+        (activity as? MainActivity)?.hideBottomNav()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.showBottomNav()
+    }
+
     private fun initViews(view: View) {
         ivBackdrop      = view.findViewById(R.id.iv_backdrop)
         ivCover         = view.findViewById(R.id.iv_cover)
@@ -90,27 +108,32 @@ class DetailFragment : Fragment() {
         tvReadMore      = view.findViewById(R.id.tv_read_more)
         rvChapters      = view.findViewById(R.id.rv_chapters)
         tvSortChapter   = view.findViewById(R.id.tv_sort_chapter)
-        // Nếu layout có ProgressBar thì dùng, không thì bỏ qua
-        progressLoading = view.findViewById(R.id.progress_loading) ?: return
+        progressLoading = view.findViewById(R.id.progress_loading)
+
+        // Comment views
+        etComment       = view.findViewById(R.id.et_comment)
+        btnSendComment  = view.findViewById(R.id.btn_send_comment)
+        rvComments      = view.findViewById(R.id.rv_comments)
+        tvCommentCount  = view.findViewById(R.id.tv_comment_count)
 
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
     private fun loadMangaDetail() {
         if (firestoreId.isEmpty()) return
-        if (::progressLoading.isInitialized) progressLoading.visibility = View.VISIBLE
+        progressLoading.visibility = View.VISIBLE
 
         MangaRepository.getMangaById(
             firestoreId = firestoreId,
             onSuccess = { manga ->
                 if (!isAdded || manga == null) return@getMangaById
-                if (::progressLoading.isInitialized) progressLoading.visibility = View.GONE
+                progressLoading.visibility = View.GONE
                 bindMangaInfo(manga)
                 loadChapters(manga)
             },
             onError = {
                 if (!isAdded) return@getMangaById
-                if (::progressLoading.isInitialized) progressLoading.visibility = View.GONE
+                progressLoading.visibility = View.GONE
                 Toast.makeText(requireContext(), "Không tải được thông tin truyện", Toast.LENGTH_SHORT).show()
             }
         )
@@ -153,7 +176,6 @@ class DetailFragment : Fragment() {
                 chapterList = chapters
                 tvChapterCount.text = chapters.size.toString()
 
-                // Nút đọc
                 btnReadFirst.setOnClickListener {
                     chapters.firstOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
                 }
@@ -161,7 +183,6 @@ class DetailFragment : Fragment() {
                     chapters.lastOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
                 }
 
-                // Danh sách chương
                 chapterAdapter = ChapterAdapter(chapters) { chapter ->
                     navigateToRead(manga, chapter.chapterNumber)
                 }
@@ -169,7 +190,6 @@ class DetailFragment : Fragment() {
                 rvChapters.isNestedScrollingEnabled = false
                 rvChapters.adapter = chapterAdapter
 
-                // Sắp xếp
                 tvSortChapter.setOnClickListener {
                     isChapterReversed = !isChapterReversed
                     val sorted = if (isChapterReversed) chapters.sortedBy { it.chapterNumber }
@@ -177,12 +197,47 @@ class DetailFragment : Fragment() {
                     tvSortChapter.text = if (isChapterReversed) "Cũ nhất ↑" else "Mới nhất ↓"
                     chapterAdapter.updateList(sorted)
                 }
+
+                // Load comments sau khi có firestoreId sẵn sàng
+                setupComments()
             },
             onError = {
                 if (!isAdded) return@getChaptersByMangaId
                 Toast.makeText(requireContext(), "Không tải được danh sách chương", Toast.LENGTH_SHORT).show()
             }
         )
+    }
+
+    private fun setupComments() {
+        MangaRepository.initComments(requireContext())
+        val commentList = MangaRepository.getCommentsByFirestoreId(firestoreId).toMutableList()
+        tvCommentCount.text = "${commentList.size} bình luận"
+
+        commentAdapter = CommentAdapter(commentList)
+        rvComments.layoutManager = LinearLayoutManager(requireContext())
+        rvComments.isNestedScrollingEnabled = false
+        rvComments.adapter = commentAdapter
+
+        btnSendComment.setOnClickListener {
+            val content = etComment.text.toString().trim()
+            if (content.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập bình luận", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val newComment = Comment(
+                id          = System.currentTimeMillis().toString(),
+                firestoreId = firestoreId,
+                userId      = "me",
+                userName    = "Bạn",
+                content     = content,
+                timestamp   = System.currentTimeMillis()
+            )
+            MangaRepository.addComment(requireContext(), newComment)
+            commentAdapter.addComment(newComment)
+            etComment.setText("")
+            tvCommentCount.text = "${commentAdapter.itemCount} bình luận"
+            Toast.makeText(requireContext(), "Đã gửi bình luận!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupGenreTags(manga: Manga) {

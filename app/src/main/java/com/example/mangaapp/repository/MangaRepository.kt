@@ -1,9 +1,12 @@
 package com.example.mangaapp.repository
 
+import android.content.Context
 import com.example.mangaapp.models.Chapter
+import com.example.mangaapp.models.Comment
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaCategory
 import com.example.mangaapp.models.MangaStatus
+import com.example.mangaapp.utils.CommentStorage
 import com.google.firebase.firestore.FirebaseFirestore
 
 object MangaRepository {
@@ -196,6 +199,48 @@ object MangaRepository {
                 onSuccess(pages)
             }
             .addOnFailureListener { onError(it) }
+    }
+
+    // ─── COMMENTS ────────────────────────────────────────────────────────────
+
+    private var comments: MutableList<Comment> = mutableListOf()
+    private var isCommentsLoaded = false
+
+    private fun defaultComments() = mutableListOf(
+        Comment(
+            id          = "1",
+            firestoreId = "sample",
+            userId      = "user1",
+            userName    = "Naruto_Fan",
+            content     = "Truyện hay quá!"
+        ),
+        Comment(
+            id          = "2",
+            firestoreId = "sample",
+            userId      = "user2",
+            userName    = "MangaLover",
+            content     = "Tác giả vẽ đẹp vãi!"
+        )
+    )
+
+    fun initComments(context: Context) {
+        if (isCommentsLoaded) return
+        val saved = CommentStorage.loadComments(context)
+        comments = if (saved.isEmpty()) defaultComments() else saved
+        isCommentsLoaded = true
+    }
+
+    fun getCommentsByFirestoreId(firestoreId: String): List<Comment> {
+        return comments.filter { it.firestoreId == firestoreId && it.chapterId == null }
+    }
+
+    fun getCommentsByChapter(firestoreId: String, chapterId: Int): List<Comment> {
+        return comments.filter { it.firestoreId == firestoreId && it.chapterId == chapterId }
+    }
+
+    fun addComment(context: Context, comment: Comment) {
+        comments.add(comment)
+        CommentStorage.saveComments(context, comments)
     }
 
     // ─── HELPER ──────────────────────────────────────────────────────────────

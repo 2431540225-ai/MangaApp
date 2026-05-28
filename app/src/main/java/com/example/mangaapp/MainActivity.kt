@@ -57,4 +57,12 @@ class MainActivity : AppCompatActivity() {
     fun navigateTo(navItemId: Int) {
         bottomNav.selectedItemId = navItemId
     }
+
+    fun hideBottomNav() {
+        bottomNav.visibility = android.view.View.GONE
+    }
+
+    fun showBottomNav() {
+        bottomNav.visibility = android.view.View.VISIBLE
+    }
 }

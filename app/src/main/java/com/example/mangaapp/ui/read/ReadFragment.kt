@@ -35,6 +35,11 @@ class ReadFragment : Fragment() {
     private lateinit var spinnerChapter: Spinner
     private lateinit var btnFontSize: ImageButton
     private lateinit var progressLoading: ProgressBar
+    private lateinit var etChapterComment: EditText
+    private lateinit var btnSendChapterComment: Button
+    private lateinit var rvChapterComments: RecyclerView
+    private lateinit var tvChapterCommentCount: TextView
+    private lateinit var chapterCommentAdapter: com.example.mangaapp.ui.detail.CommentAdapter
 
     companion object {
         fun newInstance(mangaId: Int, chapterNumber: Int): ReadFragment {
@@ -67,6 +72,16 @@ class ReadFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_read, container, false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        (activity as? com.example.mangaapp.MainActivity)?.hideBottomNav()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? com.example.mangaapp.MainActivity)?.showBottomNav()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[ReaderViewModel::class.java]
@@ -87,6 +102,10 @@ class ReadFragment : Fragment() {
         btnNext         = view.findViewById(R.id.btn_next_chapter)
         spinnerChapter  = view.findViewById(R.id.spinner_chapter)
         btnFontSize     = view.findViewById(R.id.btn_font_size)
+        etChapterComment      = view.findViewById(R.id.et_chapter_comment)
+        btnSendChapterComment = view.findViewById(R.id.btn_send_chapter_comment)
+        rvChapterComments     = view.findViewById(R.id.rv_chapter_comments)
+        tvChapterCommentCount = view.findViewById(R.id.tv_chapter_comment_count)
         progressLoading = view.findViewById(R.id.progress_loading)
     }
 
@@ -206,6 +225,8 @@ class ReadFragment : Fragment() {
             spinnerChapter.setSelection(idx)
         }
 
+        setupChapterComments(chapNum)
+
         // Load pages từ Firestore
         if (firestoreStoryId.isNotEmpty()) {
             viewModel.loadChapterFromFirestore(firestoreStoryId, "chapter_$chapNum")
@@ -257,6 +278,39 @@ class ReadFragment : Fragment() {
         btnFontSize.setOnClickListener {
             fontSize = if (fontSize >= 22) 14 else fontSize + 2
             tvContent.textSize = fontSize.toFloat()
+        }
+    }
+
+    private fun setupChapterComments(chapNum: Int) {
+        MangaRepository.initComments(requireContext())
+        val commentList = MangaRepository.getCommentsByChapter(firestoreStoryId, chapNum).toMutableList()
+        tvChapterCommentCount.text = "${commentList.size} bình luận"
+
+        chapterCommentAdapter = com.example.mangaapp.ui.detail.CommentAdapter(commentList)
+        rvChapterComments.layoutManager = LinearLayoutManager(requireContext())
+        rvChapterComments.isNestedScrollingEnabled = false
+        rvChapterComments.adapter = chapterCommentAdapter
+
+        btnSendChapterComment.setOnClickListener {
+            val content = etChapterComment.text.toString().trim()
+            if (content.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập bình luận", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val newComment = com.example.mangaapp.models.Comment(
+                id          = System.currentTimeMillis().toString(),
+                firestoreId = firestoreStoryId,  // dùng firestoreStoryId: String
+                chapterId   = chapNum,
+                userId      = "me",
+                userName    = "Bạn",
+                content     = content,
+                timestamp   = System.currentTimeMillis()
+            )
+            MangaRepository.addComment(requireContext(), newComment)
+            chapterCommentAdapter.addComment(newComment)
+            etChapterComment.setText("")
+            tvChapterCommentCount.text = "${chapterCommentAdapter.itemCount} bình luận"
+            Toast.makeText(requireContext(), "Đã gửi bình luận!", Toast.LENGTH_SHORT).show()
         }
     }
 }

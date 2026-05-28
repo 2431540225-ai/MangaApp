@@ -11,6 +11,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- ===== PROGRESS LOADING (FIX: thêm view này) ===== -->
+        <ProgressBar
+            android:id="@+id/progress_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:visibility="gone" />
+
         <!-- ===== HEADER ẢNH BÌA ===== -->
         <FrameLayout
             android:layout_width="match_parent"
@@ -317,6 +327,87 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:paddingBottom="16dp" />
+
+        </LinearLayout>
+
+        <!-- ===== BÌNH LUẬN ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/light_surface"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="💬 Bình luận"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/light_text_primary"/>
+
+                <TextView
+                    android:id="@+id/tv_comment_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="@color/light_text_secondary"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="12dp"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/et_comment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Viết bình luận..."
+                    android:textColorHint="@color/light_text_secondary"
+                    android:textColor="@color/light_text_primary"
+                    android:textSize="14sp"
+                    android:padding="10dp"
+                    android:maxLines="3"
+                    android:background="@color/light_background"/>
+
+                <Button
+                    android:id="@+id/btn_send_comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gửi"
+                    android:textColor="@color/white"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="@color/primary"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_divider"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingTop="4dp"
+                android:paddingBottom="16dp"/>
 
         </LinearLayout>
 

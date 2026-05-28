@@ -52,4 +52,5 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
     implementation("com.google.firebase:firebase-analytics-ktx:22.4.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 }
