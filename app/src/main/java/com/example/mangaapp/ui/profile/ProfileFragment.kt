@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.mangaapp.R
+import com.example.mangaapp.ui.auth.LoginFragment
+import com.example.mangaapp.ui.auth.RegisterFragment
 import com.google.android.material.snackbar.Snackbar
 
 class ProfileFragment : Fragment() {
@@ -28,9 +30,28 @@ class ProfileFragment : Fragment() {
 
     private fun setupClickListeners() {
 
+        // ✅ FIX: Nút Đăng nhập → mở LoginFragment
+        rootView.findViewById<View>(R.id.btn_login)?.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, LoginFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        // ✅ FIX: Nút Đăng ký → mở RegisterFragment
+        rootView.findViewById<View>(R.id.btn_register)?.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, RegisterFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
         // Click phần avatar - Đăng nhập
         rootView.findViewById<View>(R.id.img_avatar)?.setOnClickListener {
-            showMessage("Mở màn hình Đăng nhập / Đăng ký")
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, LoginFragment())
+                .addToBackStack(null)
+                .commit()
         }
 
         // Các item trong Liên Hệ
