@@ -109,7 +109,7 @@ class ReadFragment : Fragment() {
         progressLoading = view.findViewById(R.id.progress_loading)
     }
 
-    // ─── LOAD CHAPTER LIST ────────────────────────────────────────────────────
+    // LOAD CHAPTER LIST
 
     private fun loadChapterList() {
         if (firestoreStoryId.isEmpty()) return
@@ -141,7 +141,7 @@ class ReadFragment : Fragment() {
         )
     }
 
-    // ─── OBSERVERS ───────────────────────────────────────────────────────────
+    // OBSERVERS
 
     private fun setupObservers() {
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
@@ -183,7 +183,7 @@ class ReadFragment : Fragment() {
         tvContent.text       = "Chương này chưa có nội dung."
     }
 
-    // ─── SPINNER ─────────────────────────────────────────────────────────────
+    // SPINNER
 
     private fun setupSpinner() {
         if (!isAdded) return
@@ -204,7 +204,7 @@ class ReadFragment : Fragment() {
         }
     }
 
-    // ─── LOAD CHAPTER ────────────────────────────────────────────────────────
+    // LOAD CHAPTER
 
     private fun loadChapter(chapNum: Int) {
         chapterNumber = chapNum

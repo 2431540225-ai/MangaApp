@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -45,7 +44,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ─── THÔNG TIN TRUYỆN ───────────────────────────────── -->
+            <!-- ─── THÔNG TIN TRUYỆN ─────────────────────────────── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -82,20 +81,58 @@
                 android:layout_marginBottom="10dp" />
 
             <EditText
-                android:id="@+id/et_upload_cover_url"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="URL ảnh bìa (https://...) *"
-                android:inputType="textUri"
-                android:layout_marginBottom="10dp" />
-
-            <EditText
                 android:id="@+id/et_upload_genres"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Thể loại (cách nhau bằng dấu phẩy, vd: Hành Động, Tình Cảm)"
                 android:inputType="text"
-                android:layout_marginBottom="10dp" />
+                android:layout_marginBottom="12dp" />
+
+            <!-- Ảnh bìa -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🖼️ Ảnh bìa *"
+                android:textSize="14sp"
+                android:textColor="#444"
+                android:layout_marginBottom="6dp" />
+
+            <!-- Preview ảnh bìa -->
+            <ImageView
+                android:id="@+id/iv_cover_preview"
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp"
+                android:background="#EEEEEE" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="14dp">
+
+                <Button
+                    android:id="@+id/btn_pick_cover"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chọn ảnh bìa"
+                    android:textSize="13sp"
+                    android:backgroundTint="#1A1A2E"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/tv_cover_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Chưa chọn ảnh"
+                    android:textSize="12sp"
+                    android:textColor="#888"
+                    android:layout_marginStart="10dp" />
+            </LinearLayout>
 
             <!-- Loại truyện -->
             <TextView
@@ -203,9 +240,9 @@
                     android:layout_marginStart="4dp" />
             </LinearLayout>
 
-            <!-- Nội dung truyện tranh: danh sách URL ảnh -->
+            <!-- Ảnh trang (truyện tranh) -->
             <LinearLayout
-                android:id="@+id/layout_page_urls"
+                android:id="@+id/layout_page_picker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -214,20 +251,37 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="URL các trang ảnh * (mỗi dòng 1 URL):"
+                    android:text="🖼️ Ảnh các trang * (chọn nhiều cùng lúc)"
                     android:textSize="13sp"
                     android:textColor="#444"
-                    android:layout_marginBottom="4dp" />
+                    android:layout_marginBottom="6dp" />
 
-                <EditText
-                    android:id="@+id/et_page_urls"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="https://example.com/page1.jpg&#10;https://example.com/page2.jpg"
-                    android:inputType="textMultiLine"
-                    android:minLines="4"
-                    android:gravity="top"
-                    android:layout_marginBottom="10dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <Button
+                        android:id="@+id/btn_pick_pages"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chọn ảnh trang"
+                        android:textSize="13sp"
+                        android:backgroundTint="#1A1A2E"
+                        android:textColor="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_pages_status"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Chưa chọn ảnh"
+                        android:textSize="12sp"
+                        android:textColor="#888"
+                        android:layout_marginStart="10dp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Nội dung tiểu thuyết -->
@@ -273,6 +327,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_progress_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="#888"
+                android:gravity="center"
                 android:visibility="gone"
                 android:layout_marginBottom="8dp" />
 

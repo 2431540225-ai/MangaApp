@@ -16,7 +16,7 @@ object MangaRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // ─── MANGA ───────────────────────────────────────────────────────────────
+    // MANGA
 
     fun getAllManga(onSuccess: (List<Manga>) -> Unit, onError: (Exception) -> Unit) {
         db.collection("stories")
@@ -236,6 +236,9 @@ object MangaRepository {
             return
         }
 
+        // Tạo slug từ tên truyện: chữ thường, bỏ dấu, thay khoảng trắng bằng "-"
+        val slug = generateSlug(title)
+
         val data = hashMapOf(
             "title"         to title,
             "author"        to author,
@@ -250,10 +253,47 @@ object MangaRepository {
             "createdAt"     to System.currentTimeMillis().toString()
         )
 
-        db.collection("stories")
-            .add(data)
-            .addOnSuccessListener { ref -> onSuccess(ref.id) }
+        // Kiểm tra slug đã tồn tại chưa, nếu có thì thêm timestamp vào cuối
+        val docRef = db.collection("stories").document(slug)
+        docRef.get()
+            .addOnSuccessListener { snapshot ->
+                val finalSlug = if (snapshot.exists()) "$slug-${System.currentTimeMillis() % 10000}" else slug
+                db.collection("stories").document(finalSlug)
+                    .set(data)
+                    .addOnSuccessListener { onSuccess(finalSlug) }
+                    .addOnFailureListener { onError(it) }
+            }
             .addOnFailureListener { onError(it) }
+    }
+
+    /**
+     * Tạo slug URL-friendly từ tên truyện.
+     * Ví dụ: "Thám Tử Lừng Danh Conan" → "tham-tu-lung-danh-conan"
+     */
+    private fun generateSlug(title: String): String {
+        val vietnameseMap = mapOf(
+            'à' to 'a', 'á' to 'a', 'ả' to 'a', 'ã' to 'a', 'ạ' to 'a',
+            'ă' to 'a', 'ắ' to 'a', 'ặ' to 'a', 'ằ' to 'a', 'ẳ' to 'a', 'ẵ' to 'a',
+            'â' to 'a', 'ấ' to 'a', 'ầ' to 'a', 'ẩ' to 'a', 'ẫ' to 'a', 'ậ' to 'a',
+            'è' to 'e', 'é' to 'e', 'ẻ' to 'e', 'ẽ' to 'e', 'ẹ' to 'e',
+            'ê' to 'e', 'ế' to 'e', 'ề' to 'e', 'ể' to 'e', 'ễ' to 'e', 'ệ' to 'e',
+            'ì' to 'i', 'í' to 'i', 'ỉ' to 'i', 'ĩ' to 'i', 'ị' to 'i',
+            'ò' to 'o', 'ó' to 'o', 'ỏ' to 'o', 'õ' to 'o', 'ọ' to 'o',
+            'ô' to 'o', 'ố' to 'o', 'ồ' to 'o', 'ổ' to 'o', 'ỗ' to 'o', 'ộ' to 'o',
+            'ơ' to 'o', 'ớ' to 'o', 'ờ' to 'o', 'ở' to 'o', 'ỡ' to 'o', 'ợ' to 'o',
+            'ù' to 'u', 'ú' to 'u', 'ủ' to 'u', 'ũ' to 'u', 'ụ' to 'u',
+            'ư' to 'u', 'ứ' to 'u', 'ừ' to 'u', 'ử' to 'u', 'ữ' to 'u', 'ự' to 'u',
+            'ỳ' to 'y', 'ý' to 'y', 'ỷ' to 'y', 'ỹ' to 'y', 'ỵ' to 'y',
+            'đ' to 'd'
+        )
+        return title.lowercase()
+            .map { vietnameseMap[it] ?: it }
+            .joinToString("")
+            .replace(Regex("[^a-z0-9\\s-]"), "")
+            .replace(Regex("\\s+"), "-")
+            .replace(Regex("-+"), "-")
+            .trim('-')
+            .take(80) // Giới hạn độ dài slug
     }
 
     /**

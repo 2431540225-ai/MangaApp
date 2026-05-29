@@ -52,6 +52,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
     implementation("com.google.firebase:firebase-analytics-ktx:22.4.0")
     implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
 
     implementation("com.google.code.gson:gson:2.10.1")
 }
