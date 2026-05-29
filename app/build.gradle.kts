@@ -48,9 +48,10 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.fragment:fragment-ktx:1.8.1")
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    // Firebase — khai báo version thẳng, không dùng BOM
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
     implementation("com.google.firebase:firebase-analytics-ktx:22.4.0")
+    implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
+
     implementation("com.google.code.gson:gson:2.10.1")
 }

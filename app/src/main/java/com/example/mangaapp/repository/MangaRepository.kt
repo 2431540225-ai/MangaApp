@@ -7,6 +7,7 @@ import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaCategory
 import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.utils.CommentStorage
+import com.example.mangaapp.utils.UserSession
 import com.google.firebase.firestore.FirebaseFirestore
 
 object MangaRepository {
@@ -124,6 +125,10 @@ object MangaRepository {
 
     // ─── CHAPTERS ────────────────────────────────────────────────────────────
 
+    /**
+     * Lấy danh sách chapter kèm thông tin lock (isFree, coinPrice).
+     * Dùng cho DetailFragment để hiển thị icon khóa.
+     */
     fun getChaptersByMangaId(
         firestoreId: String,
         onSuccess: (List<Chapter>) -> Unit,
@@ -141,8 +146,13 @@ object MangaRepository {
                         id            = (data["chapterNumber"] as? Long)?.toInt() ?: 0,
                         mangaId       = 0,
                         chapterNumber = (data["chapterNumber"] as? Long)?.toInt() ?: 0,
-                        title         = data["title"] as? String ?: "",
-                        publishedAt   = data["createdAt"] as? String ?: ""
+                        title         = data["title"]     as? String ?: "",
+                        publishedAt   = data["createdAt"] as? String ?: "",
+                        // Coin lock fields
+                        isFree        = data["isFree"]    as? Boolean ?: true,
+                        coinPrice     = (data["coinPrice"] as? Long)?.toInt() ?: 0,
+                        authorId      = data["authorId"]  as? String ?: "",
+                        firestoreDocId = doc.id
                     )
                 }
                 onSuccess(chapters)
@@ -163,15 +173,19 @@ object MangaRepository {
             .limit(1)
             .get()
             .addOnSuccessListener { result ->
-                val doc = result.documents.firstOrNull()
+                val doc  = result.documents.firstOrNull()
                 val data = doc?.data
                 val chapter = data?.let {
                     Chapter(
                         id            = chapterNumber,
                         mangaId       = 0,
                         chapterNumber = chapterNumber,
-                        title         = it["title"] as? String ?: "",
-                        publishedAt   = it["createdAt"] as? String ?: ""
+                        title         = it["title"]     as? String  ?: "",
+                        publishedAt   = it["createdAt"] as? String  ?: "",
+                        isFree        = it["isFree"]    as? Boolean ?: true,
+                        coinPrice     = (it["coinPrice"] as? Long)?.toInt() ?: 0,
+                        authorId      = it["authorId"]  as? String  ?: "",
+                        firestoreDocId = doc.id
                     )
                 }
                 onSuccess(chapter)
@@ -201,26 +215,124 @@ object MangaRepository {
             .addOnFailureListener { onError(it) }
     }
 
+    // ─── UPLOAD MANGA (dành cho tác giả) ─────────────────────────────────────
+
+    /**
+     * Tác giả đăng truyện mới lên Firestore.
+     * @return firestoreId của truyện vừa tạo qua onSuccess callback
+     */
+    fun uploadManga(
+        title: String,
+        author: String,
+        description: String,
+        coverUrl: String,
+        genres: List<String>,
+        category: MangaCategory,
+        onSuccess: (firestoreId: String) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val authorId = UserSession.firebaseUid ?: run {
+            onError(Exception("Bạn cần đăng nhập để đăng truyện"))
+            return
+        }
+
+        val data = hashMapOf(
+            "title"         to title,
+            "author"        to author,
+            "description"   to description,
+            "coverUrl"      to coverUrl,
+            "genres"        to genres,
+            "category"      to if (category == MangaCategory.TRUYEN_TRANH) "truyen_tranh" else "tieu_thuyet",
+            "status"        to "ongoing",
+            "totalChapters" to 0,
+            "totalViews"    to 0,
+            "authorId"      to authorId,
+            "createdAt"     to System.currentTimeMillis().toString()
+        )
+
+        db.collection("stories")
+            .add(data)
+            .addOnSuccessListener { ref -> onSuccess(ref.id) }
+            .addOnFailureListener { onError(it) }
+    }
+
+    /**
+     * Tác giả đăng chapter mới cho một truyện đã có.
+     *
+     * @param isFree     true = miễn phí, false = cần coin
+     * @param coinPrice  Số coin cần để mở (chỉ dùng khi isFree = false)
+     */
+    fun uploadChapter(
+        storyFirestoreId: String,
+        chapterNumber: Int,
+        title: String,
+        contentText: String,      // nếu là tiểu thuyết
+        pageUrls: List<String>,   // nếu là truyện tranh
+        isFree: Boolean,
+        coinPrice: Int,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val authorId = UserSession.firebaseUid ?: run {
+            onError(Exception("Bạn cần đăng nhập để đăng chapter"))
+            return
+        }
+
+        val chapterData = hashMapOf(
+            "chapterNumber" to chapterNumber,
+            "title"         to title,
+            "isFree"        to isFree,
+            "coinPrice"     to if (isFree) 0 else coinPrice,
+            "authorId"      to authorId,
+            "createdAt"     to System.currentTimeMillis().toString()
+        )
+
+        val storyRef = db.collection("stories").document(storyFirestoreId)
+        val chapterId = "chapter_$chapterNumber"
+
+        storyRef.collection("chapters").document(chapterId)
+            .set(chapterData)
+            .addOnSuccessListener {
+                // Nếu là tiểu thuyết → lưu content vào field
+                if (contentText.isNotEmpty()) {
+                    storyRef.collection("chapters").document(chapterId)
+                        .update("content", contentText)
+                }
+                // Nếu là truyện tranh → lưu pages vào sub-collection
+                if (pageUrls.isNotEmpty()) {
+                    val batch = db.batch()
+                    pageUrls.forEachIndexed { index, url ->
+                        val pageRef = storyRef.collection("chapters")
+                            .document(chapterId)
+                            .collection("pages")
+                            .document("page_${index + 1}")
+                        batch.set(pageRef, mapOf("pageNumber" to index + 1, "url" to url))
+                    }
+                    batch.commit()
+                        .addOnSuccessListener {
+                            // Cập nhật totalChapters
+                            storyRef.update("totalChapters",
+                                com.google.firebase.firestore.FieldValue.increment(1))
+                            onSuccess()
+                        }
+                        .addOnFailureListener { onError(it) }
+                } else {
+                    storyRef.update("totalChapters",
+                        com.google.firebase.firestore.FieldValue.increment(1))
+                    onSuccess()
+                }
+            }
+            .addOnFailureListener { onError(it) }
+    }
+
     // ─── COMMENTS ────────────────────────────────────────────────────────────
 
     private var comments: MutableList<Comment> = mutableListOf()
     private var isCommentsLoaded = false
 
     private fun defaultComments() = mutableListOf(
-        Comment(
-            id          = "1",
-            firestoreId = "sample",
-            userId      = "user1",
-            userName    = "Naruto_Fan",
-            content     = "Truyện hay quá!"
-        ),
-        Comment(
-            id          = "2",
-            firestoreId = "sample",
-            userId      = "user2",
-            userName    = "MangaLover",
-            content     = "Tác giả vẽ đẹp vãi!"
-        )
+        Comment(id = "1", firestoreId = "sample", userId = "user1", userName = "Naruto_Fan", content = "Truyện hay quá!"),
+        Comment(id = "2", firestoreId = "sample", userId = "user2", userName = "MangaLover", content = "Tác giả vẽ đẹp vãi!")
     )
 
     fun initComments(context: Context) {
@@ -230,13 +342,11 @@ object MangaRepository {
         isCommentsLoaded = true
     }
 
-    fun getCommentsByFirestoreId(firestoreId: String): List<Comment> {
-        return comments.filter { it.firestoreId == firestoreId && it.chapterId == null }
-    }
+    fun getCommentsByFirestoreId(firestoreId: String): List<Comment> =
+        comments.filter { it.firestoreId == firestoreId && it.chapterId == null }
 
-    fun getCommentsByChapter(firestoreId: String, chapterId: Int): List<Comment> {
-        return comments.filter { it.firestoreId == firestoreId && it.chapterId == chapterId }
-    }
+    fun getCommentsByChapter(firestoreId: String, chapterId: Int): List<Comment> =
+        comments.filter { it.firestoreId == firestoreId && it.chapterId == chapterId }
 
     fun addComment(context: Context, comment: Comment) {
         comments.add(comment)
@@ -247,18 +357,18 @@ object MangaRepository {
 
     @Suppress("UNCHECKED_CAST")
     private fun docToManga(id: String, data: Map<String, Any>, index: Int): Manga {
-        val statusStr = data["status"] as? String ?: "completed"
+        val statusStr   = data["status"]   as? String ?: "completed"
         val categoryStr = data["category"] as? String ?: "truyen_tranh"
         return Manga(
             id            = index + 1,
-            name          = data["title"] as? String ?: "",
+            name          = data["title"]       as? String ?: "",
             slug          = id,
-            author        = data["author"] as? String ?: "",
+            author        = data["author"]      as? String ?: "",
             description   = data["description"] as? String ?: "",
-            coverUrl      = data["coverUrl"] as? String ?: "",
-            genres        = (data["genres"] as? List<String>) ?: emptyList(),
+            coverUrl      = data["coverUrl"]    as? String ?: "",
+            genres        = (data["genres"]     as? List<String>) ?: emptyList(),
             totalChapters = (data["totalChapters"] as? Long)?.toInt() ?: 0,
-            totalViews    = (data["totalViews"] as? Long)?.toInt() ?: 0,
+            totalViews    = (data["totalViews"]    as? Long)?.toInt() ?: 0,
             status        = if (statusStr == "ongoing") MangaStatus.ONGOING else MangaStatus.COMPLETED,
             category      = if (categoryStr == "tieu_thuyet") MangaCategory.TIEU_THUYET else MangaCategory.TRUYEN_TRANH,
             createdAt     = data["createdAt"] as? String ?: "",

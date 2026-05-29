@@ -17,12 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#1A1A2E"
-            app:title="@string/profile_title"
+            app:title="Hồ sơ"
             app:titleTextColor="#FFFFFF" />
-
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- NESTED SCROLL VIEW -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -33,561 +31,357 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- =============================================
-                 PHẦN 1: HEADER - Avatar + Thông tin
-                 ============================================= -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- ══ TRẠNG THÁI: CHƯA ĐĂNG NHẬP ══════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/layout_guest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                app:cardBackgroundColor="#1A1A2E"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="0dp">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="48dp"
+                android:visibility="visible">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👤"
+                    android:textSize="64sp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đăng nhập để sử dụng đầy đủ tính năng"
+                    android:textSize="16sp"
+                    android:textColor="#444"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <Button
+                    android:id="@+id/btn_login_profile"
+                    android:layout_width="200dp"
+                    android:layout_height="48dp"
+                    android:text="Đăng nhập"
+                    android:textSize="15sp"
+                    android:backgroundTint="#1A1A2E"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <!-- ══ TRẠNG THÁI: ĐÃ ĐĂNG NHẬP ═════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/layout_logged_in"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Header: Avatar + Tên + Email -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:cardBackgroundColor="#1A1A2E"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="24dp"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/img_avatar"
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            android:src="@android:drawable/ic_menu_myplaces"
+                            android:background="#2D2D4E"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:id="@+id/tv_username"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tên người dùng"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tv_email"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="email@example.com"
+                            android:textSize="13sp"
+                            android:textColor="#AAAAAA"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/tv_role"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📖 Độc giả"
+                            android:textSize="13sp"
+                            android:textColor="#F5A623"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Coin Card ─────────────────────────────────────────── -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFF8E7">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Số dư coin"
+                                android:textSize="12sp"
+                                android:textColor="#888" />
+
+                            <TextView
+                                android:id="@+id/tv_coin_balance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 🪙"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:textColor="#F5A623" />
+                        </LinearLayout>
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Nạp coin"
+                            android:textSize="13sp"
+                            android:backgroundTint="#F5A623"
+                            android:textColor="@android:color/white"
+                            android:onClick="onWalletClick" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Menu Items ────────────────────────────────────────── -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- Ví coin -->
+                        <LinearLayout
+                            android:id="@+id/btn_wallet"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:background="?attr/selectableItemBackground">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🪙"
+                                android:textSize="20sp"
+                                android:layout_marginEnd="12dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Ví coin của tôi"
+                                android:textSize="15sp"
+                                android:textColor="#1A1A2E" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="›"
+                                android:textSize="18sp"
+                                android:textColor="#999" />
+                        </LinearLayout>
+
+                        <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EBEBEB" />
+
+                        <!-- Lịch sử đọc (placeholder) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:background="?attr/selectableItemBackground">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📖"
+                                android:textSize="20sp"
+                                android:layout_marginEnd="12dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Lịch sử đọc"
+                                android:textSize="15sp"
+                                android:textColor="#1A1A2E" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="›"
+                                android:textSize="18sp"
+                                android:textColor="#999" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Author Section (chỉ hiện với tác giả/admin) ───────── -->
                 <LinearLayout
+                    android:id="@+id/layout_author_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="24dp"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:id="@+id/img_avatar"
-                        android:layout_width="88dp"
-                        android:layout_height="88dp"
-                        android:src="@android:drawable/ic_menu_myplaces"
-                        android:background="#2D2D4E"
-                        android:padding="16dp"
-                        android:scaleType="centerInside"
-                        android:contentDescription="@string/profile_avatar_desc" />
-
-                    <TextView
-                        android:id="@+id/tv_username"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/profile_login_prompt"
-                        android:textColor="#FFFFFF"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/profile_login_sub"
-                        android:textColor="#AAAACC"
-                        android:textSize="13sp" />
+                        android:text="✍️ Khu vực tác giả"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#888"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp" />
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal">
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginBottom="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_login"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="@string/profile_btn_login"
-                            android:textSize="13sp"
-                            android:layout_marginEnd="8dp"
-                            app:backgroundTint="#E94560" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_register"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="@string/profile_btn_register"
-                            android:textSize="13sp"
-                            android:textColor="#E94560"
-                            app:backgroundTint="@android:color/transparent"
-                            app:strokeColor="#E94560"
-                            app:strokeWidth="1dp"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                            <!-- Đăng truyện mới -->
+                            <LinearLayout
+                                android:id="@+id/btn_upload_manga"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="16dp"
+                                android:background="?attr/selectableItemBackground">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="➕"
+                                    android:textSize="20sp"
+                                    android:layout_marginEnd="12dp" />
 
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Đăng truyện mới"
+                                    android:textSize="15sp"
+                                    android:textColor="#1A1A2E" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="›"
+                                    android:textSize="18sp"
+                                    android:textColor="#999" />
+                            </LinearLayout>
+
+                            <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EBEBEB" />
+
+                            <!-- Doanh thu (placeholder) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="16dp"
+                                android:background="?attr/selectableItemBackground">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="💰"
+                                    android:textSize="20sp"
+                                    android:layout_marginEnd="12dp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Doanh thu của tôi"
+                                    android:textSize="15sp"
+                                    android:textColor="#1A1A2E" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="›"
+                                    android:textSize="18sp"
+                                    android:textColor="#999" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- =============================================
-                 PHẦN 2: THỐNG KÊ
-                 ============================================= -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-
-                <LinearLayout
+                <!-- ── Đăng xuất ─────────────────────────────────────────── -->
+                <Button
+                    android:id="@+id/btn_logout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:layout_height="48dp"
+                    android:text="Đăng xuất"
+                    android:textSize="15sp"
+                    android:backgroundTint="#E53935"
+                    android:textColor="@android:color/white"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="32dp" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:id="@+id/tv_reading_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_stat_default"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="#1A1A2E" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_stat_reading"
-                            android:textSize="12sp"
-                            android:textColor="#888888" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="#EEEEEE" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:id="@+id/tv_done_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_stat_default"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="#1A1A2E" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_stat_done"
-                            android:textSize="12sp"
-                            android:textColor="#888888" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="#EEEEEE" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:id="@+id/tv_fav_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_stat_default"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="#1A1A2E" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_stat_fav"
-                            android:textSize="12sp"
-                            android:textColor="#888888" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- =============================================
-                 PHẦN 3: CÀI ĐẶT
-                 ============================================= -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp"
-                android:text="@string/profile_section_settings"
-                android:textColor="#888888"
-                android:textSize="11sp" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- Chế độ đọc -->
-                    <LinearLayout
-                        android:id="@+id/item_reading_mode"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_view"
-                            app:tint="#3B7DE8"
-                            android:contentDescription="@string/desc_icon_reading" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_reading_mode"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_item_reading_mode_value"
-                            android:textSize="13sp"
-                            android:textColor="#888888"
-                            android:layout_marginEnd="4dp" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="#F0F0F0" android:layout_marginStart="56dp" />
-
-                    <!-- Thông báo -->
-                    <LinearLayout
-                        android:id="@+id/item_notification"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_popup_reminder"
-                            app:tint="#E07020"
-                            android:contentDescription="@string/desc_icon_notification" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_notification"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="#F0F0F0" android:layout_marginStart="56dp" />
-
-                    <!-- Ngôn ngữ -->
-                    <LinearLayout
-                        android:id="@+id/item_language"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_help"
-                            app:tint="#28A060"
-                            android:contentDescription="@string/desc_icon_language" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_language"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_item_language_value"
-                            android:textSize="13sp"
-                            android:textColor="#888888"
-                            android:layout_marginEnd="4dp" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- =============================================
-                 PHẦN 4: LIÊN HỆ & HỖ TRỢ
-                 ============================================= -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp"
-                android:text="@string/profile_section_contact"
-                android:textColor="#888888"
-                android:textSize="11sp" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- item_admin -->
-                    <LinearLayout
-                        android:id="@+id/item_admin"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_send"
-                            app:tint="#E94560"
-                            android:contentDescription="@string/desc_icon_admin" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_admin"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="#F0F0F0" android:layout_marginStart="56dp" />
-
-                    <!-- item_privacy -->
-                    <LinearLayout
-                        android:id="@+id/item_privacy"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_secure"
-                            app:tint="#E94560"
-                            android:contentDescription="@string/desc_icon_privacy" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_privacy"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_item_privacy_badge"
-                            android:textSize="11sp"
-                            android:textColor="#FFFFFF"
-                            android:background="#AAAAAA"
-                            android:paddingHorizontal="6dp"
-                            android:paddingVertical="2dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="#F0F0F0" android:layout_marginStart="56dp" />
-
-                    <!-- item_rate -->
-                    <LinearLayout
-                        android:id="@+id/item_rate"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/btn_star_big_on"
-                            app:tint="#E94560"
-                            android:contentDescription="@string/desc_icon_rate" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_rate"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="#F0F0F0" android:layout_marginStart="56dp" />
-
-                    <!-- item_share -->
-                    <LinearLayout
-                        android:id="@+id/item_share"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_share"
-                            app:tint="#E94560"
-                            android:contentDescription="@string/desc_icon_share" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/profile_item_share"
-                            android:textSize="15sp"
-                            android:textColor="#1A1A2E" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_media_next"
-                            app:tint="#CCCCCC"
-                            android:contentDescription="@string/desc_arrow" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- PHIÊN BẢN -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
-                android:gravity="center"
-                android:text="@string/profile_version"
-                android:textColor="#AAAAAA"
-                android:textSize="12sp" />
-
-            <View android:layout_width="match_parent" android:layout_height="16dp" />
+            </LinearLayout>
+            <!-- end layout_logged_in -->
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

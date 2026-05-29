@@ -16,14 +16,15 @@ import com.example.mangaapp.models.Comment
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.repository.MangaRepository
+import com.example.mangaapp.ui.read.ReadFragment
+import com.example.mangaapp.utils.UserSession
 import java.text.NumberFormat
 import java.util.Locale
-import com.example.mangaapp.ui.read.ReadFragment
 
 class DetailFragment : Fragment() {
 
     private var firestoreId: String = ""
-    private var isDescExpanded = false
+    private var isDescExpanded   = false
     private var isChapterReversed = false
     private var chapterList: List<Chapter> = emptyList()
 
@@ -43,14 +44,11 @@ class DetailFragment : Fragment() {
     private lateinit var rvChapters: RecyclerView
     private lateinit var tvSortChapter: TextView
     private lateinit var progressLoading: ProgressBar
-
-    // ── Comment views ──
     private lateinit var etComment: EditText
     private lateinit var btnSendComment: Button
     private lateinit var rvComments: RecyclerView
     private lateinit var tvCommentCount: TextView
     private lateinit var commentAdapter: CommentAdapter
-
     private lateinit var chapterAdapter: ChapterAdapter
 
     companion object {
@@ -69,12 +67,8 @@ class DetailFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_detail, container, false)
-    }
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? = inflater.inflate(R.layout.fragment_detail, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,13 +103,10 @@ class DetailFragment : Fragment() {
         rvChapters      = view.findViewById(R.id.rv_chapters)
         tvSortChapter   = view.findViewById(R.id.tv_sort_chapter)
         progressLoading = view.findViewById(R.id.progress_loading)
-
-        // Comment views
         etComment       = view.findViewById(R.id.et_comment)
         btnSendComment  = view.findViewById(R.id.btn_send_comment)
         rvComments      = view.findViewById(R.id.rv_comments)
         tvCommentCount  = view.findViewById(R.id.tv_comment_count)
-
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
@@ -141,10 +132,8 @@ class DetailFragment : Fragment() {
 
     private fun bindMangaInfo(manga: Manga) {
         val format = NumberFormat.getNumberInstance(Locale("vi", "VN"))
-
         Glide.with(this).load(manga.coverUrl).centerCrop().into(ivCover)
         Glide.with(this).load(manga.coverUrl).centerCrop().into(ivBackdrop)
-
         tvName.text         = manga.name
         tvAuthor.text       = "✍️ ${manga.author}"
         tvViews.text        = format.format(manga.totalViews)
@@ -160,7 +149,6 @@ class DetailFragment : Fragment() {
         }
 
         setupGenreTags(manga)
-
         tvReadMore.setOnClickListener {
             isDescExpanded = !isDescExpanded
             tvDescription.maxLines = if (isDescExpanded) Int.MAX_VALUE else 4
@@ -177,15 +165,18 @@ class DetailFragment : Fragment() {
                 tvChapterCount.text = chapters.size.toString()
 
                 btnReadFirst.setOnClickListener {
-                    chapters.firstOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
+                    chapters.firstOrNull()?.let { handleChapterClick(manga, it) }
                 }
                 btnReadLatest.setOnClickListener {
-                    chapters.lastOrNull()?.let { navigateToRead(manga, it.chapterNumber) }
+                    chapters.lastOrNull()?.let { handleChapterClick(manga, it) }
                 }
 
                 chapterAdapter = ChapterAdapter(chapters) { chapter ->
-                    navigateToRead(manga, chapter.chapterNumber)
+                    handleChapterClick(manga, chapter)
                 }
+                // ── Truyền storyId để adapter biết chapter nào đã unlock ──────
+                chapterAdapter.setStoryId(firestoreId)
+
                 rvChapters.layoutManager = LinearLayoutManager(requireContext())
                 rvChapters.isNestedScrollingEnabled = false
                 rvChapters.adapter = chapterAdapter
@@ -198,7 +189,6 @@ class DetailFragment : Fragment() {
                     chapterAdapter.updateList(sorted)
                 }
 
-                // Load comments sau khi có firestoreId sẵn sàng
                 setupComments()
             },
             onError = {
@@ -208,16 +198,61 @@ class DetailFragment : Fragment() {
         )
     }
 
+    /**
+     * Xử lý click vào chapter:
+     *  - Nếu miễn phí hoặc đã mở khóa → đọc ngay
+     *  - Nếu trả phí và chưa mở → hiện dialog xác nhận coin
+     *  - Nếu chưa đăng nhập → yêu cầu đăng nhập
+     */
+    private fun handleChapterClick(manga: Manga, chapter: Chapter) {
+        // Miễn phí → vào thẳng
+        if (chapter.isFree) {
+            navigateToRead(manga, chapter.chapterNumber)
+            return
+        }
+
+        // Đã mở khóa trước đó → vào thẳng
+        val user = UserSession.currentUser
+        if (user != null && user.hasUnlocked(firestoreId, chapter.chapterNumber)) {
+            navigateToRead(manga, chapter.chapterNumber)
+            return
+        }
+
+        // Chưa đăng nhập
+        if (!UserSession.isLoggedIn) {
+            Toast.makeText(
+                requireContext(),
+                "Vui lòng đăng nhập để mở khóa chương này",
+                Toast.LENGTH_LONG
+            ).show()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, com.example.mangaapp.ui.auth.LoginFragment())
+                .addToBackStack(null)
+                .commit()
+            return
+        }
+
+        // Hiện dialog mở khóa bằng coin
+        UnlockChapterDialog.show(
+            fragmentManager = parentFragmentManager,
+            storyId         = firestoreId,
+            chapter         = chapter,
+            onUnlocked      = {
+                // Reload adapter để cập nhật icon khóa
+                chapterAdapter.notifyDataSetChanged()
+                navigateToRead(manga, chapter.chapterNumber)
+            }
+        )
+    }
+
     private fun setupComments() {
         MangaRepository.initComments(requireContext())
         val commentList = MangaRepository.getCommentsByFirestoreId(firestoreId).toMutableList()
         tvCommentCount.text = "${commentList.size} bình luận"
-
         commentAdapter = CommentAdapter(commentList)
         rvComments.layoutManager = LinearLayoutManager(requireContext())
         rvComments.isNestedScrollingEnabled = false
         rvComments.adapter = commentAdapter
-
         btnSendComment.setOnClickListener {
             val content = etComment.text.toString().trim()
             if (content.isEmpty()) {
@@ -228,7 +263,7 @@ class DetailFragment : Fragment() {
                 id          = System.currentTimeMillis().toString(),
                 firestoreId = firestoreId,
                 userId      = "me",
-                userName    = "Bạn",
+                userName    = UserSession.currentUser?.username ?: "Bạn",
                 content     = content,
                 timestamp   = System.currentTimeMillis()
             )
@@ -236,7 +271,6 @@ class DetailFragment : Fragment() {
             commentAdapter.addComment(newComment)
             etComment.setText("")
             tvCommentCount.text = "${commentAdapter.itemCount} bình luận"
-            Toast.makeText(requireContext(), "Đã gửi bình luận!", Toast.LENGTH_SHORT).show()
         }
     }
 
