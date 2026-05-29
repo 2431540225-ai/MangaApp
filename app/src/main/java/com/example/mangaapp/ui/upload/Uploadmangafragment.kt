@@ -1,10 +1,7 @@
 package com.example.mangaapp.ui.upload
 
-import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,38 +60,29 @@ class UploadMangaFragment : Fragment() {
     private var pageImageUris: List<Uri> = emptyList()
     private val storage = FirebaseStorage.getInstance()
 
-    // ─── Image pickers ───────────────────────────────────────────────────────
+    // ─── Image pickers — dùng GetContent / GetMultipleContents ───────────────
 
-    /** Chọn 1 ảnh bìa */
+    /** Chọn 1 ảnh bìa — hoạt động đúng trên cả máy thật lẫn emulator */
     private val pickCoverLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                coverImageUri = uri
-                tvCoverStatus.text = "✅ Đã chọn ảnh bìa"
-                tvCoverStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-                Glide.with(this).load(uri).centerCrop().into(ivCoverPreview)
-                ivCoverPreview.visibility = View.VISIBLE
-            }
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            coverImageUri = uri
+            tvCoverStatus.text = "✅ Đã chọn ảnh bìa"
+            tvCoverStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
+            Glide.with(this).load(uri).centerCrop().into(ivCoverPreview)
+            ivCoverPreview.visibility = View.VISIBLE
         }
     }
 
-    /** Chọn nhiều ảnh trang (truyện tranh) */
+    /** Chọn nhiều ảnh trang (truyện tranh) — hoạt động đúng trên cả máy thật lẫn emulator */
     private val pickPagesLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val uris = mutableListOf<Uri>()
-            result.data?.clipData?.let { clip ->
-                for (i in 0 until clip.itemCount) uris.add(clip.getItemAt(i).uri)
-            } ?: result.data?.data?.let { uris.add(it) }
-
-            if (uris.isNotEmpty()) {
-                pageImageUris = uris
-                tvPagesStatus.text = "✅ Đã chọn ${uris.size} trang"
-                tvPagesStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-            }
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        if (uris.isNotEmpty()) {
+            pageImageUris = uris
+            tvPagesStatus.text = "✅ Đã chọn ${uris.size} trang"
+            tvPagesStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
         }
     }
 
@@ -179,18 +167,14 @@ class UploadMangaFragment : Fragment() {
             switchFreeChapter.text     = if (isChecked) "Chương miễn phí" else "Chương trả phí"
         }
 
-        // Chọn ảnh bìa
+        // Chọn ảnh bìa — dùng GetContent("image/*")
         btnPickCover.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickCoverLauncher.launch(intent)
+            pickCoverLauncher.launch("image/*")
         }
 
-        // Chọn ảnh trang (nhiều)
+        // Chọn ảnh trang (nhiều) — dùng GetMultipleContents("image/*")
         btnPickPages.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            }
-            pickPagesLauncher.launch(intent)
+            pickPagesLauncher.launch("image/*")
         }
 
         btnUpload.setOnClickListener { validateAndUpload() }

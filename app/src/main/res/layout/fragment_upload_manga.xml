@@ -60,6 +60,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Tên truyện *"
                 android:inputType="text"
+                android:textColor="#1A1A2E"
+                android:textColorHint="#9CA3AF"
                 android:layout_marginBottom="10dp" />
 
             <EditText
@@ -68,6 +70,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Tên tác giả *"
                 android:inputType="text"
+                android:textColor="#1A1A2E"
+                android:textColorHint="#9CA3AF"
                 android:layout_marginBottom="10dp" />
 
             <EditText
@@ -78,6 +82,8 @@
                 android:inputType="textMultiLine"
                 android:minLines="3"
                 android:gravity="top"
+                android:textColor="#1A1A2E"
+                android:textColorHint="#9CA3AF"
                 android:layout_marginBottom="10dp" />
 
             <EditText
@@ -86,6 +92,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Thể loại (cách nhau bằng dấu phẩy, vd: Hành Động, Tình Cảm)"
                 android:inputType="text"
+                android:textColor="#1A1A2E"
+                android:textColorHint="#9CA3AF"
                 android:layout_marginBottom="12dp" />
 
             <!-- Ảnh bìa -->
@@ -94,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:text="🖼️ Ảnh bìa *"
                 android:textSize="14sp"
-                android:textColor="#444"
+                android:textColor="#1A1A2E"
                 android:layout_marginBottom="6dp" />
 
             <!-- Preview ảnh bìa -->
@@ -105,7 +113,7 @@
                 android:scaleType="centerCrop"
                 android:visibility="gone"
                 android:layout_marginBottom="8dp"
-                android:background="#EEEEEE" />
+                android:background="#DDDDDD" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -130,7 +138,7 @@
                     android:layout_weight="1"
                     android:text="Chưa chọn ảnh"
                     android:textSize="12sp"
-                    android:textColor="#888"
+                    android:textColor="#6B7280"
                     android:layout_marginStart="10dp" />
             </LinearLayout>
 
@@ -140,7 +148,7 @@
                 android:layout_height="wrap_content"
                 android:text="Loại truyện"
                 android:textSize="14sp"
-                android:textColor="#444"
+                android:textColor="#1A1A2E"
                 android:layout_marginBottom="4dp" />
 
             <RadioGroup
@@ -155,6 +163,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Truyện tranh"
+                    android:textColor="#1A1A2E"
                     android:checked="true"
                     android:layout_marginEnd="24dp" />
 
@@ -162,7 +171,8 @@
                     android:id="@+id/rb_upload_novel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tiểu thuyết" />
+                    android:text="Tiểu thuyết"
+                    android:textColor="#1A1A2E" />
             </RadioGroup>
 
             <!-- ─── CHAPTER ĐẦU TIÊN ──────────────────────────────── -->
@@ -187,6 +197,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Số chương * (vd: 1)"
                 android:inputType="number"
+                android:textColor="#1A1A2E"
+                android:textColorHint="#9CA3AF"
                 android:layout_marginBottom="10dp" />
 
             <EditText
@@ -195,6 +207,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Tên chương (không bắt buộc)"
                 android:inputType="text"
+                android:textColor="#1A1A2E"
+                android:textColorHint="#9CA3AF"
                 android:layout_marginBottom="10dp" />
 
             <!-- Miễn phí / Trả phí -->
@@ -203,6 +217,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Chương miễn phí"
+                android:textColor="#1A1A2E"
                 android:checked="true"
                 android:textSize="14sp"
                 android:layout_marginBottom="10dp" />
@@ -222,7 +237,7 @@
                     android:layout_height="wrap_content"
                     android:text="Giá (coin): "
                     android:textSize="14sp"
-                    android:textColor="#444" />
+                    android:textColor="#1A1A2E" />
 
                 <EditText
                     android:id="@+id/et_coin_price"
@@ -230,6 +245,8 @@
                     android:layout_height="wrap_content"
                     android:hint="vd: 5"
                     android:inputType="number"
+                    android:textColor="#1A1A2E"
+                    android:textColorHint="#9CA3AF"
                     android:layout_marginStart="8dp" />
 
                 <TextView
@@ -253,7 +270,7 @@
                     android:layout_height="wrap_content"
                     android:text="🖼️ Ảnh các trang * (chọn nhiều cùng lúc)"
                     android:textSize="13sp"
-                    android:textColor="#444"
+                    android:textColor="#1A1A2E"
                     android:layout_marginBottom="6dp" />
 
                 <LinearLayout
@@ -279,7 +296,7 @@
                         android:layout_weight="1"
                         android:text="Chưa chọn ảnh"
                         android:textSize="12sp"
-                        android:textColor="#888"
+                        android:textColor="#6B7280"
                         android:layout_marginStart="10dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -297,7 +314,7 @@
                     android:layout_height="wrap_content"
                     android:text="Nội dung chương *:"
                     android:textSize="13sp"
-                    android:textColor="#444"
+                    android:textColor="#1A1A2E"
                     android:layout_marginBottom="4dp" />
 
                 <EditText
@@ -308,6 +325,8 @@
                     android:inputType="textMultiLine"
                     android:minLines="8"
                     android:gravity="top"
+                    android:textColor="#1A1A2E"
+                    android:textColorHint="#9CA3AF"
                     android:layout_marginBottom="10dp" />
             </LinearLayout>
 
@@ -335,7 +354,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="12sp"
-                android:textColor="#888"
+                android:textColor="#1A1A2E"
                 android:gravity="center"
                 android:visibility="gone"
                 android:layout_marginBottom="8dp" />
