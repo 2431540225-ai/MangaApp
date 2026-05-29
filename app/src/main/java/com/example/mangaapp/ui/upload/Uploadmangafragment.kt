@@ -67,6 +67,12 @@ class UploadMangaFragment : Fragment() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
+            // Giữ quyền đọc URI sau khi activity restart (cần thiết cho Firebase Storage)
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) { /* một số provider không hỗ trợ — bỏ qua */ }
             coverImageUri = uri
             tvCoverStatus.text = "✅ Đã chọn ảnh bìa"
             tvCoverStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
@@ -80,6 +86,14 @@ class UploadMangaFragment : Fragment() {
         ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
+            // Giữ quyền đọc từng URI
+            uris.forEach { uri ->
+                try {
+                    requireContext().contentResolver.takePersistableUriPermission(
+                        uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: Exception) { /* bỏ qua nếu provider không hỗ trợ */ }
+            }
             pageImageUris = uris
             tvPagesStatus.text = "✅ Đã chọn ${uris.size} trang"
             tvPagesStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
@@ -281,6 +295,8 @@ class UploadMangaFragment : Fragment() {
 
     /**
      * Upload một ảnh lên Firebase Storage và trả về download URL.
+     * Dùng InputStream thay vì putFile(uri) trực tiếp để tránh lỗi
+     * "Object does not exist at location" trên một số thiết bị/emulator.
      */
     private fun uploadImageToStorage(
         uri: Uri,
@@ -289,13 +305,20 @@ class UploadMangaFragment : Fragment() {
         onError: (Exception) -> Unit
     ) {
         val ref = storage.reference.child(path)
-        ref.putFile(uri)
-            .continueWithTask { task ->
-                if (!task.isSuccessful) throw task.exception!!
-                ref.downloadUrl
-            }
-            .addOnSuccessListener { downloadUri -> onSuccess(downloadUri.toString()) }
-            .addOnFailureListener { onError(it) }
+        try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+                ?: throw Exception("Không thể đọc file ảnh")
+            ref.putStream(inputStream)
+                .continueWithTask { task ->
+                    inputStream.close()
+                    if (!task.isSuccessful) throw task.exception!!
+                    ref.downloadUrl
+                }
+                .addOnSuccessListener { downloadUri -> onSuccess(downloadUri.toString()) }
+                .addOnFailureListener { onError(it) }
+        } catch (e: Exception) {
+            onError(e)
+        }
     }
 
     /**
