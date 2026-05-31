@@ -9,6 +9,7 @@ import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.utils.CommentStorage
 import com.example.mangaapp.utils.UserSession
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 
 object MangaRepository {
 
@@ -125,10 +126,6 @@ object MangaRepository {
 
     // ─── CHAPTERS ────────────────────────────────────────────────────────────
 
-    /**
-     * Lấy danh sách chapter kèm thông tin lock (isFree, coinPrice).
-     * Dùng cho DetailFragment để hiển thị icon khóa.
-     */
     fun getChaptersByMangaId(
         firestoreId: String,
         onSuccess: (List<Chapter>) -> Unit,
@@ -148,7 +145,6 @@ object MangaRepository {
                         chapterNumber = (data["chapterNumber"] as? Long)?.toInt() ?: 0,
                         title         = data["title"]     as? String ?: "",
                         publishedAt   = data["createdAt"] as? String ?: "",
-                        // Coin lock fields
                         isFree        = data["isFree"]    as? Boolean ?: true,
                         coinPrice     = (data["coinPrice"] as? Long)?.toInt() ?: 0,
                         authorId      = data["authorId"]  as? String ?: "",
@@ -236,7 +232,6 @@ object MangaRepository {
             return
         }
 
-        // Tạo slug từ tên truyện: chữ thường, bỏ dấu, thay khoảng trắng bằng "-"
         val slug = generateSlug(title)
 
         val data = hashMapOf(
@@ -253,7 +248,6 @@ object MangaRepository {
             "createdAt"     to System.currentTimeMillis().toString()
         )
 
-        // Kiểm tra slug đã tồn tại chưa, nếu có thì thêm timestamp vào cuối
         val docRef = db.collection("stories").document(slug)
         docRef.get()
             .addOnSuccessListener { snapshot ->
@@ -268,7 +262,6 @@ object MangaRepository {
 
     /**
      * Tạo slug URL-friendly từ tên truyện.
-     * Ví dụ: "Thám Tử Lừng Danh Conan" → "tham-tu-lung-danh-conan"
      */
     private fun generateSlug(title: String): String {
         val vietnameseMap = mapOf(
@@ -293,21 +286,24 @@ object MangaRepository {
             .replace(Regex("\\s+"), "-")
             .replace(Regex("-+"), "-")
             .trim('-')
-            .take(80) // Giới hạn độ dài slug
+            .take(80)
     }
 
     /**
      * Tác giả đăng chapter mới cho một truyện đã có.
      *
-     * @param isFree     true = miễn phí, false = cần coin
-     * @param coinPrice  Số coin cần để mở (chỉ dùng khi isFree = false)
+     * FIX: Chuỗi async được nối đúng thứ tự:
+     *   1. set(chapterData)
+     *   2a. Nếu truyện tranh → batch.commit() pages → update totalChapters → onSuccess()
+     *   2b. Nếu tiểu thuyết  → update(content) → update totalChapters → onSuccess()
+     *   2c. Nếu không có pages/content → update totalChapters → onSuccess()
      */
     fun uploadChapter(
         storyFirestoreId: String,
         chapterNumber: Int,
         title: String,
-        contentText: String,      // nếu là tiểu thuyết
-        pageUrls: List<String>,   // nếu là truyện tranh
+        contentText: String,
+        pageUrls: List<String>,
         isFree: Boolean,
         coinPrice: Int,
         onSuccess: () -> Unit,
@@ -327,42 +323,48 @@ object MangaRepository {
             "createdAt"     to System.currentTimeMillis().toString()
         )
 
-        val storyRef = db.collection("stories").document(storyFirestoreId)
-        val chapterId = "chapter_$chapterNumber"
+        val storyRef   = db.collection("stories").document(storyFirestoreId)
+        val chapterId  = "chapter_$chapterNumber"
+        val chapterRef = storyRef.collection("chapters").document(chapterId)
 
-        storyRef.collection("chapters").document(chapterId)
-            .set(chapterData)
+        // Bước 1: Tạo document chapter
+        chapterRef.set(chapterData)
+            .addOnFailureListener { onError(it) }
             .addOnSuccessListener {
-                // Nếu là tiểu thuyết → lưu content vào field
-                if (contentText.isNotEmpty()) {
-                    storyRef.collection("chapters").document(chapterId)
-                        .update("content", contentText)
-                }
-                // Nếu là truyện tranh → lưu pages vào sub-collection
-                if (pageUrls.isNotEmpty()) {
-                    val batch = db.batch()
-                    pageUrls.forEachIndexed { index, url ->
-                        val pageRef = storyRef.collection("chapters")
-                            .document(chapterId)
-                            .collection("pages")
-                            .document("page_${index + 1}")
-                        batch.set(pageRef, mapOf("pageNumber" to index + 1, "url" to url))
-                    }
-                    batch.commit()
-                        .addOnSuccessListener {
-                            // Cập nhật totalChapters
-                            storyRef.update("totalChapters",
-                                com.google.firebase.firestore.FieldValue.increment(1))
-                            onSuccess()
-                        }
+
+                // Helper: tăng totalChapters rồi gọi onSuccess()
+                fun incrementAndFinish() {
+                    storyRef.update("totalChapters", FieldValue.increment(1))
+                        .addOnSuccessListener { onSuccess() }
                         .addOnFailureListener { onError(it) }
-                } else {
-                    storyRef.update("totalChapters",
-                        com.google.firebase.firestore.FieldValue.increment(1))
-                    onSuccess()
+                }
+
+                when {
+                    // Bước 2a: Truyện tranh — lưu pages vào sub-collection
+                    pageUrls.isNotEmpty() -> {
+                        val batch = db.batch()
+                        pageUrls.forEachIndexed { index, url ->
+                            val pageRef = chapterRef
+                                .collection("pages")
+                                .document("page_${index + 1}")
+                            batch.set(pageRef, mapOf("pageNumber" to index + 1, "url" to url))
+                        }
+                        batch.commit()
+                            .addOnFailureListener { onError(it) }
+                            .addOnSuccessListener { incrementAndFinish() }
+                    }
+
+                    // Bước 2b: Tiểu thuyết — lưu content vào field
+                    contentText.isNotEmpty() -> {
+                        chapterRef.update("content", contentText)
+                            .addOnFailureListener { onError(it) }
+                            .addOnSuccessListener { incrementAndFinish() }
+                    }
+
+                    // Bước 2c: Không có gì thêm
+                    else -> incrementAndFinish()
                 }
             }
-            .addOnFailureListener { onError(it) }
     }
 
     // ─── COMMENTS ────────────────────────────────────────────────────────────

@@ -48,11 +48,13 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.fragment:fragment-ktx:1.8.1")
 
-    // Firebase — khai báo version thẳng, không dùng BOM
+    // Firebase
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
     implementation("com.google.firebase:firebase-analytics-ktx:22.4.0")
     implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
-    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+
+    // OkHttp — dùng để upload ảnh lên Cloudinary
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation("com.google.code.gson:gson:2.10.1")
 }
