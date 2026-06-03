@@ -7,9 +7,9 @@ import androidx.fragment.app.Fragment
 import com.example.mangaapp.ui.home.HomeFragment
 import com.example.mangaapp.utils.ThemeManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.example.mangaapp.ui.list.ListFragment
+import com.example.mangaapp.ui.favorites.FavoritesFragment
 import com.example.mangaapp.ui.profile.ProfileFragment
-
+import com.example.mangaapp.ui.list.ListFragment
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> { loadFragment(HomeFragment()); true }
                 R.id.nav_list -> { loadFragment(ListFragment()); true }
+                R.id.nav_favorites -> { loadFragment(FavoritesFragment()); true }
                 R.id.nav_search -> { true }
                 R.id.nav_profile -> { loadFragment(ProfileFragment()); true }
                 else -> false

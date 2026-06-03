@@ -395,6 +395,119 @@ object MangaRepository {
         CommentStorage.saveComments(context, comments)
     }
 
+    // ─── FAVORITES & FOLLOWING ───────────────────────────────────────────────
+
+    // Cache local để tránh gọi Firestore liên tục trong cùng session
+    private val favoriteCache = mutableMapOf<String, MutableList<String>>()   // uid -> [storyId]
+    private val followingCache = mutableMapOf<String, MutableList<String>>()  // uid -> [storyId]
+
+    /** Lấy danh sách storyId đã yêu thích (từ cache hoặc Firestore) */
+    fun getFavoriteIds(uid: String): List<String> = favoriteCache[uid] ?: emptyList()
+
+    /** Lấy danh sách storyId đang theo dõi (từ cache hoặc Firestore) */
+    fun getFollowingIds(uid: String): List<String> = followingCache[uid] ?: emptyList()
+
+    /** Tải favorites + following từ Firestore về cache */
+    fun loadUserLists(uid: String, onComplete: () -> Unit) {
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { doc ->
+                @Suppress("UNCHECKED_CAST")
+                val favs = (doc.get("favorites") as? List<String>) ?: emptyList()
+                val follows = (doc.get("following") as? List<String>) ?: emptyList()
+                favoriteCache[uid] = favs.toMutableList()
+                followingCache[uid] = follows.toMutableList()
+                onComplete()
+            }
+            .addOnFailureListener { onComplete() }
+    }
+
+    /** Kiểm tra truyện có trong yêu thích không */
+    fun isFavorite(uid: String, storyId: String): Boolean =
+        favoriteCache[uid]?.contains(storyId) == true
+
+    /** Kiểm tra truyện có đang theo dõi không */
+    fun isFollowing(uid: String, storyId: String): Boolean =
+        followingCache[uid]?.contains(storyId) == true
+
+    /** Thêm vào yêu thích */
+    fun addFavorite(uid: String, storyId: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        db.collection("users").document(uid)
+            .update("favorites", com.google.firebase.firestore.FieldValue.arrayUnion(storyId))
+            .addOnSuccessListener {
+                favoriteCache.getOrPut(uid) { mutableListOf() }.add(storyId)
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                // Nếu field chưa tồn tại, set luôn
+                db.collection("users").document(uid)
+                    .update(mapOf("favorites" to listOf(storyId)))
+                    .addOnSuccessListener {
+                        favoriteCache.getOrPut(uid) { mutableListOf() }.add(storyId)
+                        onSuccess()
+                    }
+                    .addOnFailureListener { onError(it) }
+            }
+    }
+
+    /** Xóa khỏi yêu thích */
+    fun removeFavorite(uid: String, storyId: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        db.collection("users").document(uid)
+            .update("favorites", com.google.firebase.firestore.FieldValue.arrayRemove(storyId))
+            .addOnSuccessListener {
+                favoriteCache[uid]?.remove(storyId)
+                onSuccess()
+            }
+            .addOnFailureListener { onError(it) }
+    }
+
+    /** Thêm vào theo dõi */
+    fun addFollowing(uid: String, storyId: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        db.collection("users").document(uid)
+            .update("following", com.google.firebase.firestore.FieldValue.arrayUnion(storyId))
+            .addOnSuccessListener {
+                followingCache.getOrPut(uid) { mutableListOf() }.add(storyId)
+                onSuccess()
+            }
+            .addOnFailureListener {
+                db.collection("users").document(uid)
+                    .update(mapOf("following" to listOf(storyId)))
+                    .addOnSuccessListener {
+                        followingCache.getOrPut(uid) { mutableListOf() }.add(storyId)
+                        onSuccess()
+                    }
+                    .addOnFailureListener { e -> onError(e) }
+            }
+    }
+
+    /** Bỏ theo dõi */
+    fun removeFollowing(uid: String, storyId: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        db.collection("users").document(uid)
+            .update("following", com.google.firebase.firestore.FieldValue.arrayRemove(storyId))
+            .addOnSuccessListener {
+                followingCache[uid]?.remove(storyId)
+                onSuccess()
+            }
+            .addOnFailureListener { onError(it) }
+    }
+
+    /** Toggle yêu thích: nếu đã thích thì bỏ, chưa thích thì thêm */
+    fun toggleFavorite(uid: String, storyId: String, onSuccess: (Boolean) -> Unit, onError: (Exception) -> Unit) {
+        if (isFavorite(uid, storyId)) {
+            removeFavorite(uid, storyId, { onSuccess(false) }, onError)
+        } else {
+            addFavorite(uid, storyId, { onSuccess(true) }, onError)
+        }
+    }
+
+    /** Toggle theo dõi */
+    fun toggleFollowing(uid: String, storyId: String, onSuccess: (Boolean) -> Unit, onError: (Exception) -> Unit) {
+        if (isFollowing(uid, storyId)) {
+            removeFollowing(uid, storyId, { onSuccess(false) }, onError)
+        } else {
+            addFollowing(uid, storyId, { onSuccess(true) }, onError)
+        }
+    }
+
     // ─── HELPER ──────────────────────────────────────────────────────────────
 
     @Suppress("UNCHECKED_CAST")

@@ -38,6 +38,8 @@ class DetailFragment : Fragment() {
     private lateinit var tvChapterCount: TextView
     private lateinit var btnReadFirst: Button
     private lateinit var btnReadLatest: Button
+    private lateinit var btnFavorite: Button
+    private lateinit var btnFollow: Button
     private lateinit var llGenres: LinearLayout
     private lateinit var tvDescription: TextView
     private lateinit var tvReadMore: TextView
@@ -97,6 +99,8 @@ class DetailFragment : Fragment() {
         tvChapterCount  = view.findViewById(R.id.tv_chapter_count)
         btnReadFirst    = view.findViewById(R.id.btn_read_first)
         btnReadLatest   = view.findViewById(R.id.btn_read_latest)
+        btnFavorite     = view.findViewById(R.id.btn_favorite)
+        btnFollow       = view.findViewById(R.id.btn_follow)
         llGenres        = view.findViewById(R.id.ll_genres)
         tvDescription   = view.findViewById(R.id.tv_description)
         tvReadMore      = view.findViewById(R.id.tv_read_more)
@@ -154,6 +158,8 @@ class DetailFragment : Fragment() {
             tvDescription.maxLines = if (isDescExpanded) Int.MAX_VALUE else 4
             tvReadMore.text = if (isDescExpanded) "Thu gọn ‹" else "Xem thêm ›"
         }
+
+        setupFavoriteFollowButtons(manga)
     }
 
     private fun loadChapters(manga: Manga) {
@@ -271,6 +277,83 @@ class DetailFragment : Fragment() {
             commentAdapter.addComment(newComment)
             etComment.setText("")
             tvCommentCount.text = "${commentAdapter.itemCount} bình luận"
+        }
+    }
+
+    private fun setupFavoriteFollowButtons(manga: Manga) {
+        val uid = com.example.mangaapp.utils.UserSession.firebaseUid
+        if (uid == null) {
+            // Chưa đăng nhập: nhấn thì toast
+            btnFavorite.setOnClickListener {
+                android.widget.Toast.makeText(context, "Đăng nhập để yêu thích truyện", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            btnFollow.setOnClickListener {
+                android.widget.Toast.makeText(context, "Đăng nhập để theo dõi truyện", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        // Load danh sách yêu thích từ Firestore nếu chưa có trong cache
+        com.example.mangaapp.repository.MangaRepository.loadUserLists(uid) {
+            if (!isAdded) return@loadUserLists
+            updateFavoriteButtonUI(uid, manga.firestoreId)
+            updateFollowButtonUI(uid, manga.firestoreId)
+        }
+
+        btnFavorite.setOnClickListener {
+            com.example.mangaapp.repository.MangaRepository.toggleFavorite(uid, manga.firestoreId,
+                onSuccess = { isNowFav ->
+                    val msg = if (isNowFav) "Đã thêm vào yêu thích ❤" else "Đã xóa khỏi yêu thích"
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                    updateFavoriteButtonUI(uid, manga.firestoreId)
+                },
+                onError = {
+                    android.widget.Toast.makeText(context, "Lỗi, thử lại sau", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+
+        btnFollow.setOnClickListener {
+            com.example.mangaapp.repository.MangaRepository.toggleFollowing(uid, manga.firestoreId,
+                onSuccess = { isNowFollowing ->
+                    val msg = if (isNowFollowing) "Đang theo dõi truyện 🔔" else "Đã bỏ theo dõi"
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                    updateFollowButtonUI(uid, manga.firestoreId)
+                },
+                onError = {
+                    android.widget.Toast.makeText(context, "Lỗi, thử lại sau", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    }
+
+    private fun updateFavoriteButtonUI(uid: String, storyId: String) {
+        val isFav = com.example.mangaapp.repository.MangaRepository.isFavorite(uid, storyId)
+        if (isFav) {
+            btnFavorite.text = "❤ Đã yêu thích"
+            btnFavorite.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.primary, null))
+            btnFavorite.setTextColor(resources.getColor(R.color.white, null))
+        } else {
+            btnFavorite.text = "❤ Yêu thích"
+            btnFavorite.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.light_surface, null))
+            btnFavorite.setTextColor(resources.getColor(R.color.primary, null))
+        }
+    }
+
+    private fun updateFollowButtonUI(uid: String, storyId: String) {
+        val isFollow = com.example.mangaapp.repository.MangaRepository.isFollowing(uid, storyId)
+        if (isFollow) {
+            btnFollow.text = "🔔 Đang theo dõi"
+            btnFollow.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.primary, null))
+            btnFollow.setTextColor(resources.getColor(R.color.white, null))
+        } else {
+            btnFollow.text = "🔔 Theo dõi"
+            btnFollow.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.light_surface, null))
+            btnFollow.setTextColor(resources.getColor(R.color.primary, null))
         }
     }
 
