@@ -2,14 +2,18 @@ package com.example.mangaapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.example.mangaapp.ui.home.HomeFragment
 import com.example.mangaapp.utils.ThemeManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.mangaapp.ui.favorites.FavoritesFragment
 import com.example.mangaapp.ui.profile.ProfileFragment
+
 import com.example.mangaapp.ui.list.ListFragment
+
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
@@ -60,10 +64,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun hideBottomNav() {
-        bottomNav.visibility = android.view.View.GONE
+        val params = bottomNav.layoutParams as? CoordinatorLayout.LayoutParams
+        val behavior = params?.behavior as? HideBottomViewOnScrollBehavior
+        behavior?.slideDown(bottomNav)
     }
 
+    // Dùng behavior để slide up (hiện) thay vì VISIBLE
     fun showBottomNav() {
-        bottomNav.visibility = android.view.View.VISIBLE
+        val params = bottomNav.layoutParams as? CoordinatorLayout.LayoutParams
+        val behavior = params?.behavior as? HideBottomViewOnScrollBehavior
+        behavior?.slideUp(bottomNav)
     }
 }
