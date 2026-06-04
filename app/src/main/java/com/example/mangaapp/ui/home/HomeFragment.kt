@@ -28,6 +28,7 @@ class HomeFragment : Fragment() {
     private lateinit var rvLatest: RecyclerView
     private lateinit var rvRanking: RecyclerView
     private lateinit var btnThemeToggle: ImageButton
+    private lateinit var btnHomeCheckin: TextView
     private lateinit var tvLatestSeeAll: TextView
     private lateinit var tvRankingSeeAll: TextView
 
@@ -48,6 +49,7 @@ class HomeFragment : Fragment() {
         setupLatestManga()
         setupRanking()
         setupClickListeners()
+        checkDailyCheckIn()
     }
 
     private fun initViews(view: View) {
@@ -56,8 +58,19 @@ class HomeFragment : Fragment() {
         rvLatest        = view.findViewById(R.id.rv_latest)
         rvRanking       = view.findViewById(R.id.rv_ranking)
         btnThemeToggle  = view.findViewById(R.id.btn_theme_toggle)
+        btnHomeCheckin  = view.findViewById(R.id.btn_home_checkin)
         tvLatestSeeAll  = view.findViewById(R.id.tv_latest_see_all)
         tvRankingSeeAll = view.findViewById(R.id.tv_ranking_see_all)
+    }
+
+    private fun checkDailyCheckIn() {
+        if (!com.example.mangaapp.utils.UserSession.isLoggedIn) return
+
+        com.example.mangaapp.repository.CheckInRepository.getCheckInStatus { status ->
+            if (isAdded && !status.alreadyCheckedInToday) {
+                com.example.mangaapp.ui.checkin.DailyCheckInDialog.show(parentFragmentManager)
+            }
+        }
     }
 
     private fun setupBanner() {
@@ -212,6 +225,13 @@ class HomeFragment : Fragment() {
         btnThemeToggle.setOnClickListener {
             ThemeManager.toggle()
             requireActivity().recreate()
+        }
+        btnHomeCheckin.setOnClickListener {
+            if (!com.example.mangaapp.utils.UserSession.isLoggedIn) {
+                android.widget.Toast.makeText(requireContext(), "Vui lòng đăng nhập để điểm danh", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            com.example.mangaapp.ui.checkin.DailyCheckInDialog.show(parentFragmentManager)
         }
         tvLatestSeeAll.setOnClickListener { }
         tvRankingSeeAll.setOnClickListener { }

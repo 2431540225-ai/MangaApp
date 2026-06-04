@@ -79,7 +79,14 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
-        loadMangaDetail()
+
+        // Đảm bảo UserSession đã load trước khi dùng
+        if (com.example.mangaapp.utils.UserSession.firebaseUid != null &&
+            !com.example.mangaapp.utils.UserSession.isLoggedIn) {
+            com.example.mangaapp.utils.UserSession.loadUser { loadMangaDetail() }
+        } else {
+            loadMangaDetail()
+        }
     }
 
     override fun onResume() {
@@ -290,14 +297,14 @@ class DetailFragment : Fragment() {
 
     private fun setupFavoriteFollowButtons(manga: Manga) {
         val uid = com.example.mangaapp.utils.UserSession.firebaseUid
-        if (uid == null) {
-            // Chưa đăng nhập: nhấn thì toast
-            btnFavorite.setOnClickListener {
-                android.widget.Toast.makeText(context, "Đăng nhập để yêu thích truyện", android.widget.Toast.LENGTH_SHORT).show()
+
+        if (uid == null || !com.example.mangaapp.utils.UserSession.isLoggedIn) {
+            // Chưa đăng nhập: nhấn thì toast + chuyển sang màn login
+            val goLogin = {
+                android.widget.Toast.makeText(context, "Vui lòng đăng nhập để sử dụng tính năng này", android.widget.Toast.LENGTH_SHORT).show()
             }
-            btnFollow.setOnClickListener {
-                android.widget.Toast.makeText(context, "Đăng nhập để theo dõi truyện", android.widget.Toast.LENGTH_SHORT).show()
-            }
+            btnFavorite.setOnClickListener { goLogin() }
+            btnFollow.setOnClickListener { goLogin() }
             return
         }
 

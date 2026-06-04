@@ -33,6 +33,19 @@
                 app:layout_constraintBottom_toBottomOf="parent" />
 
 
+            <TextView
+                android:id="@+id/btn_home_checkin"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:text="🎁"
+                android:textSize="22sp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toStartOf="@id/btn_theme_toggle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
             <ImageButton
                 android:id="@+id/btn_theme_toggle"
                 android:layout_width="50dp"

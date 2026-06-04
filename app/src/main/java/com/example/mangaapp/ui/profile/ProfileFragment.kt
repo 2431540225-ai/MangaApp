@@ -19,6 +19,8 @@ class ProfileFragment : Fragment() {
     private lateinit var tvRole: TextView
     private lateinit var tvCoinBalance: TextView
     private lateinit var btnWallet: LinearLayout
+    private lateinit var btnDailyCheckin: LinearLayout
+    private lateinit var tvCheckinBadge: TextView
     private lateinit var btnUploadManga: LinearLayout
     private lateinit var btnLogin: Button
     private lateinit var btnLogout: Button
@@ -61,6 +63,8 @@ class ProfileFragment : Fragment() {
         tvRole              = view.findViewById(R.id.tv_role)
         tvCoinBalance       = view.findViewById(R.id.tv_coin_balance)
         btnWallet           = view.findViewById(R.id.btn_wallet)
+        btnDailyCheckin     = view.findViewById(R.id.btn_daily_checkin)
+        tvCheckinBadge      = view.findViewById(R.id.tv_checkin_badge)
         btnUploadManga      = view.findViewById(R.id.btn_upload_manga)
         btnLogin            = view.findViewById(R.id.btn_login_profile)
         btnLogout           = view.findViewById(R.id.btn_logout)
@@ -105,6 +109,24 @@ class ProfileFragment : Fragment() {
         // Hiện section đăng truyện nếu là tác giả hoặc admin
         layoutAuthorSection.visibility =
             if (user.isAuthor) View.VISIBLE else View.GONE
+
+        // Cập nhật trạng thái điểm danh
+        com.example.mangaapp.repository.CheckInRepository.getCheckInStatus { status ->
+            if (isAdded) {
+                if (status.alreadyCheckedInToday) {
+                    tvCheckinBadge.text = "Chuỗi ${status.currentStreak} ngày 🔥"
+                    tvCheckinBadge.setBackgroundColor(android.graphics.Color.parseColor("#4CAF50"))
+                } else {
+                    tvCheckinBadge.text = "Nhận xu!"
+                    tvCheckinBadge.setBackgroundColor(android.graphics.Color.parseColor("#F5A623"))
+                }
+            }
+        }
+
+        // Nút điểm danh
+        btnDailyCheckin.setOnClickListener {
+            com.example.mangaapp.ui.checkin.DailyCheckInDialog.show(parentFragmentManager)
+        }
 
         // Nút ví coin
         btnWallet.setOnClickListener {

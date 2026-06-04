@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="24dp">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🎁 Điểm danh hàng ngày"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1A1A2E"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tv_checkin_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Điểm danh mỗi ngày để nhận coin miễn phí!"
+        android:textSize="13sp"
+        android:textColor="#888888"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <!-- ── Grid 7 ngày ──────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="20dp">
+
+        <!-- Ngày 1 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day1_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5🪙"
+                android:textSize="10sp"
+                android:textColor="#888"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Ngày 2 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day2_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10🪙"
+                android:textSize="10sp"
+                android:textColor="#888"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Ngày 3 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day3_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15🪙"
+                android:textSize="10sp"
+                android:textColor="#888"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Ngày 4 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day4_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20🪙"
+                android:textSize="10sp"
+                android:textColor="#888"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Ngày 5 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day5_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25🪙"
+                android:textSize="10sp"
+                android:textColor="#888"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Ngày 6 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day6_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30🪙"
+                android:textSize="10sp"
+                android:textColor="#888"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Ngày 7 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tv_day7_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:text="⬜"
+                android:background="@drawable/bg_dot_inactive" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50🪙"
+                android:textSize="10sp"
+                android:textColor="#F5A623"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ── Streak Info ──────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#FFF8E7"
+        android:padding="16dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/tv_checkin_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔥 Chuỗi: 0 ngày liên tiếp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tv_checkin_reward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hôm nay nhận: 5 🪙"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#F5A623" />
+    </LinearLayout>
+
+    <!-- ── Buttons ──────────────────────────────────────── -->
+    <Button
+        android:id="@+id/btn_checkin"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="✨ Điểm danh nhận xu"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#F5A623"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/btn_checkin_close"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="Để sau"
+        android:textSize="14sp"
+        android:textColor="#888888"
+        android:backgroundTint="#F0F0F5"
+        style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+    <!-- ── Status sau khi đã điểm danh ─────────────────── -->
+    <TextView
+        android:id="@+id/tv_checkin_done"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="✅ Đã điểm danh hôm nay!"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#4CAF50"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+
+    <!-- ── Progress ────────────────────────────────────── -->
+    <ProgressBar
+        android:id="@+id/progress_checkin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</LinearLayout>
