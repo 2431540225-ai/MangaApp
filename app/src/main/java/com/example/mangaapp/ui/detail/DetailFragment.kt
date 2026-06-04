@@ -38,8 +38,12 @@ class DetailFragment : Fragment() {
     private lateinit var tvChapterCount: TextView
     private lateinit var btnReadFirst: Button
     private lateinit var btnReadLatest: Button
-    private lateinit var btnFavorite: Button
-    private lateinit var btnFollow: Button
+    private lateinit var btnFavorite: android.widget.LinearLayout
+    private lateinit var btnFollow: android.widget.LinearLayout
+    private lateinit var ivFavoriteIcon: android.widget.ImageView
+    private lateinit var ivFollowIcon: android.widget.ImageView
+    private lateinit var tvFavoriteLabel: android.widget.TextView
+    private lateinit var tvFollowLabel: android.widget.TextView
     private lateinit var llGenres: LinearLayout
     private lateinit var tvDescription: TextView
     private lateinit var tvReadMore: TextView
@@ -101,6 +105,10 @@ class DetailFragment : Fragment() {
         btnReadLatest   = view.findViewById(R.id.btn_read_latest)
         btnFavorite     = view.findViewById(R.id.btn_favorite)
         btnFollow       = view.findViewById(R.id.btn_follow)
+        ivFavoriteIcon  = view.findViewById(R.id.iv_favorite_icon)
+        ivFollowIcon    = view.findViewById(R.id.iv_follow_icon)
+        tvFavoriteLabel = view.findViewById(R.id.tv_favorite_label)
+        tvFollowLabel   = view.findViewById(R.id.tv_follow_label)
         llGenres        = view.findViewById(R.id.ll_genres)
         tvDescription   = view.findViewById(R.id.tv_description)
         tvReadMore      = view.findViewById(R.id.tv_read_more)
@@ -330,30 +338,26 @@ class DetailFragment : Fragment() {
     private fun updateFavoriteButtonUI(uid: String, storyId: String) {
         val isFav = com.example.mangaapp.repository.MangaRepository.isFavorite(uid, storyId)
         if (isFav) {
-            btnFavorite.text = "❤ Đã yêu thích"
-            btnFavorite.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.primary, null))
-            btnFavorite.setTextColor(resources.getColor(R.color.white, null))
+            ivFavoriteIcon.setImageResource(R.drawable.ic_favorite_filled)
+            tvFavoriteLabel.text = "Đã thích"
+            tvFavoriteLabel.setTextColor(resources.getColor(R.color.primary, null))
         } else {
-            btnFavorite.text = "❤ Yêu thích"
-            btnFavorite.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.light_surface, null))
-            btnFavorite.setTextColor(resources.getColor(R.color.primary, null))
+            ivFavoriteIcon.setImageResource(R.drawable.ic_favorite_border)
+            tvFavoriteLabel.text = "Yêu thích"
+            tvFavoriteLabel.setTextColor(resources.getColor(R.color.light_text_secondary, null))
         }
     }
 
     private fun updateFollowButtonUI(uid: String, storyId: String) {
         val isFollow = com.example.mangaapp.repository.MangaRepository.isFollowing(uid, storyId)
         if (isFollow) {
-            btnFollow.text = "🔔 Đang theo dõi"
-            btnFollow.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.primary, null))
-            btnFollow.setTextColor(resources.getColor(R.color.white, null))
+            ivFollowIcon.setImageResource(R.drawable.ic_follow_filled)
+            tvFollowLabel.text = "Đang theo dõi"
+            tvFollowLabel.setTextColor(resources.getColor(R.color.primary, null))
         } else {
-            btnFollow.text = "🔔 Theo dõi"
-            btnFollow.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(resources.getColor(R.color.light_surface, null))
-            btnFollow.setTextColor(resources.getColor(R.color.primary, null))
+            ivFollowIcon.setImageResource(R.drawable.ic_follow_border)
+            tvFollowLabel.text = "Theo dõi"
+            tvFollowLabel.setTextColor(resources.getColor(R.color.light_text_secondary, null))
         }
     }
 

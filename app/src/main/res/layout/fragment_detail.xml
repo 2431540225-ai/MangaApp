@@ -218,33 +218,70 @@
 
         </LinearLayout>
 
-        <!-- ===== NÚT YÊU THÍCH & THEO DÕI ===== -->
+        <!-- ===== NÚT YÊU THÍCH & THEO DÕI (icon style) ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="12dp"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="16dp"
             android:gravity="center">
 
-            <Button
+            <!-- YÊU THÍCH -->
+            <LinearLayout
                 android:id="@+id/btn_favorite"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="❤ Yêu thích"
-                android:textColor="@color/primary"
-                android:backgroundTint="@color/light_surface"
-                android:layout_marginEnd="8dp" />
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless">
 
-            <Button
+                <ImageView
+                    android:id="@+id/iv_favorite_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_favorite_border" />
+
+                <TextView
+                    android:id="@+id/tv_favorite_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yêu thích"
+                    android:textSize="11sp"
+                    android:textColor="@color/light_text_secondary"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <!-- THEO DÕI -->
+            <LinearLayout
                 android:id="@+id/btn_follow"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🔔 Theo dõi"
-                android:textColor="@color/primary"
-                android:backgroundTint="@color/light_surface" />
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <ImageView
+                    android:id="@+id/iv_follow_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_follow_border" />
+
+                <TextView
+                    android:id="@+id/tv_follow_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Theo dõi"
+                    android:textSize="11sp"
+                    android:textColor="@color/light_text_secondary"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
