@@ -25,6 +25,7 @@ class ProfileFragment : Fragment() {
     private lateinit var layoutLoggedIn: LinearLayout
     private lateinit var layoutGuest: LinearLayout
     private lateinit var layoutAuthorSection: LinearLayout
+    private lateinit var btnReadingHistory: LinearLayout
 
     // Lắng nghe thay đổi coin realtime
     private val coinListener: (Int) -> Unit = { newCoins ->
@@ -55,17 +56,18 @@ class ProfileFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        tvUsername         = view.findViewById(R.id.tv_username)
-        tvEmail            = view.findViewById(R.id.tv_email)
-        tvRole             = view.findViewById(R.id.tv_role)
-        tvCoinBalance      = view.findViewById(R.id.tv_coin_balance)
-        btnWallet          = view.findViewById(R.id.btn_wallet)
-        btnUploadManga     = view.findViewById(R.id.btn_upload_manga)
-        btnLogin           = view.findViewById(R.id.btn_login_profile)
-        btnLogout          = view.findViewById(R.id.btn_logout)
-        layoutLoggedIn     = view.findViewById(R.id.layout_logged_in)
-        layoutGuest        = view.findViewById(R.id.layout_guest)
+        tvUsername          = view.findViewById(R.id.tv_username)
+        tvEmail             = view.findViewById(R.id.tv_email)
+        tvRole              = view.findViewById(R.id.tv_role)
+        tvCoinBalance       = view.findViewById(R.id.tv_coin_balance)
+        btnWallet           = view.findViewById(R.id.btn_wallet)
+        btnUploadManga      = view.findViewById(R.id.btn_upload_manga)
+        btnLogin            = view.findViewById(R.id.btn_login_profile)
+        btnLogout           = view.findViewById(R.id.btn_logout)
+        layoutLoggedIn      = view.findViewById(R.id.layout_logged_in)
+        layoutGuest         = view.findViewById(R.id.layout_guest)
         layoutAuthorSection = view.findViewById(R.id.layout_author_section)
+        btnReadingHistory   = view.findViewById(R.id.btn_reading_history)
     }
 
     private fun renderUI() {
@@ -108,6 +110,14 @@ class ProfileFragment : Fragment() {
         btnWallet.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container, CoinWalletFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        // Nút lịch sử đọc
+        btnReadingHistory.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, ReadingHistoryFragment.newInstance())
                 .addToBackStack(null)
                 .commit()
         }

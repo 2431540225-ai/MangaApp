@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mangaapp.R
 import com.example.mangaapp.models.Chapter
 import com.example.mangaapp.repository.MangaRepository
+import com.example.mangaapp.repository.ReadingHistoryRepository
 
 class ReadFragment : Fragment() {
 
@@ -19,7 +20,6 @@ class ReadFragment : Fragment() {
     private var chapterNumber: Int = 1
     private var fontSize: Int = 16
 
-    // Cache chapters để dùng cho prev/next/spinner
     private var chapterList: List<Chapter> = emptyList()
 
     private lateinit var viewModel: ReaderViewModel
@@ -40,6 +40,12 @@ class ReadFragment : Fragment() {
     private lateinit var rvChapterComments: RecyclerView
     private lateinit var tvChapterCommentCount: TextView
     private lateinit var chapterCommentAdapter: com.example.mangaapp.ui.detail.CommentAdapter
+
+    // ← THÊM MỚI
+    private val historyRepository = ReadingHistoryRepository()
+    private var mangaName: String = ""
+    private var mangaCoverUrl: String = ""
+    private var mangaAuthor: String = ""
 
     companion object {
         fun newInstance(mangaId: Int, chapterNumber: Int): ReadFragment {
@@ -109,22 +115,23 @@ class ReadFragment : Fragment() {
         progressLoading = view.findViewById(R.id.progress_loading)
     }
 
-    // LOAD CHAPTER LIST
-
     private fun loadChapterList() {
         if (firestoreStoryId.isEmpty()) return
 
-        // Load thông tin truyện (tên) từ Firestore
+        // Load thông tin truyện (tên + ảnh bìa + tác giả) từ Firestore
         MangaRepository.getMangaById(
             firestoreId = firestoreStoryId,
             onSuccess = { manga ->
                 if (!isAdded) return@getMangaById
                 tvMangaName.text = manga?.name ?: ""
+                // ← THÊM MỚI: lưu lại để dùng khi ghi lịch sử
+                mangaName     = manga?.name ?: ""
+                mangaCoverUrl = manga?.coverUrl ?: ""
+                mangaAuthor   = manga?.author ?: ""
             },
             onError = { }
         )
 
-        // Load danh sách chapter
         MangaRepository.getChaptersByMangaId(
             firestoreId = firestoreStoryId,
             onSuccess = { chapters ->
@@ -140,8 +147,6 @@ class ReadFragment : Fragment() {
             }
         )
     }
-
-    // OBSERVERS
 
     private fun setupObservers() {
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
@@ -183,8 +188,6 @@ class ReadFragment : Fragment() {
         tvContent.text       = "Chương này chưa có nội dung."
     }
 
-    // SPINNER
-
     private fun setupSpinner() {
         if (!isAdded) return
         val labels = chapterList.map { "Chương ${it.chapterNumber}: ${it.title}" }
@@ -204,22 +207,17 @@ class ReadFragment : Fragment() {
         }
     }
 
-    // LOAD CHAPTER
-
     private fun loadChapter(chapNum: Int) {
         chapterNumber = chapNum
 
-        // Cập nhật UI header
         val total = chapterList.size
         tvChapterInfo.text = "Chương $chapNum${if (total > 0) " / $total" else ""}"
 
         val chapTitle = chapterList.find { it.chapterNumber == chapNum }?.title ?: ""
         tvChapterTitle.text = "Chương $chapNum${if (chapTitle.isNotEmpty()) ": $chapTitle" else ""}"
 
-        // Cập nhật nút prev/next
         updateNavButtons()
 
-        // Cập nhật spinner
         val idx = chapterList.indexOfFirst { it.chapterNumber == chapNum }
         if (idx >= 0 && spinnerChapter.selectedItemPosition != idx) {
             spinnerChapter.setSelection(idx)
@@ -227,9 +225,18 @@ class ReadFragment : Fragment() {
 
         setupChapterComments(chapNum)
 
-        // Load pages từ Firestore
         if (firestoreStoryId.isNotEmpty()) {
             viewModel.loadChapterFromFirestore(firestoreStoryId, "chapter_$chapNum")
+
+            // ← THÊM MỚI: lưu lịch sử đọc
+            historyRepository.saveOrUpdateHistory(
+                storyId      = firestoreStoryId,
+                storyTitle   = mangaName,
+                storyCoverUrl = mangaCoverUrl,
+                authorName   = mangaAuthor,
+                chapterId    = "chapter_$chapNum",
+                chapterTitle = "Chương $chapNum${if (chapTitle.isNotEmpty()) ": $chapTitle" else ""}"
+            )
         } else {
             showNoContent()
         }
@@ -244,8 +251,6 @@ class ReadFragment : Fragment() {
         btnNext.alpha     = if (nextChap != null) 1f else 0.4f
     }
 
-    // ─── PREFETCH ────────────────────────────────────────────────────────────
-
     private fun prefetchNextChapter() {
         if (firestoreStoryId.isEmpty()) return
         val nextChap = chapterList
@@ -259,8 +264,6 @@ class ReadFragment : Fragment() {
             onError   = {}
         )
     }
-
-    // ─── CLICK LISTENERS ─────────────────────────────────────────────────────
 
     private fun setupClickListeners() {
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
@@ -299,7 +302,7 @@ class ReadFragment : Fragment() {
             }
             val newComment = com.example.mangaapp.models.Comment(
                 id          = System.currentTimeMillis().toString(),
-                firestoreId = firestoreStoryId,  // dùng firestoreStoryId: String
+                firestoreId = firestoreStoryId,
                 chapterId   = chapNum,
                 userId      = "me",
                 userName    = "Bạn",

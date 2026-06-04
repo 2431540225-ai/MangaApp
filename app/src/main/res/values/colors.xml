@@ -79,5 +79,12 @@
     <color name="color_ripple">@color/light_ripple</color>
     <color name="color_skeleton">@color/light_skeleton_bg</color>
     <color name="color_glass_border">@color/light_glass_border</color>
-
+    <!-- Thêm các dòng này vì ReadingHistory -->
+    <color name="background">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="colorError">#E53935</color>
+    <color name="colorAccent">#FF6F00</color>
 </resources>
