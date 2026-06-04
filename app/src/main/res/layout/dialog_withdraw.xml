@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dialog_withdraw.xml -->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Tiêu đề coin -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#F8F8FF"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số coin muốn rút"
+                android:textSize="12sp"
+                android:textColor="#888"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/et_withdraw_amount"
+                android:layout_width="140dp"
+                android:layout_height="52dp"
+                android:inputType="number"
+                android:hint="0"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A2E"
+                android:gravity="center"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/tv_withdraw_vnd_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="≈ 0đ"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#F5A623" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thông tin ngân hàng nhận tiền"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Tên ngân hàng -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên ngân hàng *"
+            android:textSize="12sp"
+            android:textColor="#666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_bank_name"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="VD: Vietcombank, Techcombank..."
+            android:paddingHorizontal="12dp"
+            android:background="@android:drawable/edit_text"
+            android:inputType="textCapWords"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Số tài khoản -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số tài khoản *"
+            android:textSize="12sp"
+            android:textColor="#666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_account_number"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:inputType="number"
+            android:hint="Nhập số tài khoản"
+            android:paddingHorizontal="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Tên chủ tài khoản -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên chủ tài khoản *"
+            android:textSize="12sp"
+            android:textColor="#666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_account_holder"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Viết hoa, đúng tên trên thẻ"
+            android:paddingHorizontal="12dp"
+            android:background="@android:drawable/edit_text"
+            android:inputType="textCapCharacters"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Lưu ý -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#FFF8E7"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚠️"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tiền sẽ được chuyển trong 3–7 ngày làm việc sau khi admin duyệt. Thông tin ngân hàng sẽ được lưu lại cho lần sau."
+                android:textSize="11sp"
+                android:textColor="#7A5200" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -2,10 +2,11 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_package"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="3dp"
     app:cardBackgroundColor="@android:color/white">
 
@@ -13,67 +14,117 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp">
+        android:gravity="center">
 
-        <!-- Badge (Phổ biến / Tiết kiệm nhất) -->
+        <!-- Badge dải màu ngang trên cùng — luôn hiện, không bị clip -->
         <TextView
             android:id="@+id/tv_pkg_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:gravity="center"
             android:text="Phổ biến"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:background="#E53935"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="3dp"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp" />
+            android:visibility="gone" />
 
-        <!-- Số coin chính -->
-        <TextView
-            android:id="@+id/tv_pkg_coins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="100 🪙"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#F5A623"
-            android:layout_marginBottom="2dp" />
-
-        <!-- Bonus coin -->
-        <TextView
-            android:id="@+id/tv_pkg_bonus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+10 bonus"
-            android:textSize="12sp"
-            android:textColor="#4CAF50"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Giá tiền -->
-        <TextView
-            android:id="@+id/tv_pkg_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="10.000đ"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Nút mua -->
-        <Button
-            android:id="@+id/btn_pkg_buy"
+        <!-- Spacer thay thế khi không có badge (giữ layout cân đều) -->
+        <View
+            android:id="@+id/view_badge_placeholder"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Mua ngay"
-            android:textSize="13sp"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#1A1A2E" />
+            android:layout_height="28dp"
+            android:background="@android:color/transparent"
+            android:visibility="visible" />
 
+        <!-- Nội dung chính -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="14dp">
+
+            <!-- Coin icon -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🪙"
+                android:textSize="28sp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Số coin chính -->
+            <TextView
+                android:id="@+id/tv_pkg_coins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A2E"
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="coin"
+                android:textSize="11sp"
+                android:textColor="#888"
+                android:layout_marginBottom="6dp" />
+
+            <!-- Bonus coins -->
+            <TextView
+                android:id="@+id/tv_pkg_bonus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+10 bonus 🎁"
+                android:textSize="11sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="#10B981"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp" />
+
+            <Space
+                android:id="@+id/space_no_bonus"
+                android:layout_width="match_parent"
+                android:layout_height="18dp"
+                android:visibility="visible" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F0F0F5"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Giá tiền -->
+            <TextView
+                android:id="@+id/tv_pkg_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10.000đ"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A2E"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Nút mua -->
+            <Button
+                android:id="@+id/btn_pkg_buy"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:text="Mua ngay"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#1A1A2E"
+                style="@style/Widget.MaterialComponents.Button" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

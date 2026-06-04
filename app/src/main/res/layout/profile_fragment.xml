@@ -382,8 +382,9 @@
 
                             <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EBEBEB" />
 
-                            <!-- Doanh thu (placeholder) -->
+                            <!-- Doanh thu tác giả -->
                             <LinearLayout
+                                android:id="@+id/btn_author_revenue"
                                 android:layout_width="match_parent"
                                 android:layout_height="52dp"
                                 android:orientation="horizontal"
@@ -405,6 +406,16 @@
                                     android:text="Doanh thu của tôi"
                                     android:textSize="15sp"
                                     android:textColor="#1A1A2E" />
+
+                                <TextView
+                                    android:id="@+id/tv_author_pending"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text=""
+                                    android:textSize="12sp"
+                                    android:textColor="#10B981"
+                                    android:layout_marginEnd="8dp"
+                                    android:visibility="gone" />
 
                                 <TextView
                                     android:layout_width="wrap_content"

@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import com.example.mangaapp.R
 import com.example.mangaapp.ui.auth.LoginFragment
 import com.example.mangaapp.ui.coin.CoinWalletFragment
+import com.example.mangaapp.repository.AuthorRevenueRepository
+import com.example.mangaapp.ui.author.AuthorEarningsFragment
 import com.example.mangaapp.ui.upload.UploadMangaFragment
 import com.example.mangaapp.utils.UserSession
 
@@ -22,6 +24,8 @@ class ProfileFragment : Fragment() {
     private lateinit var btnDailyCheckin: LinearLayout
     private lateinit var tvCheckinBadge: TextView
     private lateinit var btnUploadManga: LinearLayout
+    private lateinit var btnAuthorRevenue: LinearLayout
+    private lateinit var tvAuthorPending: TextView
     private lateinit var btnLogin: Button
     private lateinit var btnLogout: Button
     private lateinit var layoutLoggedIn: LinearLayout
@@ -62,16 +66,41 @@ class ProfileFragment : Fragment() {
         tvEmail             = view.findViewById(R.id.tv_email)
         tvRole              = view.findViewById(R.id.tv_role)
         tvCoinBalance       = view.findViewById(R.id.tv_coin_balance)
+
         btnWallet           = view.findViewById(R.id.btn_wallet)
+
         btnDailyCheckin     = view.findViewById(R.id.btn_daily_checkin)
         tvCheckinBadge      = view.findViewById(R.id.tv_checkin_badge)
+
         btnUploadManga      = view.findViewById(R.id.btn_upload_manga)
+
+        btnAuthorRevenue    = view.findViewById(R.id.btn_author_revenue)
+        tvAuthorPending     = view.findViewById(R.id.tv_author_pending)
+
         btnLogin            = view.findViewById(R.id.btn_login_profile)
         btnLogout           = view.findViewById(R.id.btn_logout)
+
         layoutLoggedIn      = view.findViewById(R.id.layout_logged_in)
         layoutGuest         = view.findViewById(R.id.layout_guest)
+
         layoutAuthorSection = view.findViewById(R.id.layout_author_section)
         btnReadingHistory   = view.findViewById(R.id.btn_reading_history)
+    }
+
+    private fun loadAuthorPendingBadge(authorId: String) {
+        AuthorRevenueRepository.getRevenueSummary(
+            authorId = authorId,
+            onSuccess = { summary ->
+                if (!isAdded) return@getRevenueSummary
+                if (summary.pendingCoins > 0) {
+                    tvAuthorPending.visibility = View.VISIBLE
+                    tvAuthorPending.text = "${summary.pendingCoins} 🪙"
+                } else {
+                    tvAuthorPending.visibility = View.GONE
+                }
+            },
+            onError = { tvAuthorPending.visibility = View.GONE }
+        )
     }
 
     private fun renderUI() {
@@ -151,6 +180,15 @@ class ProfileFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
+
+        btnAuthorRevenue.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, AuthorEarningsFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        loadAuthorPendingBadge(user.firestoreId)
 
         // Đăng xuất
         btnLogout.setOnClickListener {

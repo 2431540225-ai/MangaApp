@@ -122,8 +122,9 @@ object CoinRepository {
             tx.set(
                 authorRef,
                 mapOf(
-                    "authorId"    to authorId,
-                    "pendingCoins" to FieldValue.increment(authorCoins)
+                    "authorId"       to authorId,
+                    "pendingCoins"   to FieldValue.increment(authorCoins),
+                    "totalEarned"    to FieldValue.increment(authorCoins)
                 ),
                 com.google.firebase.firestore.SetOptions.merge()
             )
@@ -211,21 +212,50 @@ object CoinRepository {
         }
     }
 
-    // ── Author Revenue ────────────────────────────────────────────────────────
+    // ── Lịch sử coin độc giả ──────────────────────────────────────────────────
 
-    /**
-     * Lấy số coin hoa hồng tác giả đang chờ nhận.
-     */
-    fun getAuthorPendingRevenue(
-        authorId: String,
-        onSuccess: (Long) -> Unit,
-        onError: (Exception) -> Unit
+    fun getUserCoinHistory(
+        userId: String,
+        limit: Int = 30,
+        onSuccess: (List<com.example.mangaapp.models.WalletTransaction>) -> Unit,
+        onError: (String) -> Unit
     ) {
-        db.collection("authorRevenue").document(authorId).get()
-            .addOnSuccessListener { doc ->
-                val pending = doc.getLong("pendingCoins") ?: 0L
-                onSuccess(pending)
+        db.collection("coinTransactions")
+            .whereEqualTo("userId", userId)
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+            .get()
+            .addOnSuccessListener { result ->
+                onSuccess(result.documents.map { doc -> mapUserTransaction(doc.id, doc.data ?: emptyMap()) })
             }
-            .addOnFailureListener { onError(it) }
+            .addOnFailureListener {
+                db.collection("coinTransactions")
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .addOnSuccessListener { result ->
+                        val list = result.documents
+                            .sortedByDescending { it.getLong("timestamp") ?: 0L }
+                            .take(limit)
+                            .map { doc -> mapUserTransaction(doc.id, doc.data ?: emptyMap()) }
+                        onSuccess(list)
+                    }
+                    .addOnFailureListener { e -> onError(e.message ?: "Không tải lịch sử") }
+            }
+    }
+
+    private fun mapUserTransaction(
+        id: String,
+        data: Map<String, Any?>
+    ): com.example.mangaapp.models.WalletTransaction {
+        val type = data["type"] as? String ?: ""
+        val amount = (data["amount"] as? Long) ?: 0L
+        return com.example.mangaapp.models.WalletTransaction(
+            id            = id,
+            type          = type,
+            amount        = amount,
+            timestamp     = (data["timestamp"] as? Long) ?: 0L,
+            storyTitle    = data["storyId"] as? String ?: "",
+            chapterNumber = ((data["chapterNumber"] as? Long) ?: 0L).toInt()
+        )
     }
 }

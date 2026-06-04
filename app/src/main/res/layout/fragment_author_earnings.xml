@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- fragment_author_earnings.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,7 +18,7 @@
         android:paddingHorizontal="8dp">
 
         <ImageButton
-            android:id="@+id/btn_back_wallet"
+            android:id="@+id/btn_back_earnings"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@android:drawable/ic_media_previous"
@@ -28,27 +29,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ví Coin"
+            android:text="Doanh thu của tôi"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:layout_marginStart="8dp" />
-
-        <!-- Nút lịch sử (shortcut scroll) -->
-        <TextView
-            android:id="@+id/btn_history_shortcut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lịch sử"
-            android:textSize="13sp"
-            android:textColor="#F5A623"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
+    <!-- ProgressBar loading -->
+    <ProgressBar
+        android:id="@+id/progress_earnings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:visibility="gone" />
+
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll_wallet"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -57,7 +54,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ══ Thẻ số dư ══ -->
+            <!-- ══ Card số dư khả dụng ══ -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,27 +70,17 @@
                     android:padding="24dp"
                     android:gravity="center">
 
-                    <!-- Icon coin lớn -->
-                    <TextView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:gravity="center"
-                        android:text="🪙"
-                        android:textSize="28sp"
-                        android:background="#2A2A4E"
-                        android:layout_marginBottom="12dp" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SỐ DƯ HIỆN TẠI"
+                        android:text="CÓ THỂ RÚT"
                         android:textSize="11sp"
                         android:letterSpacing="0.15"
                         android:textColor="#8888AA"
                         android:layout_marginBottom="6dp" />
 
                     <TextView
-                        android:id="@+id/tv_wallet_balance"
+                        android:id="@+id/tv_pending_coins"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 🪙"
@@ -101,163 +88,195 @@
                         android:textStyle="bold"
                         android:textColor="#F5A623" />
 
-                    <!-- Quy đổi VND -->
                     <TextView
-                        android:id="@+id/tv_balance_vnd"
+                        android:id="@+id/tv_pending_vnd"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="≈ 0đ"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textColor="#8888AA"
                         android:layout_marginTop="4dp"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="20dp" />
 
-                    <TextView
-                        android:id="@+id/tv_wallet_login_prompt"
+                    <Button
+                        android:id="@+id/btn_withdraw"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Đăng nhập để xem số dư"
+                        android:layout_height="44dp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="24dp"
+                        android:text="🏦  Rút tiền về ngân hàng"
                         android:textSize="13sp"
-                        android:textColor="#8888AA"
-                        android:visibility="gone"
-                        android:layout_marginTop="8dp" />
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#10B981"
+                        style="@style/Widget.MaterialComponents.Button" />
 
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#2A2A4E"
-                        android:layout_marginVertical="8dp" />
-
-                    <!-- Ghi chú coin -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="💡 Coin không có hạn sử dụng · Chương đã mở dùng mãi mãi"
+                        android:text="Tối thiểu 100 coin để rút"
                         android:textSize="11sp"
-                        android:textColor="#8888AA"
-                        android:gravity="center" />
+                        android:textColor="#666688"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- ══ Tiêu đề gói nạp ══ -->
+            <!-- ══ Thống kê 2 cột ══ -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="10dp">
+                android:layout_marginBottom="12dp">
 
-                <TextView
+                <!-- Tổng thu -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Chọn gói nạp coin"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A2E" />
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📈"
+                            android:textSize="20sp"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tổng thu"
+                            android:textSize="12sp"
+                            android:textColor="#888" />
+
+                        <TextView
+                            android:id="@+id/tv_total_earned"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 🪙"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#1A1A2E"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Đã rút -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="100 coin = 10.000đ"
-                    android:textSize="11sp"
-                    android:textColor="#888" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="💸"
+                            android:textSize="20sp"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đã rút"
+                            android:textSize="12sp"
+                            android:textColor="#888" />
+
+                        <TextView
+                            android:id="@+id/tv_total_withdrawn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 🪙"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#1A1A2E"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
-            <!-- Loading packages -->
-            <ProgressBar
-                android:id="@+id/progress_wallet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:layout_marginVertical="24dp" />
-
-            <!-- Grid gói coin -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_coin_packages"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingBottom="8dp"
-                android:nestedScrollingEnabled="false" />
-
-            <!-- Banner khuyến mãi nhỏ -->
+            <!-- ══ Hoa hồng info card ══ -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
-                app:cardBackgroundColor="#FFF8E7"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#EEF2FF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="12dp">
+                    android:padding="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🎁"
-                        android:textSize="20sp"
+                        android:text="ℹ️"
+                        android:textSize="18sp"
                         android:layout_marginEnd="10dp" />
 
                     <TextView
+                        android:id="@+id/tv_commission_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Mua gói lớn hơn để nhận thêm coin bonus — tiết kiệm hơn tới 30%!"
+                        android:text="Bạn nhận 70% mỗi lần độc giả mở khóa chapter trả phí. App giữ 30% phí nền tảng."
                         android:textSize="12sp"
-                        android:textColor="#7A5200" />
+                        android:textColor="#3730A3" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- ══ Lịch sử giao dịch ══ -->
-            <LinearLayout
-                android:id="@+id/section_history"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:text="Lịch sử giao dịch"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A2E"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="8dp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Lịch sử giao dịch"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A2E" />
-            </LinearLayout>
-
-            <!-- Empty state lịch sử -->
+            <!-- Empty state -->
             <LinearLayout
-                android:id="@+id/layout_empty_history"
+                android:id="@+id/layout_empty_earnings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="32dp"
+                android:padding="40dp"
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📋"
-                    android:textSize="36sp"
+                    android:text="📭"
+                    android:textSize="40sp"
                     android:layout_marginBottom="8dp" />
 
                 <TextView
-                    android:id="@+id/tv_wallet_empty_history"
+                    android:id="@+id/tv_empty_history"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chưa có giao dịch nào"
@@ -268,13 +287,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mua gói coin đầu tiên của bạn ở trên!"
+                    android:text="Doanh thu sẽ xuất hiện khi độc giả mở khóa chapter của bạn"
                     android:textSize="12sp"
                     android:textColor="#BBB"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="6dp"
+                    android:gravity="center" />
             </LinearLayout>
 
-            <!-- Danh sách giao dịch -->
+            <!-- Danh sách lịch sử -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -285,7 +305,7 @@
                 app:cardBackgroundColor="#FFFFFF">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_wallet_history"
+                    android:id="@+id/rv_earnings_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false" />
