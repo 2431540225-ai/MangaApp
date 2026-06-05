@@ -232,8 +232,18 @@ class HomeFragment : Fragment() {
             }
             com.example.mangaapp.ui.checkin.DailyCheckInDialog.show(parentFragmentManager)
         }
-        tvLatestSeeAll.setOnClickListener { }
-        tvRankingSeeAll.setOnClickListener { }
+        tvLatestSeeAll.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, com.example.mangaapp.ui.list.ListFragment.newInstance("Mới nhất"))
+                .addToBackStack(null)
+                .commit()
+        }
+        tvRankingSeeAll.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, com.example.mangaapp.ui.list.ListFragment.newInstance("Xem nhiều"))
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     private fun updateThemeIcon() {

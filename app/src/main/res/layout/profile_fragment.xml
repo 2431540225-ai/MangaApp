@@ -382,6 +382,41 @@
 
                             <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EBEBEB" />
 
+                            <!-- Thêm chapter mới -->
+                            <LinearLayout
+                                android:id="@+id/btn_add_chapter"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingHorizontal="16dp"
+                                android:background="?attr/selectableItemBackground">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="📄"
+                                    android:textSize="20sp"
+                                    android:layout_marginEnd="12dp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thêm chapter mới"
+                                    android:textSize="15sp"
+                                    android:textColor="#1A1A2E" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="›"
+                                    android:textSize="18sp"
+                                    android:textColor="#999" />
+                            </LinearLayout>
+
+                            <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EBEBEB" />
+
                             <!-- Doanh thu tác giả -->
                             <LinearLayout
                                 android:id="@+id/btn_author_revenue"

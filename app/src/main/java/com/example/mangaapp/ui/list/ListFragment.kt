@@ -45,8 +45,21 @@ class ListFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_list, container, false)
     }
 
+    companion object {
+        private const val ARG_SORT = "initial_sort"
+
+        /** @param initialSort "Mới nhất" hoặc "Xem nhiều" */
+        fun newInstance(initialSort: String = "Mới nhất"): ListFragment {
+            val f = ListFragment()
+            f.arguments = Bundle().apply { putString(ARG_SORT, initialSort) }
+            return f
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Áp dụng sort được truyền vào từ HomeFragment (nếu có)
+        arguments?.getString("initial_sort")?.let { selectedSort = it }
         initViews(view)
         setupAdapters()
         setupTabs()
@@ -109,6 +122,10 @@ class ListFragment : Fragment() {
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sortOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerSort.adapter = adapter
+
+        // Đặt vị trí spinner theo selectedSort hiện tại (có thể được set từ args)
+        val initialIndex = sortOptions.indexOf(selectedSort).coerceAtLeast(0)
+        spinnerSort.setSelection(initialIndex, false)
 
         spinnerSort.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

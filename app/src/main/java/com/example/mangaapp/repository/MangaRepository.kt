@@ -527,7 +527,76 @@ object MangaRepository {
             status        = if (statusStr == "ongoing") MangaStatus.ONGOING else MangaStatus.COMPLETED,
             category      = if (categoryStr == "tieu_thuyet") MangaCategory.TIEU_THUYET else MangaCategory.TRUYEN_TRANH,
             createdAt     = data["createdAt"] as? String ?: "",
-            firestoreId   = id
+            firestoreId   = id,
+            averageRating = (data["averageRating"] as? Double)?.toFloat() ?: 0f,
+            ratingCount   = (data["ratingCount"]   as? Long)?.toInt() ?: 0
         )
+    }
+
+    /**
+     * Người dùng đánh giá truyện (1–5 sao).
+     * Dùng Firestore Transaction để tính lại averageRating an toàn khi nhiều user cùng rate.
+     *
+     * Cấu trúc Firestore:
+     *   stories/{storyId}/ratings/{uid}  →  { star: Int, createdAt: String }
+     *   stories/{storyId}                →  { averageRating: Float, ratingCount: Int }
+     */
+    fun submitRating(
+        storyId: String,
+        star: Int,
+        onSuccess: (newAverage: Float, newCount: Int) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val uid = UserSession.firebaseUid ?: run {
+            onError(Exception("Bạn cần đăng nhập để đánh giá"))
+            return
+        }
+
+        val storyRef  = db.collection("stories").document(storyId)
+        val ratingRef = storyRef.collection("ratings").document(uid)
+
+        db.runTransaction { tx ->
+            val oldRatingSnap = tx.get(ratingRef)
+            val storySnap     = tx.get(storyRef)
+
+            val oldStar      = if (oldRatingSnap.exists()) (oldRatingSnap.getLong("star") ?: 0L).toInt() else 0
+            val oldAvg       = (storySnap.getDouble("averageRating") ?: 0.0).toFloat()
+            val oldCount     = (storySnap.getLong("ratingCount") ?: 0L).toInt()
+            val isFirstRating = !oldRatingSnap.exists()
+
+            val (newAvg, newCount) = if (isFirstRating) {
+                val nc  = oldCount + 1
+                val na  = ((oldAvg * oldCount) + star) / nc
+                Pair(na, nc)
+            } else {
+                // Thay thế star cũ bằng star mới
+                val na = ((oldAvg * oldCount) - oldStar + star) / oldCount
+                Pair(na, oldCount)
+            }
+
+            tx.set(ratingRef, mapOf("star" to star, "createdAt" to System.currentTimeMillis().toString()))
+            tx.update(storyRef, mapOf("averageRating" to newAvg, "ratingCount" to newCount))
+
+            Pair(newAvg, newCount)
+        }.addOnSuccessListener { (avg, count) ->
+            onSuccess(avg, count)
+        }.addOnFailureListener { onError(it) }
+    }
+
+    /**
+     * Lấy số sao người dùng hiện tại đã rate cho truyện này (0 = chưa rate).
+     */
+    fun getUserRating(
+        storyId: String,
+        onResult: (Int) -> Unit
+    ) {
+        val uid = UserSession.firebaseUid ?: run { onResult(0); return }
+        db.collection("stories").document(storyId)
+            .collection("ratings").document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                onResult(if (doc.exists()) (doc.getLong("star") ?: 0L).toInt() else 0)
+            }
+            .addOnFailureListener { onResult(0) }
     }
 }

@@ -23,6 +23,14 @@ import java.util.Locale
 
 class DetailFragment : Fragment() {
 
+    // rating views
+    private lateinit var tvAverageRating: TextView
+    private lateinit var llStarsDisplay: LinearLayout
+    private lateinit var tvRatingCount: TextView
+    private lateinit var llStarsInput: LinearLayout
+    private lateinit var tvYourRatingLabel: TextView
+    private var userCurrentStar = 0
+
     private var firestoreId: String = ""
     private var isDescExpanded   = false
     private var isChapterReversed = false
@@ -116,6 +124,13 @@ class DetailFragment : Fragment() {
         btnSendComment  = view.findViewById(R.id.btn_send_comment)
         rvComments      = view.findViewById(R.id.rv_comments)
         tvCommentCount  = view.findViewById(R.id.tv_comment_count)
+
+        tvAverageRating  = view.findViewById(R.id.tv_average_rating)
+        llStarsDisplay   = view.findViewById(R.id.ll_stars_display)
+        tvRatingCount    = view.findViewById(R.id.tv_rating_count)
+        llStarsInput     = view.findViewById(R.id.ll_stars_input)
+        tvYourRatingLabel = view.findViewById(R.id.tv_your_rating_label)
+
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
@@ -165,6 +180,7 @@ class DetailFragment : Fragment() {
         }
 
         setupFavoriteFollowButtons(manga)
+        setupRating(manga)
     }
 
     private fun loadChapters(manga: Manga) {
@@ -363,5 +379,104 @@ class DetailFragment : Fragment() {
             .replace(R.id.container, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    // ─── Rating ──────────────────────────────────────────────────────────────
+
+    private fun setupRating(manga: Manga) {
+        updateRatingDisplay(manga.averageRating, manga.ratingCount)
+        buildInputStars(manga.firestoreId)
+
+        // Load số sao user đã rate trước đó
+        MangaRepository.getUserRating(manga.firestoreId) { savedStar ->
+            if (!isAdded) return@getUserRating
+            userCurrentStar = savedStar
+            highlightInputStars(savedStar)
+            if (savedStar > 0) tvYourRatingLabel.text = "Bạn đã đánh giá $savedStar ⭐"
+        }
+    }
+
+    /** Cập nhật TextView điểm trung bình và dãy sao hiển thị (read-only) */
+    private fun updateRatingDisplay(avg: Float, count: Int) {
+        tvAverageRating.text = if (avg > 0) "%.1f".format(avg) else "–"
+        tvRatingCount.text   = "$count đánh giá"
+
+        llStarsDisplay.removeAllViews()
+        val full  = avg.toInt()
+        val half  = (avg - full) >= 0.4f
+        for (i in 1..5) {
+            val tv = TextView(requireContext()).apply {
+                text     = when {
+                    i <= full          -> "★"
+                    i == full + 1 && half -> "★"
+                    else               -> "☆"
+                }
+                textSize = 18f
+                setTextColor(
+                    if (i <= full || (i == full + 1 && half))
+                        resources.getColor(android.R.color.holo_orange_light, null)
+                    else
+                        resources.getColor(android.R.color.darker_gray, null)
+                )
+            }
+            llStarsDisplay.addView(tv)
+        }
+    }
+
+    /** Tạo 5 sao bấm được để user chọn điểm */
+    private fun buildInputStars(storyId: String) {
+        llStarsInput.removeAllViews()
+        for (i in 1..5) {
+            val tv = TextView(requireContext()).apply {
+                text     = "☆"
+                textSize = 28f
+                setPadding(4, 0, 4, 0)
+                setTextColor(resources.getColor(android.R.color.darker_gray, null))
+                setOnClickListener { onStarSelected(storyId, i) }
+            }
+            llStarsInput.addView(tv)
+        }
+    }
+
+    private fun highlightInputStars(selected: Int) {
+        for (i in 0 until llStarsInput.childCount) {
+            val tv = llStarsInput.getChildAt(i) as TextView
+            if (i < selected) {
+                tv.text = "★"
+                tv.setTextColor(resources.getColor(android.R.color.holo_orange_light, null))
+            } else {
+                tv.text = "☆"
+                tv.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            }
+        }
+    }
+
+    private fun onStarSelected(storyId: String, star: Int) {
+        if (!UserSession.isLoggedIn) {
+            Toast.makeText(requireContext(), "Vui lòng đăng nhập để đánh giá", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (star == userCurrentStar) return  // Bấm lại cùng sao → bỏ qua
+
+        highlightInputStars(star)
+        tvYourRatingLabel.text = "Đang lưu..."
+
+        MangaRepository.submitRating(
+            storyId   = storyId,
+            star      = star,
+            onSuccess = { newAvg, newCount ->
+                if (!isAdded) return@submitRating
+                userCurrentStar = star
+                updateRatingDisplay(newAvg, newCount)
+                tvYourRatingLabel.text = "Bạn đã đánh giá $star ⭐"
+                Toast.makeText(requireContext(), "Đánh giá thành công!", Toast.LENGTH_SHORT).show()
+            },
+            onError = { e ->
+                if (!isAdded) return@submitRating
+                highlightInputStars(userCurrentStar)
+                tvYourRatingLabel.text = if (userCurrentStar > 0) "Bạn đã đánh giá $userCurrentStar ⭐" else ""
+                Toast.makeText(requireContext(), "Lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        )
     }
 }

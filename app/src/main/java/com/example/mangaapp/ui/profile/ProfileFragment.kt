@@ -11,6 +11,7 @@ import com.example.mangaapp.ui.auth.LoginFragment
 import com.example.mangaapp.ui.coin.CoinWalletFragment
 import com.example.mangaapp.repository.AuthorRevenueRepository
 import com.example.mangaapp.ui.author.AuthorEarningsFragment
+import com.example.mangaapp.ui.upload.AddChapterFragment
 import com.example.mangaapp.ui.upload.UploadMangaFragment
 import com.example.mangaapp.utils.UserSession
 
@@ -24,6 +25,7 @@ class ProfileFragment : Fragment() {
     private lateinit var btnDailyCheckin: LinearLayout
     private lateinit var tvCheckinBadge: TextView
     private lateinit var btnUploadManga: LinearLayout
+    private lateinit var btnAddChapter: LinearLayout
     private lateinit var btnAuthorRevenue: LinearLayout
     private lateinit var tvAuthorPending: TextView
     private lateinit var btnLogin: Button
@@ -73,7 +75,7 @@ class ProfileFragment : Fragment() {
         tvCheckinBadge      = view.findViewById(R.id.tv_checkin_badge)
 
         btnUploadManga      = view.findViewById(R.id.btn_upload_manga)
-
+        btnAddChapter       = view.findViewById(R.id.btn_add_chapter)
         btnAuthorRevenue    = view.findViewById(R.id.btn_author_revenue)
         tvAuthorPending     = view.findViewById(R.id.tv_author_pending)
 
@@ -177,6 +179,13 @@ class ProfileFragment : Fragment() {
         btnUploadManga.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container, UploadMangaFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        btnAddChapter.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, AddChapterFragment())
                 .addToBackStack(null)
                 .commit()
         }
