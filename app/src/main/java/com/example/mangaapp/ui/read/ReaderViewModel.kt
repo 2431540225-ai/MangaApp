@@ -24,12 +24,12 @@ class ReaderViewModel : ViewModel() {
             storyId = storyId,
             chapterId = chapterId,
             onSuccess = { pageUrls ->
-                _pages.value = pageUrls
-                _isLoading.value = false
+                _pages.postValue(pageUrls)
+                _isLoading.postValue(false)
             },
             onError = { exception ->
-                _error.value = exception.message
-                _isLoading.value = false
+                _error.postValue(exception.message)
+                _isLoading.postValue(false)
             }
         )
     }

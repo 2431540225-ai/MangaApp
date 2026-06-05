@@ -21,8 +21,8 @@ import com.example.mangaapp.utils.ThemeManager
 import com.example.mangaapp.ui.detail.DetailFragment
 
 class HomeFragment : Fragment() {
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
+    private val handler = Handler(Looper.getMainLooper())
+    private var autoScrollRunnable: Runnable? = null
     private lateinit var vpBanner: ViewPager2
     private lateinit var llDots: LinearLayout
     private lateinit var rvLatest: RecyclerView
@@ -115,8 +115,7 @@ class HomeFragment : Fragment() {
                     }
                 })
 
-                handler = Handler(Looper.getMainLooper())
-                runnable = object : Runnable {
+                autoScrollRunnable = object : Runnable {
                     override fun run() {
                         if (!isAdded) return
                         val next = vpBanner.currentItem + 1
@@ -128,7 +127,7 @@ class HomeFragment : Fragment() {
                         handler.postDelayed(this, 3000)
                     }
                 }
-                handler.postDelayed(runnable, 3000)
+                handler.postDelayed(autoScrollRunnable!!, 3000)
             },
             onError = { /* banner trống nếu lỗi */ }
         )
@@ -245,8 +244,7 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (::handler.isInitialized && ::runnable.isInitialized) {
-            handler.removeCallbacks(runnable)
-        }
+        autoScrollRunnable?.let { handler.removeCallbacks(it) }
+        autoScrollRunnable = null
     }
 }

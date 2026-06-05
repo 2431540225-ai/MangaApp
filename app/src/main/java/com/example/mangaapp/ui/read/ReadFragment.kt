@@ -285,6 +285,7 @@ class ReadFragment : Fragment() {
     }
 
     private fun setupChapterComments(chapNum: Int) {
+        if (!isAdded) return
         MangaRepository.initComments(requireContext())
         val commentList = MangaRepository.getCommentsByChapter(firestoreStoryId, chapNum).toMutableList()
         tvChapterCommentCount.text = "${commentList.size} bình luận"
