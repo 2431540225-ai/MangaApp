@@ -188,12 +188,13 @@
 
         </LinearLayout>
 
-        <!-- ===== NÚT ĐỌC NGAY ===== -->
+        <!-- ===== NÚT TƯƠNG TÁC ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
             android:gravity="center">
 
             <Button
@@ -202,8 +203,12 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="▶ Đọc từ đầu"
+                android:textSize="14sp"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/primary"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp"
                 android:layout_marginEnd="8dp" />
 
             <Button
@@ -212,76 +217,25 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="⏩ Đọc mới nhất"
+                android:textSize="14sp"
                 android:textColor="@color/primary"
                 android:backgroundTint="@color/light_surface"
-                android:strokeColor="@color/primary" />
+                app:strokeColor="@color/primary"
+                app:strokeWidth="1dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp"
+                android:layout_marginEnd="8dp" />
 
-        </LinearLayout>
-
-        <!-- ===== NÚT YÊU THÍCH & THEO DÕI (icon style) ===== -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="24dp"
-            android:paddingBottom="16dp"
-            android:gravity="center">
-
-            <!-- YÊU THÍCH -->
-            <LinearLayout
-                android:id="@+id/btn_favorite"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <ImageView
-                    android:id="@+id/iv_favorite_icon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_favorite_border" />
-
-                <TextView
-                    android:id="@+id/tv_favorite_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Yêu thích"
-                    android:textSize="11sp"
-                    android:textColor="@color/light_text_secondary"
-                    android:layout_marginTop="4dp" />
-
-            </LinearLayout>
-
-            <!-- THEO DÕI -->
-            <LinearLayout
-                android:id="@+id/btn_follow"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <ImageView
-                    android:id="@+id/iv_follow_icon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_follow_border" />
-
-                <TextView
-                    android:id="@+id/tv_follow_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Theo dõi"
-                    android:textSize="11sp"
-                    android:textColor="@color/light_text_secondary"
-                    android:layout_marginTop="4dp" />
-
-            </LinearLayout>
+            <ImageButton
+                android:id="@+id/btn_favorite_follow"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_circle_primary_light"
+                android:src="@drawable/ic_heart_plus"
+                app:tint="@color/primary"
+                android:padding="12dp"
+                android:scaleType="fitCenter" />
 
         </LinearLayout>
 

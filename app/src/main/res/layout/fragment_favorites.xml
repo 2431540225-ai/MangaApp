@@ -20,7 +20,7 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="❤️ Yêu Thích &amp; Theo Dõi"
+            android:text="❤️ Yêu Thích"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/primary"
@@ -29,18 +29,6 @@
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- TABS -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_favorites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/light_surface"
-        app:tabTextColor="@color/light_text_secondary"
-        app:tabSelectedTextColor="@color/primary"
-        app:tabIndicatorColor="@color/primary"
-        app:tabIndicatorHeight="3dp"
-        app:tabMode="fixed" />
 
     <!-- RECYCLERVIEW -->
     <FrameLayout

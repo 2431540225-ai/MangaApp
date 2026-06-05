@@ -34,6 +34,7 @@ class ReadFragment : Fragment() {
     private lateinit var btnNext: Button
     private lateinit var spinnerChapter: Spinner
     private lateinit var btnFontSize: ImageButton
+    private lateinit var btnFollowRead: ImageButton
     private lateinit var progressLoading: ProgressBar
     private lateinit var etChapterComment: EditText
     private lateinit var btnSendChapterComment: Button
@@ -108,6 +109,7 @@ class ReadFragment : Fragment() {
         btnNext         = view.findViewById(R.id.btn_next_chapter)
         spinnerChapter  = view.findViewById(R.id.spinner_chapter)
         btnFontSize     = view.findViewById(R.id.btn_font_size)
+        btnFollowRead   = view.findViewById(R.id.btn_follow_read)
         etChapterComment      = view.findViewById(R.id.et_chapter_comment)
         btnSendChapterComment = view.findViewById(R.id.btn_send_chapter_comment)
         rvChapterComments     = view.findViewById(R.id.rv_chapter_comments)
@@ -117,6 +119,13 @@ class ReadFragment : Fragment() {
 
     private fun loadChapterList() {
         if (firestoreStoryId.isEmpty()) return
+
+        val uid = com.example.mangaapp.utils.UserSession.firebaseUid
+        if (uid != null && com.example.mangaapp.utils.UserSession.isLoggedIn) {
+            MangaRepository.loadUserLists(uid) {
+                if (isAdded) updateFollowReadUI(uid, firestoreStoryId)
+            }
+        }
 
         // Load thông tin truyện (tên + ảnh bìa + tác giả) từ Firestore
         MangaRepository.getMangaById(
@@ -281,6 +290,36 @@ class ReadFragment : Fragment() {
         btnFontSize.setOnClickListener {
             fontSize = if (fontSize >= 22) 14 else fontSize + 2
             tvContent.textSize = fontSize.toFloat()
+        }
+
+        btnFollowRead.setOnClickListener {
+            val uid = com.example.mangaapp.utils.UserSession.firebaseUid
+            if (uid == null || !com.example.mangaapp.utils.UserSession.isLoggedIn) {
+                Toast.makeText(requireContext(), "Vui lòng đăng nhập để mượn/theo dõi truyện", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            MangaRepository.toggleFavorite(uid, firestoreStoryId,
+                onSuccess = { isNowFav ->
+                    val msg = if (isNowFav) "Đã thêm vào yêu thích ❤" else "Đã xóa khỏi yêu thích"
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    updateFollowReadUI(uid, firestoreStoryId)
+                },
+                onError = {}
+            )
+            MangaRepository.toggleFollowing(uid, firestoreStoryId,
+                onSuccess = { updateFollowReadUI(uid, firestoreStoryId) },
+                onError = {}
+            )
+        }
+    }
+
+    private fun updateFollowReadUI(uid: String, storyId: String) {
+        val isFav = MangaRepository.isFavorite(uid, storyId)
+        val isFollow = MangaRepository.isFollowing(uid, storyId)
+        if (isFav || isFollow) {
+            btnFollowRead.setImageResource(R.drawable.ic_favorite_filled)
+        } else {
+            btnFollowRead.setImageResource(R.drawable.ic_heart_plus)
         }
     }
 

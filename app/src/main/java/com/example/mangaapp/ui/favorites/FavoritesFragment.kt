@@ -15,11 +15,9 @@ import com.example.mangaapp.R
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.repository.MangaRepository
 import com.example.mangaapp.utils.UserSession
-import com.google.android.material.tabs.TabLayout
 
 class FavoritesFragment : Fragment() {
 
-    private lateinit var tabFavorites: TabLayout
     private lateinit var rvFavorites: RecyclerView
     private lateinit var layoutEmpty: LinearLayout
     private lateinit var tvEmptyMsg: TextView
@@ -27,8 +25,6 @@ class FavoritesFragment : Fragment() {
 
     private lateinit var adapter: FavoritesAdapter
 
-    // 0 = Yêu thích, 1 = Theo dõi
-    private var currentTab = 0
     private var allManga: List<Manga> = emptyList()
 
     override fun onCreateView(
@@ -40,7 +36,6 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
-        setupTabs()
         setupAdapter()
 
         if (!UserSession.isLoggedIn) {
@@ -52,26 +47,13 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        tabFavorites   = view.findViewById(R.id.tab_favorites)
         rvFavorites    = view.findViewById(R.id.rv_favorites)
         layoutEmpty    = view.findViewById(R.id.layout_empty)
         tvEmptyMsg     = view.findViewById(R.id.tv_empty_msg)
         progressLoading = view.findViewById(R.id.progress_loading)
     }
 
-    private fun setupTabs() {
-        tabFavorites.addTab(tabFavorites.newTab().setText("❤️ Yêu thích"))
-        tabFavorites.addTab(tabFavorites.newTab().setText("🔔 Theo dõi"))
 
-        tabFavorites.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                currentTab = tab?.position ?: 0
-                filterAndShow()
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
-    }
 
     private fun setupAdapter() {
         adapter = FavoritesAdapter(
@@ -106,20 +88,15 @@ class FavoritesFragment : Fragment() {
             return
         }
 
-        val ids: List<String> = if (currentTab == 0) {
-            MangaRepository.getFavoriteIds(uid)
-        } else {
-            MangaRepository.getFollowingIds(uid)
-        }
+        val favIds = MangaRepository.getFavoriteIds(uid)
+        val folIds = MangaRepository.getFollowingIds(uid)
+        // Kết hợp lại để lấy danh sách đầy đủ
+        val ids = (favIds + folIds).distinct()
 
         val filtered = allManga.filter { ids.contains(it.firestoreId) }
 
         if (filtered.isEmpty()) {
-            val msg = if (currentTab == 0)
-                "Chưa có truyện yêu thích\nNhấn ❤ trên truyện để thêm vào đây"
-            else
-                "Chưa theo dõi truyện nào\nNhấn 🔔 trên truyện để theo dõi"
-            showEmpty(msg)
+            showEmpty("Chưa có truyện yêu thích\nNhấn ❤ trên truyện để thêm vào đây")
         } else {
             layoutEmpty.visibility = View.GONE
             rvFavorites.visibility = View.VISIBLE
@@ -129,23 +106,15 @@ class FavoritesFragment : Fragment() {
 
     private fun removeManga(manga: Manga) {
         val uid = UserSession.firebaseUid ?: return
-        if (currentTab == 0) {
-            MangaRepository.removeFavorite(uid, manga.firestoreId,
-                onSuccess = {
-                    Toast.makeText(context, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show()
-                    filterAndShow()
-                },
-                onError = { Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show() }
-            )
-        } else {
-            MangaRepository.removeFollowing(uid, manga.firestoreId,
-                onSuccess = {
-                    Toast.makeText(context, "Đã bỏ theo dõi", Toast.LENGTH_SHORT).show()
-                    filterAndShow()
-                },
-                onError = { Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show() }
-            )
-        }
+        MangaRepository.removeFavorite(uid, manga.firestoreId,
+            onSuccess = {
+                // Xóa cả trường hợp nằm bên follow để tránh dính lại
+                MangaRepository.removeFollowing(uid, manga.firestoreId, onSuccess = {}, onError = {})
+                Toast.makeText(context, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show()
+                filterAndShow()
+            },
+            onError = { Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show() }
+        )
     }
 
     private fun showEmpty(msg: String) {

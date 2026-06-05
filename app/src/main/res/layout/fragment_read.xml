@@ -63,6 +63,15 @@
             android:background="@android:color/transparent"
             android:layout_marginStart="8dp" />
 
+        <ImageButton
+            android:id="@+id/btn_follow_read"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_heart_plus"
+            app:tint="@color/white"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp" />
+
     </LinearLayout>
 
     <!-- ===== NỘI DUNG TRUYỆN ===== -->
