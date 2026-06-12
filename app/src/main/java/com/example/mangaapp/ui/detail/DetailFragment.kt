@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +48,10 @@ class DetailFragment : Fragment() {
     private lateinit var tvChapterCount: TextView
     private lateinit var btnReadFirst: Button
     private lateinit var btnReadLatest: Button
-    private lateinit var btnFavoriteFollow: ImageButton
+    private lateinit var btnFavoriteFollow: ImageView
+    private lateinit var btnFollowCard: ImageButton
+    private lateinit var btnLibraryContainer: LinearLayout
+    private lateinit var tvLibraryLabel: TextView
     private lateinit var llGenres: LinearLayout
     private lateinit var tvDescription: TextView
     private lateinit var tvReadMore: TextView
@@ -114,6 +119,9 @@ class DetailFragment : Fragment() {
         btnReadFirst    = view.findViewById(R.id.btn_read_first)
         btnReadLatest   = view.findViewById(R.id.btn_read_latest)
         btnFavoriteFollow = view.findViewById(R.id.btn_favorite_follow)
+        btnFollowCard   = view.findViewById(R.id.btn_follow_card)
+        btnLibraryContainer = view.findViewById(R.id.btn_library_container)
+        tvLibraryLabel  = view.findViewById(R.id.tv_library_label)
         llGenres        = view.findViewById(R.id.ll_genres)
         tvDescription   = view.findViewById(R.id.tv_description)
         tvReadMore      = view.findViewById(R.id.tv_read_more)
@@ -166,10 +174,12 @@ class DetailFragment : Fragment() {
 
         if (manga.status == MangaStatus.ONGOING) {
             tvStatus.text = "Đang ra"
-            tvStatus.setBackgroundColor(resources.getColor(R.color.badge_new, null))
+            tvStatus.setBackgroundResource(R.drawable.bg_badge_status)
+            tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.emerald, null))
         } else {
             tvStatus.text = "Hoàn thành"
-            tvStatus.setBackgroundColor(resources.getColor(R.color.badge_full, null))
+            tvStatus.setBackgroundResource(R.drawable.bg_badge_status)
+            tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.amber, null))
         }
 
         setupGenreTags(manga)
@@ -305,10 +315,9 @@ class DetailFragment : Fragment() {
         val uid = UserSession.firebaseUid
 
         if (uid == null || !UserSession.isLoggedIn) {
-            val goLogin = {
+            btnLibraryContainer.setOnClickListener {
                 Toast.makeText(context, "Vui lòng đăng nhập để sử dụng tính năng này", Toast.LENGTH_SHORT).show()
             }
-            btnFavoriteFollow.setOnClickListener { goLogin() }
             return
         }
 
@@ -317,37 +326,74 @@ class DetailFragment : Fragment() {
             updateFavoriteFollowButtonUI(uid, manga.firestoreId)
         }
 
-        btnFavoriteFollow.setOnClickListener {
-            // Thay đổi cả hai trạng thái Favorite và Follow
-            MangaRepository.toggleFavorite(uid, manga.firestoreId,
-                onSuccess = { isNowFav ->
-                    val msg = if (isNowFav) "Đã thêm vào yêu thích ❤" else "Đã xóa khỏi yêu thích"
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                    updateFavoriteFollowButtonUI(uid, manga.firestoreId)
-                },
-                onError = {
-                    Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show()
-                }
-            )
-
-            // Cũng cập nhật Follow nhưng không hiện toast lần 2
-            MangaRepository.toggleFollowing(uid, manga.firestoreId,
-                onSuccess = {
-                    updateFavoriteFollowButtonUI(uid, manga.firestoreId)
-                },
-                onError = {}
-            )
+        btnLibraryContainer.setOnClickListener {
+            showLibraryBottomSheet(uid, manga)
         }
     }
 
+    private fun showLibraryBottomSheet(uid: String, manga: Manga) {
+        val isFav    = MangaRepository.isFavorite(uid, manga.firestoreId)
+        val isFollow = MangaRepository.isFollowing(uid, manga.firestoreId)
+
+        val options = arrayOf(
+            (if (isFav) "❤️ Bỏ yêu thích" else "🤍 Yêu thích"),
+            (if (isFollow) "🔔 Hủy theo dõi" else "🔕 Theo dõi")
+        )
+
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Thêm vào thư viện")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> MangaRepository.toggleFavorite(uid, manga.firestoreId,
+                        onSuccess = { isNowFav ->
+                            val msg = if (isNowFav) "Đã thêm vào yêu thích ❤" else "Đã xóa khỏi yêu thích"
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            updateFavoriteFollowButtonUI(uid, manga.firestoreId)
+                        },
+                        onError = { Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show() }
+                    )
+                    1 -> MangaRepository.toggleFollowing(uid, manga.firestoreId,
+                        onSuccess = { isNowFollow ->
+                            val msg = if (isNowFollow) "Đã theo dõi truyện 🔔" else "Đã hủy theo dõi"
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            updateFavoriteFollowButtonUI(uid, manga.firestoreId)
+                        },
+                        onError = { Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show() }
+                    )
+                }
+            }
+            .show()
+    }
+
     private fun updateFavoriteFollowButtonUI(uid: String, storyId: String) {
-        val isFav = MangaRepository.isFavorite(uid, storyId)
+        val isFav    = MangaRepository.isFavorite(uid, storyId)
         val isFollow = MangaRepository.isFollowing(uid, storyId)
-        
-        if (isFav || isFollow) {
-            btnFavoriteFollow.setImageResource(R.drawable.ic_favorite_filled)
-        } else {
-            btnFavoriteFollow.setImageResource(R.drawable.ic_heart_plus)
+
+        when {
+            isFav && isFollow -> {
+                btnFavoriteFollow.setImageResource(R.drawable.ic_favorite_filled)
+                btnFavoriteFollow.setColorFilter(resources.getColor(R.color.error_red, null))
+                tvLibraryLabel.text = "Yêu thích & Đang theo dõi"
+                tvLibraryLabel.setTextColor(resources.getColor(R.color.error_red, null))
+            }
+            isFav -> {
+                btnFavoriteFollow.setImageResource(R.drawable.ic_favorite_filled)
+                btnFavoriteFollow.setColorFilter(resources.getColor(R.color.error_red, null))
+                tvLibraryLabel.text = "Đã yêu thích"
+                tvLibraryLabel.setTextColor(resources.getColor(R.color.error_red, null))
+            }
+            isFollow -> {
+                btnFavoriteFollow.setImageResource(R.drawable.ic_follow_filled)
+                btnFavoriteFollow.setColorFilter(resources.getColor(R.color.primary, null))
+                tvLibraryLabel.text = "Đang theo dõi"
+                tvLibraryLabel.setTextColor(resources.getColor(R.color.primary, null))
+            }
+            else -> {
+                btnFavoriteFollow.setImageResource(R.drawable.ic_favorite_border)
+                btnFavoriteFollow.setColorFilter(resources.getColor(R.color.color_inactive_icon, null))
+                tvLibraryLabel.text = "Thêm vào thư viện"
+                tvLibraryLabel.setTextColor(resources.getColor(R.color.color_text_secondary, null))
+            }
         }
     }
 
@@ -358,8 +404,8 @@ class DetailFragment : Fragment() {
                 text = genre
                 textSize = 12f
                 setTextColor(resources.getColor(R.color.primary, null))
-                setPadding(20, 8, 20, 8)
-                background = resources.getDrawable(android.R.drawable.btn_default_small, null)
+                setPadding(24, 10, 24, 10)
+                setBackgroundResource(R.drawable.bg_chip_inactive)
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -414,9 +460,9 @@ class DetailFragment : Fragment() {
                 textSize = 18f
                 setTextColor(
                     if (i <= full || (i == full + 1 && half))
-                        resources.getColor(android.R.color.holo_orange_light, null)
+                        resources.getColor(R.color.amber, null)
                     else
-                        resources.getColor(android.R.color.darker_gray, null)
+                        resources.getColor(R.color.color_inactive_icon, null)
                 )
             }
             llStarsDisplay.addView(tv)
@@ -431,7 +477,7 @@ class DetailFragment : Fragment() {
                 text     = "☆"
                 textSize = 28f
                 setPadding(4, 0, 4, 0)
-                setTextColor(resources.getColor(android.R.color.darker_gray, null))
+                setTextColor(resources.getColor(R.color.color_inactive_icon, null))
                 setOnClickListener { onStarSelected(storyId, i) }
             }
             llStarsInput.addView(tv)
@@ -443,10 +489,10 @@ class DetailFragment : Fragment() {
             val tv = llStarsInput.getChildAt(i) as TextView
             if (i < selected) {
                 tv.text = "★"
-                tv.setTextColor(resources.getColor(android.R.color.holo_orange_light, null))
+                tv.setTextColor(resources.getColor(R.color.amber, null))
             } else {
                 tv.text = "☆"
-                tv.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+                tv.setTextColor(resources.getColor(R.color.color_inactive_icon, null))
             }
         }
     }

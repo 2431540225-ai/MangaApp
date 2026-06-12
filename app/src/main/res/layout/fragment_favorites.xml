@@ -5,22 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/light_background">
+    android:background="@color/color_background">
 
     <!-- HEADER -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/light_surface"
+        android:background="@color/color_surface"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
-        android:elevation="4dp">
+        android:elevation="0dp">
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="❤️ Yêu Thích"
+            android:text="❤️ Thư Viện"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/primary"
@@ -52,13 +52,23 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
+            android:padding="24dp"
             android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="💔"
-                android:textSize="48sp" />
+            <!-- Circular Empty Icon Background -->
+            <FrameLayout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/bg_menu_icon_circle"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💔"
+                    android:textSize="36sp"
+                    android:layout_gravity="center" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tv_empty_msg"
@@ -66,16 +76,34 @@
                 android:layout_height="wrap_content"
                 android:text="Chưa có truyện yêu thích"
                 android:textSize="16sp"
-                android:textColor="@color/light_text_secondary"
-                android:layout_marginTop="12dp" />
+                android:textColor="@color/color_text_primary"
+                android:textStyle="bold"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nhấn ❤ trên truyện để thêm vào đây"
+                android:text="Nhấn ❤ hoặc Theo dõi trên truyện để lưu trữ tại đây"
                 android:textSize="13sp"
-                android:textColor="@color/light_text_secondary"
-                android:layout_marginTop="6dp" />
+                android:textColor="@color/color_text_secondary"
+                android:layout_marginTop="8dp"
+                android:gravity="center" />
+
+            <!-- Login CTA Button -->
+            <Button
+                android:id="@+id/btn_login_profile"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="24dp"
+                android:text="Đăng nhập ngay"
+                android:background="@drawable/bg_button_gradient"
+                app:backgroundTint="@null"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                style="@style/Widget.MaterialComponents.Button"
+                android:visibility="gone" />
 
         </LinearLayout>
 

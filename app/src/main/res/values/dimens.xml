@@ -1,29 +1,57 @@
 <resources>
     <dimen name="spacing_xs">4dp</dimen>
-    <dimen name="spacing_sm">12dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
     <dimen name="spacing_md">16dp</dimen>
-    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
     <dimen name="spacing_xl">48dp</dimen>
 
+    <!-- Border radius -->
+    <dimen name="radius_card">16dp</dimen>
+    <dimen name="radius_button">12dp</dimen>
+    <dimen name="radius_chip">20dp</dimen>
+    <dimen name="radius_bottom_sheet">24dp</dimen>
+    <dimen name="radius_avatar">40dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
     <dimen name="card_corner_radius">12dp</dimen>
     <dimen name="card_corner_radius_lg">16dp</dimen>
     <dimen name="card_elevation">0dp</dimen>
 
+    <!-- Touch targets -->
+    <dimen name="touch_target">44dp</dimen>
+    <dimen name="icon_button_size">36dp</dimen>
+    <dimen name="icon_circle_size">32dp</dimen>
+    <dimen name="avatar_size">80dp</dimen>
+    <dimen name="avatar_border">3dp</dimen>
+
+    <!-- Manga card -->
     <dimen name="manga_card_width">110dp</dimen>
     <dimen name="manga_card_height">190dp</dimen>
     <dimen name="manga_cover_height">148dp</dimen>
     <dimen name="manga_grid_cover_height">180dp</dimen>
 
+    <!-- Navigation -->
     <dimen name="bottom_nav_height">64dp</dimen>
-    <dimen name="floating_dock_margin">16dp</dimen>
+    <dimen name="floating_dock_margin">20dp</dimen>
+    <dimen name="floating_dock_bottom">16dp</dimen>
 
+    <!-- Typography -->
     <dimen name="text_xs">10sp</dimen>
+    <dimen name="text_label">11sp</dimen>
+    <dimen name="text_caption">13sp</dimen>
     <dimen name="text_sm">12sp</dimen>
+    <dimen name="text_body">15sp</dimen>
     <dimen name="text_md">14sp</dimen>
     <dimen name="text_lg">18sp</dimen>
     <dimen name="text_xl">20sp</dimen>
     <dimen name="text_xxl">24sp</dimen>
     <dimen name="text_title">28sp</dimen>
 
+    <!-- Banner -->
     <dimen name="banner_height">210dp</dimen>
+
+    <!-- Detail hero -->
+    <dimen name="detail_hero_height">300dp</dimen>
+    <dimen name="detail_cover_width">110dp</dimen>
+    <dimen name="detail_cover_height">155dp</dimen>
+
 </resources>

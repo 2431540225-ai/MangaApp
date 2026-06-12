@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bg_author_item_ripple.xml: ripple tím nhạt khi chạm vào mục tác giả -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#1FA47CF3">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF000000" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+</ripple>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vòng ring avatar: gradient tím-cam-vàng, dạng oval -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:startColor="#A47CF3"
+        android:centerColor="#FF6B35"
+        android:endColor="#FFD166"
+        android:angle="45"
+        android:type="linear" />
+    <padding
+        android:left="7dp"
+        android:top="7dp"
+        android:right="7dp"
+        android:bottom="7dp" />
+</shape>

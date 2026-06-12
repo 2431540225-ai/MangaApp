@@ -1,90 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand / Primary -->
+    <color name="primary">#7C3AED</color>
+    <color name="primary_dark">#5B21B6</color>
+    <color name="primary_light">#A78BFA</color>
+    <color name="accent">#7C3AED</color>
+    <color name="gradient_start">#7C3AED</color>
+    <color name="gradient_end">#A78BFA</color>
+    <color name="gradient_primary_start">#7C3AED</color>
+    <color name="gradient_primary_end">#A78BFA</color>
 
-    <!-- ════════════════════════════════════════════════
-         FIXED COLORS — không đổi theo theme
-         ════════════════════════════════════════════════ -->
+    <!-- Violet shades -->
+    <color name="violet_300">#C4B5FD</color>
+    <color name="violet_400">#A78BFA</color>
+    <color name="violet_600">#7C3AED</color>
+    <color name="violet_900">#1E0A3C</color>
+    <color name="violet_muted">#267C3AED</color>
+    <color name="violet_border">#337C3AED</color>
+    <color name="violet_surface">#1A7C3AED</color>
 
-    <!-- Brand -->
-    <color name="primary">#A78BFA</color>
-    <color name="primary_dark">#7C3AED</color>
-    <color name="accent">#A78BFA</color>
-    <color name="gradient_start">#A78BFA</color>
-    <color name="gradient_end">#60A5FA</color>
-    <color name="gradient_primary_start">#A78BFA</color>
-    <color name="gradient_primary_end">#60A5FA</color>
+    <!-- Amber / Coin -->
+    <color name="amber">#F59E0B</color>
+    <color name="amber_dark">#D97706</color>
+    <color name="amber_light">#FCD34D</color>
+    <color name="amber_border">#40F59E0B</color>
+
+    <!-- Emerald / Status -->
+    <color name="emerald">#10B981</color>
+    <color name="emerald_dark">#059669</color>
+    <color name="emerald_muted">#1A10B981</color>
+
+    <!-- Error -->
+    <color name="error_red">#EF4444</color>
+    <color name="error_red_dark">#DC2626</color>
 
     <!-- Badges -->
     <color name="badge_new">#10B981</color>
     <color name="badge_full">#F59E0B</color>
+    <color name="badge_hot">#EF4444</color>
 
     <!-- Utility -->
     <color name="white">#FFFFFF</color>
     <color name="transparent">#00000000</color>
     <color name="overlay_dark">#80000000</color>
+    <color name="overlay_medium">#60000000</color>
     <color name="glass_badge_bg">#80000000</color>
 
-    <!-- ════════════════════════════════════════════════
-         DARK MODE RAW COLORS
-         ════════════════════════════════════════════════ -->
-    <color name="dark_background">#12121F</color>
+    <!-- DARK MODE RAW COLORS -->
+    <color name="dark_background">#0F0F14</color>
     <color name="dark_bottom_nav">#0D0D1A</color>
-    <color name="dark_surface">#1E1B2E</color>
-    <color name="dark_card">#1E1B2E</color>
+    <color name="dark_surface">#1A1A2E</color>
+    <color name="dark_card">#16213E</color>
+    <color name="dark_card_elevated">#1E2A45</color>
     <color name="dark_text_primary">#FFFFFF</color>
-    <color name="dark_text_secondary">#9CA3AF</color>
+    <color name="dark_text_secondary">#A0A0B8</color>
     <color name="inactive_icon">#6B7280</color>
     <color name="dark_ripple">#26A78BFA</color>
     <color name="dark_divider">#1AFFFFFF</color>
     <color name="glass_border">#33FFFFFF</color>
-    <color name="dock_glass">#CC0D0D1A</color>
+    <color name="glass_border_strong">#55FFFFFF</color>
+    <color name="dock_glass">#E00D0D1A</color>
     <color name="glass_surface">#1AFFFFFF</color>
+    <color name="glass_surface_strong">#26FFFFFF</color>
     <color name="skeleton_bg">#1EFFFFFF</color>
 
-    <!-- ════════════════════════════════════════════════
-         LIGHT MODE RAW COLORS
-         ════════════════════════════════════════════════ -->
-    <color name="light_background">#F0F0F7</color>
+    <!-- LIGHT MODE RAW COLORS -->
+    <color name="light_background">#F8F7FF</color>
     <color name="light_bottom_nav">#FFFFFF</color>
     <color name="light_surface">#FFFFFF</color>
     <color name="light_card">#FFFFFF</color>
     <color name="light_text_primary">#1A1A2E</color>
     <color name="light_text_secondary">#6B7280</color>
-    <color name="light_ripple">#1AA78BFA</color>
+    <color name="light_ripple">#1A7C3AED</color>
     <color name="light_divider">#1A000000</color>
     <color name="light_inactive_icon">#9CA3AF</color>
     <color name="light_skeleton_bg">#1E000000</color>
     <color name="light_glass_border">#22000000</color>
 
-    <!-- ════════════════════════════════════════════════
-         ADAPTIVE COLORS — dùng trong layout XML
-         Giá trị ở đây = Light Mode
-         Giá trị night = Dark Mode (xem values-night/colors.xml)
-         ════════════════════════════════════════════════ -->
-
-    <!-- Backgrounds -->
+    <!-- ADAPTIVE COLORS -->
     <color name="color_background">@color/light_background</color>
     <color name="color_surface">@color/light_surface</color>
     <color name="color_card">@color/light_card</color>
     <color name="color_bottom_nav">@color/light_bottom_nav</color>
-
-    <!-- Text -->
     <color name="color_text_primary">@color/light_text_primary</color>
     <color name="color_text_secondary">@color/light_text_secondary</color>
-
-    <!-- Icon & divider -->
     <color name="color_icon">@color/light_text_primary</color>
     <color name="color_inactive_icon">@color/light_inactive_icon</color>
     <color name="color_divider">@color/light_divider</color>
     <color name="color_ripple">@color/light_ripple</color>
     <color name="color_skeleton">@color/light_skeleton_bg</color>
     <color name="color_glass_border">@color/light_glass_border</color>
-    <!-- Thêm các dòng này vì ReadingHistory -->
-    <color name="background">#F5F5F5</color>
-    <color name="card_background">#FFFFFF</color>
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
+    <color name="color_glass_surface">#0D7C3AED</color>
+    <color name="color_amber">@color/amber</color>
+    <color name="color_hero_start">#1A0D3A</color>
+    <color name="color_hero_end">#0F0820</color>
+    <color name="color_dock_glass">#E6FFFFFF</color>
+    <color name="scrim_start">#00F8F7FF</color>
+    <color name="scrim_center">#99F8F7FF</color>
+    <color name="scrim_end">#FFF8F7FF</color>
+
+    <!-- Legacy aliases -->
+    <color name="background">@color/light_background</color>
+    <color name="card_background">@color/light_card</color>
+    <color name="text_primary">@color/light_text_primary</color>
+    <color name="text_secondary">@color/light_text_secondary</color>
     <color name="text_hint">#BDBDBD</color>
-    <color name="colorError">#E53935</color>
-    <color name="colorAccent">#FF6F00</color>
+    <color name="colorError">@color/error_red</color>
+    <color name="colorAccent">@color/amber</color>
+
+    <!-- Profile -->
+    <color name="profile_bg">#FAFAFA</color>
+    <color name="profile_text_muted">#6B7280</color>
+    <color name="profile_divider">#22000000</color>
+
+    <!-- Profile adaptive cards -->
+    <color name="color_profile_card_start">#FFFFFF</color>
+    <color name="color_profile_card_end">#FFFFFF</color>
+    <color name="color_profile_tile_start">#FFFFFF</color>
+    <color name="color_profile_tile_end">#FFFFFF</color>
+    <color name="color_profile_author_start">#FFFFFF</color>
+    <color name="color_profile_author_end">#FFFFFF</color>
+    <color name="color_profile_card_stroke">#337C3AED</color>
+    <color name="color_profile_tile_stroke">#337C3AED</color>
 </resources>

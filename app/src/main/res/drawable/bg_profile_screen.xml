@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="393dp"
+    android:height="852dp"
+    android:viewportWidth="393"
+    android:viewportHeight="852">
+
+    <!-- ── Base: off-white lavender tint ── -->
+    <path
+        android:pathData="M0,0 L393,0 L393,852 L0,852 Z"
+        android:fillColor="#FAF8FF" />
+
+    <!-- ── Blob top-left: large faded lavender ── -->
+    <path
+        android:pathData="M-40,0 C20,-10 120,30 140,100 C160,170 110,230 60,210 C10,190 -30,150 -50,90 Z"
+        android:fillColor="#E9D8FF"
+        android:fillAlpha="0.10" />
+
+    <!-- ── Blob top-left secondary ── -->
+    <path
+        android:pathData="M0,40 C50,10 130,50 150,130 C165,195 100,240 40,220 C-15,202 -20,160 0,40 Z"
+        android:fillColor="#DCC7FF"
+        android:fillAlpha="0.07" />
+
+    <!-- ── Blob bottom-left ── -->
+    <path
+        android:pathData="M-30,700 C20,670 90,680 110,740 C130,800 80,860 20,850 C-30,840 -60,790 -30,700 Z"
+        android:fillColor="#E6D0FF"
+        android:fillAlpha="0.09" />
+
+    <!-- ── Blob bottom-left secondary ── -->
+    <path
+        android:pathData="M0,760 C40,730 100,750 115,810 C128,860 70,870 20,865 C-20,860 -25,820 0,760 Z"
+        android:fillColor="#F3E9FF"
+        android:fillAlpha="0.08" />
+
+    <!-- ── Halftone dot grid — top-left area ── -->
+    <!-- Row 1 -->
+    <path android:pathData="M18,55 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.12"/>
+    <path android:pathData="M30,55 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.10"/>
+    <path android:pathData="M42,55 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.08"/>
+    <path android:pathData="M54,55 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.06"/>
+    <path android:pathData="M66,55 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.05"/>
+    <!-- Row 2 -->
+    <path android:pathData="M12,67 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.10"/>
+    <path android:pathData="M24,67 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.09"/>
+    <path android:pathData="M36,67 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C4A8E8" android:fillAlpha="0.07"/>
+    <path android:pathData="M48,67 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.06"/>
+    <path android:pathData="M60,67 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.04"/>
+    <!-- Row 3 -->
+    <path android:pathData="M18,79 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.08"/>
+    <path android:pathData="M30,79 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.07"/>
+    <path android:pathData="M42,79 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.05"/>
+    <path android:pathData="M54,79 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0" android:fillColor="#C4A8E8" android:fillAlpha="0.04"/>
+    <!-- Row 4 -->
+    <path android:pathData="M12,91 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.07"/>
+    <path android:pathData="M24,91 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C4A8E8" android:fillAlpha="0.06"/>
+    <path android:pathData="M36,91 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0" android:fillColor="#C4A8E8" android:fillAlpha="0.04"/>
+    <!-- Row 5 -->
+    <path android:pathData="M18,103 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0" android:fillColor="#C4A8E8" android:fillAlpha="0.05"/>
+    <path android:pathData="M30,103 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0" android:fillColor="#C4A8E8" android:fillAlpha="0.04"/>
+
+    <!-- ── Floating geometric shapes ── -->
+
+    <!-- Small diamond top-right area -->
+    <path
+        android:pathData="M340,80 L348,90 L340,100 L332,90 Z"
+        android:fillColor="#D4B8F0"
+        android:fillAlpha="0.12" />
+
+    <!-- Tiny circle top-right -->
+    <path
+        android:pathData="M365,60 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#E2CCFF"
+        android:fillAlpha="0.15" />
+
+    <!-- Small triangle-ish shape right side -->
+    <path
+        android:pathData="M375,200 L385,220 L365,220 Z"
+        android:fillColor="#D8C2F5"
+        android:fillAlpha="0.10" />
+
+    <!-- Tiny dot cluster bottom-right -->
+    <path android:pathData="M355,750 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" android:fillColor="#C8AEED" android:fillAlpha="0.10"/>
+    <path android:pathData="M368,762 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#C8AEED" android:fillAlpha="0.08"/>
+    <path android:pathData="M358,772 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" android:fillColor="#C8AEED" android:fillAlpha="0.07"/>
+
+    <!-- Floating small diamond left-center -->
+    <path
+        android:pathData="M8,380 L14,390 L8,400 L2,390 Z"
+        android:fillColor="#CBAEF0"
+        android:fillAlpha="0.10" />
+
+    <!-- Tiny sparkle-dot right center -->
+    <path android:pathData="M383,430 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" android:fillColor="#D5BFFF" android:fillAlpha="0.12"/>
+
+</vector>

@@ -4,14 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_background">
+    android:background="@color/color_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ===== PROGRESS LOADING (FIX: thêm view này) ===== -->
+        <!-- ===== PROGRESS LOADING ===== -->
         <ProgressBar
             android:id="@+id/progress_loading"
             android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
         <!-- ===== HEADER ẢNH BÌA ===== -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="280dp">
+            android:layout_height="@dimen/detail_hero_height">
 
             <!-- Ảnh nền mờ -->
             <ImageView
@@ -32,23 +32,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:alpha="0.4" />
+                android:alpha="0.6" />
 
-            <!-- Overlay -->
+            <!-- Bottom Gradient Scrim Overlay -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/overlay_dark" />
+                android:layout_height="140dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/gradient_scrim_bottom" />
 
-            <!-- Nút back -->
+            <!-- Nút back (glassmorphism circle) -->
             <ImageButton
                 android:id="@+id/btn_back"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_margin="12dp"
+                android:layout_margin="16dp"
                 android:src="@android:drawable/ic_media_previous"
-                android:background="#66000000"
-                android:padding="8dp" />
+                android:background="@drawable/bg_action_square"
+                android:padding="10dp"
+                app:tint="@color/white" />
 
             <!-- Info overlay dưới ảnh -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,12 +60,13 @@
                 android:padding="16dp">
 
                 <!-- Ảnh bìa nhỏ -->
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cv_cover"
-                    android:layout_width="100dp"
-                    android:layout_height="140dp"
-                    app:cardCornerRadius="8dp"
+                    android:layout_width="@dimen/detail_cover_width"
+                    android:layout_height="@dimen/detail_cover_height"
+                    app:cardCornerRadius="14dp"
                     app:cardElevation="8dp"
+                    app:strokeWidth="0dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
 
@@ -73,14 +76,14 @@
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop" />
 
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Tên + tác giả -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="16dp"
                     app:layout_constraintStart_toEndOf="@id/cv_cover"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
@@ -90,9 +93,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tên truyện"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/text_xl"
                         android:textStyle="bold"
                         android:textColor="@color/white"
+                        android:shadowColor="#80000000"
+                        android:shadowDx="1.5"
+                        android:shadowDy="1.5"
+                        android:shadowRadius="2"
                         android:maxLines="2"
                         android:ellipsize="end" />
 
@@ -101,8 +108,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="✍️ Tác giả"
-                        android:textSize="13sp"
-                        android:textColor="#CCFFFFFF"
+                        android:textSize="@dimen/text_caption"
+                        android:textColor="@color/amber"
+                        android:textStyle="bold"
                         android:layout_marginTop="6dp" />
 
                     <TextView
@@ -110,9 +118,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Đang ra"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/text_xs"
+                        android:textStyle="bold"
                         android:textColor="@color/white"
-                        android:background="@color/badge_new"
+                        android:background="@drawable/bg_badge_status"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
                         android:layout_marginTop="8dp" />
@@ -123,147 +132,183 @@
 
         </FrameLayout>
 
-        <!-- ===== STATS ROW ===== -->
-        <LinearLayout
+        <!-- ===== STATS ROW (GLASS CARD) ===== -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/GlassCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/light_surface"
-            android:paddingVertical="12dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp">
 
-            <!-- Lượt xem -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:orientation="horizontal"
+                android:paddingVertical="12dp">
 
-                <TextView
-                    android:id="@+id/tv_views"
-                    android:layout_width="wrap_content"
+                <!-- Lượt xem -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/tv_views"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👁 Lượt xem"
+                        android:textSize="11sp"
+                        android:textColor="@color/color_text_secondary" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/color_glass_border" />
+
+                <!-- Số chương -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="👁 Lượt xem"
-                    android:textSize="11sp"
-                    android:textColor="@color/light_text_secondary" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tv_chapter_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📖 Chương"
+                        android:textSize="11sp"
+                        android:textColor="@color/color_text_secondary" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <View android:layout_width="1dp" android:layout_height="40dp"
-                android:background="@color/light_divider" />
-
-            <!-- Số chương -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/tv_chapter_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📖 Chương"
-                    android:textSize="11sp"
-                    android:textColor="@color/light_text_secondary" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ===== ĐÁNH GIÁ SAO ===== -->
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:id="@+id/layout_rating"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:paddingHorizontal="16dp"
-            android:background="@color/light_surface">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_surface">
 
-            <!-- Hiển thị điểm trung bình -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/tv_average_rating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0.0"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary"
-                    android:layout_marginEnd="6dp" />
-
+                <!-- Hàng trên: điểm trung bình + sao + số lượt -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- 5 sao hiển thị (read-only, tô màu theo averageRating) -->
-                    <LinearLayout
-                        android:id="@+id/ll_stars_display"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
-                        android:id="@+id/tv_rating_count"
+                        android:id="@+id/tv_average_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 đánh giá"
-                        android:textSize="11sp"
-                        android:textColor="@color/light_text_secondary" />
+                        android:text="–"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/color_amber"
+                        android:layout_marginEnd="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/ll_stars_display"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="2dp" />
+
+                        <TextView
+                            android:id="@+id/tv_rating_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 đánh giá"
+                            android:textSize="11sp"
+                            android:textColor="@color/color_text_secondary" />
+                    </LinearLayout>
+
                 </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/color_glass_border"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Hàng dưới: đánh giá của bạn -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Đánh giá của bạn:"
+                        android:textSize="13sp"
+                        android:textColor="@color/color_text_secondary" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_stars_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_your_rating_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="11sp"
+                        android:textColor="@color/primary" />
+
+                </LinearLayout>
+
             </LinearLayout>
-
-            <!-- 5 sao để người dùng bấm chọn -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đánh giá của bạn:"
-                android:textSize="12sp"
-                android:textColor="@color/light_text_secondary"
-                android:layout_marginBottom="4dp" />
-
-            <LinearLayout
-                android:id="@+id/ll_stars_input"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" />
-
-            <TextView
-                android:id="@+id/tv_your_rating_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="11sp"
-                android:textColor="@color/primary"
-                android:layout_marginTop="2dp" />
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <!-- ===== NÚT ĐỌC NGAY ===== -->
         <LinearLayout
@@ -271,7 +316,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
+            android:paddingVertical="8dp"
             android:gravity="center">
 
             <Button
@@ -282,11 +327,12 @@
                 android:text="▶ Đọc từ đầu"
                 android:textSize="14sp"
                 android:textColor="@color/white"
-                android:backgroundTint="@color/primary"
+                android:background="@drawable/bg_button_gradient"
+                app:backgroundTint="@null"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                app:cornerRadius="8dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="12dp"
+                style="@style/Widget.MaterialComponents.Button" />
 
             <Button
                 android:id="@+id/btn_read_latest"
@@ -296,23 +342,60 @@
                 android:text="⏩ Đọc mới nhất"
                 android:textSize="14sp"
                 android:textColor="@color/primary"
-                android:backgroundTint="@color/light_surface"
-                app:strokeColor="@color/primary"
-                app:strokeWidth="1dp"
+                android:background="@drawable/bg_button_outline"
+                app:backgroundTint="@null"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                app:cornerRadius="8dp"
-                android:layout_marginEnd="8dp" />
+                style="@style/Widget.MaterialComponents.Button" />
 
-            <ImageButton
-                android:id="@+id/btn_favorite_follow"
-                android:layout_width="48dp"
+        </LinearLayout>
+
+        <!-- ===== ACTION ROW (FAVORITE + FOLLOW gộp 1 nút) ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="4dp"
+            android:gravity="center">
+
+            <!-- Nút gộp: Thêm vào thư viện -->
+            <LinearLayout
+                android:id="@+id/btn_library_container"
+                android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_circle_primary_light"
-                android:src="@drawable/ic_heart_plus"
-                app:tint="@color/primary"
-                android:padding="12dp"
-                android:scaleType="fitCenter" />
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_action_square"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/btn_favorite_follow"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_favorite_border"
+                    android:layout_marginEnd="6dp" />
+
+                <!-- Hidden: giữ id để code Kotlin vẫn tìm được -->
+                <ImageButton
+                    android:id="@+id/btn_follow_card"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                    android:background="@null" />
+
+                <TextView
+                    android:id="@+id/tv_library_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thêm vào thư viện"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_text_secondary" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -322,7 +405,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="@color/light_surface"
+            android:background="@color/color_surface"
             android:layout_marginBottom="8dp">
 
             <TextView
@@ -331,7 +414,7 @@
                 android:text="Thể loại"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/light_text_primary"
+                android:textColor="@color/color_text_primary"
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
@@ -348,7 +431,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="@color/light_surface"
+            android:background="@color/color_surface"
             android:layout_marginBottom="8dp">
 
             <TextView
@@ -357,7 +440,7 @@
                 android:text="Nội dung"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/light_text_primary"
+                android:textColor="@color/color_text_primary"
                 android:layout_marginBottom="8dp" />
 
             <TextView
@@ -366,8 +449,8 @@
                 android:layout_height="wrap_content"
                 android:text="Mô tả truyện..."
                 android:textSize="14sp"
-                android:textColor="@color/light_text_secondary"
-                android:lineSpacingMultiplier="1.5"
+                android:textColor="@color/color_text_secondary"
+                android:lineSpacingMultiplier="1.3"
                 android:maxLines="4"
                 android:ellipsize="end" />
 
@@ -387,7 +470,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/light_surface">
+            android:background="@color/color_surface">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -401,7 +484,7 @@
                     android:text="Danh sách chương"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="@color/light_text_primary"
+                    android:textColor="@color/color_text_primary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" />
@@ -433,7 +516,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/light_surface"
+            android:background="@color/color_surface"
             android:layout_marginTop="8dp">
 
             <LinearLayout
@@ -450,14 +533,14 @@
                     android:text="💬 Bình luận"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="@color/light_text_primary"/>
+                    android:textColor="@color/color_text_primary"/>
 
                 <TextView
                     android:id="@+id/tv_comment_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="13sp"
-                    android:textColor="@color/light_text_secondary"/>
+                    android:textColor="@color/color_text_secondary"/>
 
             </LinearLayout>
 
@@ -476,12 +559,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Viết bình luận..."
-                    android:textColorHint="@color/light_text_secondary"
-                    android:textColor="@color/light_text_primary"
+                    android:textColorHint="@color/color_text_secondary"
+                    android:textColor="@color/color_text_primary"
                     android:textSize="14sp"
                     android:padding="10dp"
                     android:maxLines="3"
-                    android:background="@color/light_background"/>
+                    android:background="@drawable/bg_sort_chip"/>
 
                 <Button
                     android:id="@+id/btn_send_comment"
@@ -497,7 +580,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/light_divider"/>
+                android:background="@color/color_divider"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_comments"

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền tròn bên trong ring avatar -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:startColor="#2A1B52"
+        android:endColor="#1A0F35"
+        android:angle="135"
+        android:type="linear" />
+</shape>

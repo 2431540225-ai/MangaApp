@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    res/values-night/colors.xml
-    Tạo folder: res > values-night > colors.xml
+    res/values-night/color.xml
     Các màu này tự động được dùng khi Dark Mode bật
 -->
 <resources>
@@ -23,5 +22,33 @@
     <color name="color_ripple">@color/dark_ripple</color>
     <color name="color_skeleton">@color/skeleton_bg</color>
     <color name="color_glass_border">@color/glass_border</color>
+    <color name="color_glass_surface">@color/glass_surface</color>
+    <color name="color_hero_start">#1A0D3A</color>
+    <color name="color_hero_end">#0A0514</color>
+    <color name="color_dock_glass">@color/dock_glass</color>
+    <color name="scrim_start">#000F0F14</color>
+    <color name="scrim_center">#990F0F14</color>
+    <color name="scrim_end">#FF0F0F14</color>
+
+    <!-- Legacy aliases -->
+    <color name="background">@color/dark_background</color>
+    <color name="card_background">@color/dark_card</color>
+    <color name="text_primary">@color/dark_text_primary</color>
+    <color name="text_secondary">@color/dark_text_secondary</color>
+
+    <!-- Profile -->
+    <color name="profile_bg">@color/dark_background</color>
+    <color name="profile_text_muted">#99FFFFFF</color>
+    <color name="profile_divider">#22FFFFFF</color>
+
+    <!-- Profile adaptive cards (dark) -->
+    <color name="color_profile_card_start">#1E1050</color>
+    <color name="color_profile_card_end">#160D38</color>
+    <color name="color_profile_tile_start">#160D38</color>
+    <color name="color_profile_tile_end">#1E1248</color>
+    <color name="color_profile_author_start">#181030</color>
+    <color name="color_profile_author_end">#221548</color>
+    <color name="color_profile_card_stroke">#337C3AED</color>
+    <color name="color_profile_tile_stroke">#447C3AED</color>
 
 </resources>

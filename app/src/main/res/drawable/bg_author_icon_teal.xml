@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bg_author_icon_teal.xml: icon xanh ngọc cho Doanh thu -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#0A4040"
+        android:endColor="#1A7A6A"
+        android:angle="135"
+        android:type="linear" />
+    <corners android:radius="10dp" />
+</shape>

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <!--
-        item_menu_row.xml
-        Custom Layout tái sử dụng cho từng dòng menu trong Profile
-        Dữ liệu đầu vào: menu_icon, menu_title, menu_subtitle (ẩn mặc định)
-        Nơi sử dụng: ProfileFragment - phần Cài đặt
-    -->
+<!--
+    item_profile_menu.xml
+    Custom Layout reusable for menu items in Profile
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="56dp"
     android:orientation="horizontal"
@@ -16,14 +15,21 @@
     android:clickable="true"
     android:focusable="true">
 
-    <!-- Icon bên trái (dùng @android:drawable có sẵn) -->
-    <ImageView
-        android:id="@+id/menu_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@android:drawable/ic_menu_preferences"
-        android:tint="#E94560"
-        android:contentDescription="Menu icon" />
+    <!-- Circle Icon Frame -->
+    <FrameLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_menu_icon_circle">
+
+        <ImageView
+            android:id="@+id/menu_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@android:drawable/ic_menu_preferences"
+            app:tint="@color/primary"
+            android:layout_gravity="center"
+            android:contentDescription="Menu icon" />
+    </FrameLayout>
 
     <!-- Nhóm text: title + subtitle -->
     <LinearLayout
@@ -39,7 +45,8 @@
             android:layout_height="wrap_content"
             android:text="Tên mục"
             android:textSize="15sp"
-            android:textColor="#1A1A2E" />
+            android:textStyle="bold"
+            android:textColor="@color/color_text_primary" />
 
         <TextView
             android:id="@+id/menu_subtitle"
@@ -47,7 +54,7 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="12sp"
-            android:textColor="#888888"
+            android:textColor="@color/color_text_secondary"
             android:visibility="gone" />
 
     </LinearLayout>
@@ -58,7 +65,7 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:src="@android:drawable/ic_media_next"
-        android:tint="#CCCCCC"
+        app:tint="@color/color_inactive_icon"
         android:contentDescription="" />
 
 </LinearLayout>

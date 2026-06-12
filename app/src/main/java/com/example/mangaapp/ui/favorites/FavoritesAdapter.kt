@@ -46,14 +46,13 @@ class FavoritesAdapter(
         holder.tvViews.text    = "👁 ${format.format(manga.totalViews)}"
         holder.tvChapters.text = "${manga.totalChapters} chương"
 
+        holder.tvStatus.setBackgroundResource(R.drawable.bg_badge_status)
         if (manga.status == MangaStatus.ONGOING) {
             holder.tvStatus.text = "Đang ra"
-            holder.tvStatus.setBackgroundColor(
-                holder.itemView.context.getColor(R.color.badge_new))
+            holder.tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(holder.itemView.context.getColor(R.color.emerald))
         } else {
             holder.tvStatus.text = "Hoàn thành"
-            holder.tvStatus.setBackgroundColor(
-                holder.itemView.context.getColor(R.color.badge_full))
+            holder.tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(holder.itemView.context.getColor(R.color.amber))
         }
 
         holder.tvPaid.visibility = if (manga.isPaid) View.VISIBLE else View.GONE

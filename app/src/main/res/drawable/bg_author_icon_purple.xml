@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bg_author_icon_purple.xml: icon tím cho Đăng truyện -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#5A3BA0"
+        android:endColor="#7B4FD4"
+        android:angle="135"
+        android:type="linear" />
+    <corners android:radius="10dp" />
+</shape>

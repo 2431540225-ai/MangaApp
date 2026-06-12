@@ -37,12 +37,13 @@ class MangaCardAdapter(
         holder.tvChapters.text = "${manga.totalChapters}+ chapters"
 
         // Badge
+        holder.tvBadge.setBackgroundResource(R.drawable.bg_badge_status)
         if (manga.status == MangaStatus.ONGOING) {
             holder.tvBadge.text = "Đang ra"
-            holder.tvBadge.setBackgroundResource(R.drawable.bg_badge_hot)
+            holder.tvBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(holder.itemView.context.getColor(R.color.emerald))
         } else {
             holder.tvBadge.text = "Hoàn thành"
-            holder.tvBadge.setBackgroundResource(R.drawable.bg_badge_full)
+            holder.tvBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(holder.itemView.context.getColor(R.color.amber))
         }
 
         Glide.with(holder.itemView.context)

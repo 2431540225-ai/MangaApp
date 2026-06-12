@@ -37,7 +37,7 @@ class ProfileFragment : Fragment() {
 
     // Lắng nghe thay đổi coin realtime
     private val coinListener: (Int) -> Unit = { newCoins ->
-        if (isAdded) tvCoinBalance.text = "$newCoins 🪙"
+        if (isAdded) tvCoinBalance.text = "$newCoins"
     }
 
     override fun onCreateView(
@@ -96,7 +96,7 @@ class ProfileFragment : Fragment() {
                 if (!isAdded) return@getRevenueSummary
                 if (summary.pendingCoins > 0) {
                     tvAuthorPending.visibility = View.VISIBLE
-                    tvAuthorPending.text = "${summary.pendingCoins} 🪙"
+                    tvAuthorPending.text = "${summary.pendingCoins}"
                 } else {
                     tvAuthorPending.visibility = View.GONE
                 }
@@ -128,12 +128,12 @@ class ProfileFragment : Fragment() {
 
         tvUsername.text    = user.username
         tvEmail.text       = user.email
-        tvCoinBalance.text = "${user.coins} 🪙"
+        tvCoinBalance.text = "${user.coins}"
 
         val roleLabel = when (user.roleId) {
-            1    -> "👑 Admin"
-            3    -> "✍️ Tác giả"
-            else -> "📖 Độc giả"
+            1    -> "Admin"
+            3    -> "Tác giả"
+            else -> "Độc giả"
         }
         tvRole.text = roleLabel
 
@@ -144,12 +144,13 @@ class ProfileFragment : Fragment() {
         // Cập nhật trạng thái điểm danh
         com.example.mangaapp.repository.CheckInRepository.getCheckInStatus { status ->
             if (isAdded) {
+                tvCheckinBadge.setBackgroundResource(R.drawable.bg_badge_status)
                 if (status.alreadyCheckedInToday) {
                     tvCheckinBadge.text = "Chuỗi ${status.currentStreak} ngày 🔥"
-                    tvCheckinBadge.setBackgroundColor(android.graphics.Color.parseColor("#4CAF50"))
+                    tvCheckinBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.emerald, null))
                 } else {
                     tvCheckinBadge.text = "Nhận xu!"
-                    tvCheckinBadge.setBackgroundColor(android.graphics.Color.parseColor("#F5A623"))
+                    tvCheckinBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.amber, null))
                 }
             }
         }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Đường kẻ phân cách vàng-tím trong khu vực tác giả -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#80FFD166"
+        android:centerColor="#4DA47CF3"
+        android:endColor="#00A47CF3"
+        android:angle="0"
+        android:type="linear" />
+</shape>

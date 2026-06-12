@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bg_author_icon_blue.xml: icon xanh cho Thêm chapter -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#1E3A7A"
+        android:endColor="#3B5FD4"
+        android:angle="135"
+        android:type="linear" />
+    <corners android:radius="10dp" />
+</shape>

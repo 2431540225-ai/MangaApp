@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pill Tab Inactive: glassmorphism dark, cornerRadius 20dp -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#001E1E30" />
+    <corners android:radius="20dp" />
+</shape>

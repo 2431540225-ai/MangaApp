@@ -22,6 +22,7 @@ class FavoritesFragment : Fragment() {
     private lateinit var layoutEmpty: LinearLayout
     private lateinit var tvEmptyMsg: TextView
     private lateinit var progressLoading: ProgressBar
+    private lateinit var btnLoginProfile: View
 
     private lateinit var adapter: FavoritesAdapter
 
@@ -38,6 +39,13 @@ class FavoritesFragment : Fragment() {
         initViews(view)
         setupAdapter()
 
+        btnLoginProfile.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, com.example.mangaapp.ui.auth.LoginFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
         if (!UserSession.isLoggedIn) {
             showEmpty("Đăng nhập để xem danh sách yêu thích")
             return
@@ -47,10 +55,11 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        rvFavorites    = view.findViewById(R.id.rv_favorites)
-        layoutEmpty    = view.findViewById(R.id.layout_empty)
-        tvEmptyMsg     = view.findViewById(R.id.tv_empty_msg)
-        progressLoading = view.findViewById(R.id.progress_loading)
+        rvFavorites     = view.findViewById(R.id.rv_favorites)
+        layoutEmpty     = view.findViewById(R.id.layout_empty)
+        tvEmptyMsg      = view.findViewById(R.id.tv_empty_msg)
+        progressLoading  = view.findViewById(R.id.progress_loading)
+        btnLoginProfile = view.findViewById(R.id.btn_login_profile)
     }
 
 
@@ -121,6 +130,7 @@ class FavoritesFragment : Fragment() {
         rvFavorites.visibility = View.GONE
         layoutEmpty.visibility = View.VISIBLE
         tvEmptyMsg.text = msg
+        btnLoginProfile.visibility = if (!UserSession.isLoggedIn) View.VISIBLE else View.GONE
     }
 
     private fun navigateToDetail(manga: Manga) {

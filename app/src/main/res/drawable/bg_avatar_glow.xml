@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vòng ngoài glow mờ bao quanh avatar ring -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:startColor="#66A855F7"
+        android:centerColor="#44F97316"
+        android:endColor="#00FBBF24"
+        android:gradientRadius="60dp"
+        android:type="radial" />
+</shape>

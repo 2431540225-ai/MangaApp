@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nút chỉnh sửa avatar góc phải dưới: hình tròn vàng -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:startColor="#FFD166"
+        android:endColor="#F0A500"
+        android:angle="135"
+        android:type="linear" />
+    <stroke
+        android:width="2dp"
+        android:color="#110C26" />
+</shape>

@@ -86,6 +86,7 @@ class ReadFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        rvPages.removeOnScrollListener(scrollListener)
         (activity as? com.example.mangaapp.MainActivity)?.showBottomNav()
     }
 
@@ -157,6 +158,15 @@ class ReadFragment : Fragment() {
         )
     }
 
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            val lm = rvPages.layoutManager as? LinearLayoutManager ?: return
+            val lastVisible = lm.findLastVisibleItemPosition()
+            val pageCount = (rvPages.adapter?.itemCount ?: 0)
+            if (pageCount > 0 && lastVisible >= pageCount - 2) prefetchNextChapter()
+        }
+    }
+
     private fun setupObservers() {
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
             if (!isAdded) return@observe
@@ -166,13 +176,9 @@ class ReadFragment : Fragment() {
                 rvPages.layoutManager = LinearLayoutManager(requireContext())
                 rvPages.adapter = PageAdapter(pages)
 
-                rvPages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        val lm = rvPages.layoutManager as LinearLayoutManager
-                        val lastVisible = lm.findLastVisibleItemPosition()
-                        if (lastVisible >= pages.size - 2) prefetchNextChapter()
-                    }
-                })
+                // Xóa listener cũ trước khi thêm mới → tránh memory leak và crash
+                rvPages.removeOnScrollListener(scrollListener)
+                rvPages.addOnScrollListener(scrollListener)
             } else {
                 showNoContent()
             }
@@ -298,17 +304,20 @@ class ReadFragment : Fragment() {
                 Toast.makeText(requireContext(), "Vui lòng đăng nhập để mượn/theo dõi truyện", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            // Toggle favorite trước, sau khi xong mới toggle following
+            // Tránh race condition khi gọi 2 Firestore write song song
             MangaRepository.toggleFavorite(uid, firestoreStoryId,
                 onSuccess = { isNowFav ->
                     val msg = if (isNowFav) "Đã thêm vào yêu thích ❤" else "Đã xóa khỏi yêu thích"
                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                    updateFollowReadUI(uid, firestoreStoryId)
+                    MangaRepository.toggleFollowing(uid, firestoreStoryId,
+                        onSuccess = { updateFollowReadUI(uid, firestoreStoryId) },
+                        onError = { updateFollowReadUI(uid, firestoreStoryId) }
+                    )
                 },
-                onError = {}
-            )
-            MangaRepository.toggleFollowing(uid, firestoreStoryId,
-                onSuccess = { updateFollowReadUI(uid, firestoreStoryId) },
-                onError = {}
+                onError = {
+                    Toast.makeText(context, "Lỗi, thử lại sau", Toast.LENGTH_SHORT).show()
+                }
             )
         }
     }

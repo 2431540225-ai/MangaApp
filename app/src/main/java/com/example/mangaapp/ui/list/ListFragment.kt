@@ -142,14 +142,14 @@ class ListFragment : Fragment() {
             val tag = TextView(requireContext()).apply {
                 text = genre
                 textSize = 12f
-                setPadding(24, 10, 24, 10)
+                setPadding(24, 12, 24, 12)
                 setTextColor(
                     if (genre == selectedGenre) resources.getColor(R.color.white, null)
-                    else resources.getColor(R.color.light_text_primary, null)
+                    else resources.getColor(R.color.color_text_secondary, null)
                 )
-                setBackgroundColor(
-                    if (genre == selectedGenre) resources.getColor(R.color.primary, null)
-                    else resources.getColor(R.color.light_background, null)
+                setBackgroundResource(
+                    if (genre == selectedGenre) R.drawable.bg_chip_active
+                    else R.drawable.bg_chip_inactive
                 )
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -166,19 +166,36 @@ class ListFragment : Fragment() {
     }
 
     private fun setupViewModeToggle() {
+        // Set initial state
+        if (isGridMode) {
+            btnViewGrid.setBackgroundResource(R.drawable.bg_view_toggle_active)
+            btnViewGrid.setColorFilter(resources.getColor(R.color.primary, null))
+            btnViewList.setBackgroundResource(R.drawable.bg_view_toggle_inactive)
+            btnViewList.setColorFilter(resources.getColor(R.color.color_inactive_icon, null))
+        } else {
+            btnViewList.setBackgroundResource(R.drawable.bg_view_toggle_active)
+            btnViewList.setColorFilter(resources.getColor(R.color.primary, null))
+            btnViewGrid.setBackgroundResource(R.drawable.bg_view_toggle_inactive)
+            btnViewGrid.setColorFilter(resources.getColor(R.color.color_inactive_icon, null))
+        }
+
         btnViewGrid.setOnClickListener {
             isGridMode = true
             rvMangaList.layoutManager = GridLayoutManager(requireContext(), 2)
             rvMangaList.adapter = gridAdapter
-            btnViewGrid.setBackgroundColor(resources.getColor(R.color.primary, null))
-            btnViewList.setBackgroundColor(resources.getColor(R.color.light_surface, null))
+            btnViewGrid.setBackgroundResource(R.drawable.bg_view_toggle_active)
+            btnViewGrid.setColorFilter(resources.getColor(R.color.primary, null))
+            btnViewList.setBackgroundResource(R.drawable.bg_view_toggle_inactive)
+            btnViewList.setColorFilter(resources.getColor(R.color.color_inactive_icon, null))
         }
         btnViewList.setOnClickListener {
             isGridMode = false
             rvMangaList.layoutManager = LinearLayoutManager(requireContext())
             rvMangaList.adapter = listAdapter
-            btnViewList.setBackgroundColor(resources.getColor(R.color.primary, null))
-            btnViewGrid.setBackgroundColor(resources.getColor(R.color.light_surface, null))
+            btnViewList.setBackgroundResource(R.drawable.bg_view_toggle_active)
+            btnViewList.setColorFilter(resources.getColor(R.color.primary, null))
+            btnViewGrid.setBackgroundResource(R.drawable.bg_view_toggle_inactive)
+            btnViewGrid.setColorFilter(resources.getColor(R.color.color_inactive_icon, null))
         }
     }
 
