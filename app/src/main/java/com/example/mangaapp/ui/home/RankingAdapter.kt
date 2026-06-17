@@ -14,7 +14,18 @@ class RankingAdapter(
     private val items: List<Manga>,
     private val onClick: (Manga) -> Unit
 ) : RecyclerView.Adapter<RankingAdapter.RankViewHolder>() {
-
+    // Số lượng hiển thị tối đa, null = hiện tất cả
+    private var limitCount: Int? = 5
+    /** Gọi hàm này khi user bấm "Xem Tất Cả" để bỏ giới hạn */
+    fun showAll() {
+        limitCount = null
+        notifyDataSetChanged()
+    }
+    /** Số item thực sự hiển thị (có thể bị giới hạn) */
+    private fun displayCount(): Int {
+        val limit = limitCount ?: return items.size
+        return minOf(limit, items.size)
+    }
     inner class RankViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvRank: TextView     = view.findViewById(R.id.tv_rank)
         val ivCover: ImageView   = view.findViewById(R.id.iv_cover)
@@ -42,11 +53,9 @@ class RankingAdapter(
         )
 
         holder.tvName.text     = manga.name
-        // Hiển thị dạng "700+ chapters"
         holder.tvChapters.text = "${manga.totalChapters}+ chapters"
-
-        holder.tvAuthor.text = manga.author
-        holder.tvViews.text  = ""
+        holder.tvAuthor.text   = manga.author
+        holder.tvViews.text    = ""
 
         Glide.with(holder.itemView.context)
             .load(manga.coverUrl)
@@ -57,5 +66,5 @@ class RankingAdapter(
         holder.itemView.setOnClickListener { onClick(manga) }
     }
 
-    override fun getItemCount() = items.size.coerceAtMost(10)
+    override fun getItemCount() = displayCount()
 }

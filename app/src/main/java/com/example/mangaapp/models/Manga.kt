@@ -1,5 +1,7 @@
 package com.example.mangaapp.models
 
+import java.io.Serializable
+
 data class Manga(
     val id: Int,
     val name: String,
@@ -15,14 +17,14 @@ data class Manga(
     val createdAt: String = "",
     val category: MangaCategory = MangaCategory.TRUYEN_TRANH,
     val firestoreId: String = ""
-)
+) : Serializable
 
-enum class MangaStatus {
+enum class MangaStatus : Serializable {
     ONGOING,
     COMPLETED
 }
 
-enum class MangaCategory {
+enum class MangaCategory : Serializable {
     TRUYEN_TRANH,
     TIEU_THUYET
 }
