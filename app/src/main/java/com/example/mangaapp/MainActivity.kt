@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // ① Init ThemeManager trước tiên (đọc SharedPreferences)
         ThemeManager.init(this)
+        com.example.mangaapp.utils.EventTracker.init(this) // Init EventTracker 4.1
         // ② Áp dụng Night Mode — phải gọi TRƯỚC super.onCreate()
         ThemeManager.applyTheme()
 

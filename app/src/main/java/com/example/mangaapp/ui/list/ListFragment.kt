@@ -13,6 +13,7 @@ import com.example.mangaapp.R
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaCategory
 import com.example.mangaapp.repository.MangaRepository
+import com.example.mangaapp.utils.EventTracker
 import com.google.android.material.tabs.TabLayout
 
 class ListFragment : Fragment() {
@@ -58,8 +59,18 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Áp dụng sort được truyền vào từ HomeFragment (nếu có)
-        arguments?.getString("initial_sort")?.let { selectedSort = it }
+        
+        // 4.3: Nhận lại dữ liệu restore (sau khi xoay màn hình v.v.)
+        if (savedInstanceState != null) {
+            isGridMode = savedInstanceState.getBoolean("state_isGridMode", true)
+            val catName = savedInstanceState.getString("state_selectedCategory", MangaCategory.TRUYEN_TRANH.name)
+            selectedCategory = MangaCategory.valueOf(catName)
+            selectedGenre = savedInstanceState.getString("state_selectedGenre", "Tất cả")
+            selectedSort = savedInstanceState.getString("state_selectedSort", "Mới nhất")
+        } else {
+            arguments?.getString("initial_sort")?.let { selectedSort = it }
+        }
+
         initViews(view)
         setupAdapters()
         setupTabs()
@@ -67,6 +78,15 @@ class ListFragment : Fragment() {
         setupGenreTags()
         setupViewModeToggle()
         loadMangaFromFirestore()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // 4.3: Lưu trữ dữ liệu khi bị hủy để khôi phục
+        outState.putBoolean("state_isGridMode", isGridMode)
+        outState.putString("state_selectedCategory", selectedCategory.name)
+        outState.putString("state_selectedGenre", selectedGenre)
+        outState.putString("state_selectedSort", selectedSort)
     }
 
     private fun initViews(view: View) {
@@ -95,6 +115,10 @@ class ListFragment : Fragment() {
         tabLayout.addTab(tabLayout.newTab().setText("Truyện Tranh"))
         tabLayout.addTab(tabLayout.newTab().setText("Tiểu Thuyết"))
 
+        // Chọn lại tab khi khôi phục state 4.3
+        val tabIndex = if (selectedCategory == MangaCategory.TIEU_THUYET) 1 else 0
+        tabLayout.getTabAt(tabIndex)?.select()
+
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 selectedCategory = when (tab?.position) {
@@ -102,6 +126,7 @@ class ListFragment : Fragment() {
                     else -> MangaCategory.TRUYEN_TRANH
                 }
                 selectedGenre = "Tất cả"
+                EventTracker.logEvent("category_tab_changed", mapOf("category" to selectedCategory.name)) // 4.1
                 setupGenreTags()
                 applyFilters()
             }
@@ -157,6 +182,7 @@ class ListFragment : Fragment() {
                 ).also { it.marginEnd = 8 }
                 setOnClickListener {
                     selectedGenre = genre
+                    EventTracker.logEvent("genre_clicked", mapOf("genre" to genre)) // 4.1
                     setupGenreTags()
                     applyFilters()
                 }
@@ -202,34 +228,55 @@ class ListFragment : Fragment() {
     private fun applyFilters() {
         if (!isAdded) return
 
-        // Lọc theo category
-        var filtered = allMangaList.filter { it.category == selectedCategory }
+        // 4.1 Logs events locally
+        EventTracker.logEvent("filter_applied", mapOf(
+            "category" to selectedCategory.name,
+            "genre" to selectedGenre, "sort" to selectedSort, "isGridMode" to isGridMode.toString()
+        ))
 
-        // Lọc theo thể loại
-        if (selectedGenre != "Tất cả") {
-            filtered = filtered.filter { it.genres.contains(selectedGenre) }
-        }
+        // 4.4 Các thao tác quá nặng, dùng Thread hoặc Service
+        Thread {
+            try {
+                // Giả lập xử lý nặng / data khổng lồ
+                Thread.sleep(50) 
+                
+                // Lọc theo category
+                var filtered = allMangaList.filter { it.category == selectedCategory }
 
-        // Sắp xếp
-        filtered = when (selectedSort) {
-            "Xem nhiều" -> filtered.sortedByDescending { it.totalViews }
-            "Tên A-Z"   -> filtered.sortedBy { it.name }
-            else        -> filtered.sortedByDescending { it.createdAt }
-        }
+                // Lọc theo thể loại
+                if (selectedGenre != "Tất cả") {
+                    filtered = filtered.filter { it.genres.contains(selectedGenre) }
+                }
 
-        tvResultCount.visibility = if (selectedGenre != "Tất cả") View.VISIBLE else View.GONE
-        tvResultCount.text = "Tìm thấy ${filtered.size} kết quả"
+                // Sắp xếp
+                filtered = when (selectedSort) {
+                    "Xem nhiều" -> filtered.sortedByDescending { it.totalViews }
+                    "Tên A-Z"   -> filtered.sortedBy { it.name }
+                    else        -> filtered.sortedByDescending { it.createdAt }
+                }
 
-        if (filtered.isEmpty()) {
-            rvMangaList.visibility = View.GONE
-            layoutEmpty.visibility = View.VISIBLE
-        } else {
-            rvMangaList.visibility = View.VISIBLE
-            layoutEmpty.visibility = View.GONE
-        }
+                // Trả về UI Thread
+                activity?.runOnUiThread {
+                    if (!isAdded) return@runOnUiThread
+                    
+                    tvResultCount.visibility = if (selectedGenre != "Tất cả") View.VISIBLE else View.GONE
+                    tvResultCount.text = "Tìm thấy ${filtered.size} kết quả"
 
-        if (isGridMode) gridAdapter.updateList(filtered)
-        else listAdapter.updateList(filtered)
+                    if (filtered.isEmpty()) {
+                        rvMangaList.visibility = View.GONE
+                        layoutEmpty.visibility = View.VISIBLE
+                    } else {
+                        rvMangaList.visibility = View.VISIBLE
+                        layoutEmpty.visibility = View.GONE
+                    }
+
+                    if (isGridMode) gridAdapter.updateList(filtered)
+                    else listAdapter.updateList(filtered)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
     }
 
     private fun navigateToDetail(manga: Manga) {
