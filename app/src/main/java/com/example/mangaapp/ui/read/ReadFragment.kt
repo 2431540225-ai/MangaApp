@@ -209,6 +209,12 @@ class ReadFragment : Fragment() {
     private fun loadChapter(chapNum: Int) {
         chapterNumber = chapNum
 
+        if (firestoreStoryId.isNotEmpty()) {
+            context?.let { ctx ->
+                com.example.mangaapp.utils.UserPreferences.saveLastReadChapter(ctx, firestoreStoryId, chapNum)
+            }
+        }
+
         // Cập nhật UI header
         val total = chapterList.size
         tvChapterInfo.text = "Chương $chapNum${if (total > 0) " / $total" else ""}"
