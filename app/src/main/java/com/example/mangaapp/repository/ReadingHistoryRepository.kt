@@ -14,10 +14,6 @@ class ReadingHistoryRepository {
     private fun getHistoryCollection(userId: String) =
         db.collection("users").document(userId).collection("readingHistory")
 
-    /**
-     * Lưu hoặc cập nhật lịch sử đọc khi user đọc 1 chương
-     * Gọi hàm này từ màn hình đọc chương
-     */
     fun saveOrUpdateHistory(
         storyId: String,
         storyTitle: String,
@@ -31,7 +27,7 @@ class ReadingHistoryRepository {
         val userId = auth.currentUser?.uid ?: return
 
         val history = ReadingHistory(
-            historyId = storyId,         // dùng storyId làm document ID => mỗi truyện chỉ 1 bản ghi
+            historyId = storyId,
             userId = userId,
             storyId = storyId,
             storyTitle = storyTitle,
@@ -43,15 +39,12 @@ class ReadingHistoryRepository {
         )
 
         getHistoryCollection(userId)
-            .document(storyId)           // document ID = storyId, tự động ghi đè nếu đã tồn tại
+            .document(storyId)
             .set(history)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
 
-    /**
-     * Lấy danh sách lịch sử đọc, sắp xếp theo thời gian đọc gần nhất
-     */
     fun getReadingHistory(
         onSuccess: (List<ReadingHistory>) -> Unit,
         onFailure: (Exception) -> Unit
@@ -73,9 +66,25 @@ class ReadingHistoryRepository {
             .addOnFailureListener { onFailure(it) }
     }
 
-    /**
-     * Xoá 1 mục lịch sử đọc
-     */
+    fun getHistoryItem(
+        storyId: String,
+        onSuccess: (ReadingHistory?) -> Unit,
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        val userId = auth.currentUser?.uid ?: run {
+            onSuccess(null)
+            return
+        }
+
+        getHistoryCollection(userId)
+            .document(storyId)
+            .get()
+            .addOnSuccessListener { doc ->
+                onSuccess(doc.toObject(ReadingHistory::class.java))
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
     fun deleteHistory(
         storyId: String,
         onSuccess: () -> Unit = {},
@@ -90,9 +99,6 @@ class ReadingHistoryRepository {
             .addOnFailureListener { onFailure(it) }
     }
 
-    /**
-     * Xoá toàn bộ lịch sử đọc
-     */
     fun clearAllHistory(
         onSuccess: () -> Unit = {},
         onFailure: (Exception) -> Unit = {}

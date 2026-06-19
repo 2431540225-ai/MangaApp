@@ -310,6 +310,23 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- ===== NÚT ĐỌC TIẾP (chỉ hiện khi đã có lịch sử đọc) ===== -->
+        <Button
+            android:id="@+id/btn_continue_reading"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="📖 Đọc tiếp"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_button_gradient"
+            app:backgroundTint="@null"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:visibility="gone"
+            style="@style/Widget.MaterialComponents.Button" />
+
         <!-- ===== NÚT ĐỌC NGAY ===== -->
         <LinearLayout
             android:layout_width="match_parent"
