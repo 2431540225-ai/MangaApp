@@ -34,6 +34,10 @@ class MainActivity : AppCompatActivity() {
             setTheme(R.style.Theme_MangaApp_Light)
         }
 
+        // ④ Khôi phục session user từ SharedPreferences (instant)
+        //    Sau đó tự động sync Firestore ở background nếu còn token
+        com.example.mangaapp.utils.UserSession.init(this)
+
         setContentView(R.layout.activity_main)
 
         bottomNav = findViewById(R.id.bottom_nav)

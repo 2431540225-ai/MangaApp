@@ -8,6 +8,7 @@ import android.widget.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -18,7 +19,6 @@ import com.example.mangaapp.models.Comment
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaStatus
 import com.example.mangaapp.repository.MangaRepository
-import com.example.mangaapp.repository.ReadingHistoryRepository
 import com.example.mangaapp.ui.read.ReadFragment
 import com.example.mangaapp.utils.UserSession
 import java.text.NumberFormat
@@ -35,9 +35,10 @@ class DetailFragment : Fragment() {
     private var userCurrentStar = 0
 
     private var firestoreId: String = ""
-    private var isDescExpanded   = false
-    private var isChapterReversed = false
     private var chapterList: List<Chapter> = emptyList()
+
+    // ── ViewModel (giữ state qua rotation) ───────────────────────────────────
+    private val viewModel: DetailViewModel by viewModels()
 
     private lateinit var ivBackdrop: android.widget.ImageView
     private lateinit var ivCover: android.widget.ImageView
@@ -49,8 +50,6 @@ class DetailFragment : Fragment() {
     private lateinit var tvChapterCount: TextView
     private lateinit var btnReadFirst: Button
     private lateinit var btnReadLatest: Button
-    private lateinit var btnContinueReading: Button
-    private val historyRepository = ReadingHistoryRepository()
     private lateinit var btnFavoriteFollow: ImageView
     private lateinit var btnFollowCard: ImageButton
     private lateinit var btnLibraryContainer: LinearLayout
@@ -90,13 +89,16 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
+        observeViewModel()
 
         // Đảm bảo UserSession đã load trước khi dùng
         if (com.example.mangaapp.utils.UserSession.firebaseUid != null &&
             !com.example.mangaapp.utils.UserSession.isLoggedIn) {
-            com.example.mangaapp.utils.UserSession.loadUser { loadMangaDetail() }
+            com.example.mangaapp.utils.UserSession.loadUser {
+                viewModel.loadDetail(firestoreId)
+            }
         } else {
-            loadMangaDetail()
+            viewModel.loadDetail(firestoreId)
         }
     }
 
@@ -121,7 +123,6 @@ class DetailFragment : Fragment() {
         tvChapterCount  = view.findViewById(R.id.tv_chapter_count)
         btnReadFirst    = view.findViewById(R.id.btn_read_first)
         btnReadLatest   = view.findViewById(R.id.btn_read_latest)
-        btnContinueReading = view.findViewById(R.id.btn_continue_reading)
         btnFavoriteFollow = view.findViewById(R.id.btn_favorite_follow)
         btnFollowCard   = view.findViewById(R.id.btn_follow_card)
         btnLibraryContainer = view.findViewById(R.id.btn_library_container)
@@ -146,24 +147,40 @@ class DetailFragment : Fragment() {
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
-    private fun loadMangaDetail() {
-        if (firestoreId.isEmpty()) return
-        progressLoading.visibility = View.VISIBLE
+    private fun observeViewModel() {
+        // Loading state
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            progressLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
 
-        MangaRepository.getMangaById(
-            firestoreId = firestoreId,
-            onSuccess = { manga ->
-                if (!isAdded || manga == null) return@getMangaById
-                progressLoading.visibility = View.GONE
-                bindMangaInfo(manga)
-                loadChapters(manga)
-            },
-            onError = {
-                if (!isAdded) return@getMangaById
-                progressLoading.visibility = View.GONE
-                Toast.makeText(requireContext(), "Không tải được thông tin truyện", Toast.LENGTH_SHORT).show()
+        // Error
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                if (!isAdded) return@let
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
-        )
+        }
+
+        // Manga info — bind ngay khi có
+        viewModel.manga.observe(viewLifecycleOwner) { manga ->
+            if (!isAdded || manga == null) return@observe
+            bindMangaInfo(manga)
+            setupFavoriteFollowButtons(manga)
+            setupRating(manga)
+        }
+
+        // Chapters — bind ngay khi có
+        viewModel.chapters.observe(viewLifecycleOwner) { chapters ->
+            if (!isAdded) return@observe
+            bindChapters(chapters)
+        }
+
+        // Comments — load từ local storage khi view ready
+        viewModel.loadComments(firestoreId, requireContext())
+        viewModel.comments.observe(viewLifecycleOwner) { comments ->
+            if (!isAdded) return@observe
+            bindComments(comments.toMutableList())
+        }
     }
 
     private fun bindMangaInfo(manga: Manga) {
@@ -175,6 +192,10 @@ class DetailFragment : Fragment() {
         tvViews.text        = format.format(manga.totalViews)
         tvChapterCount.text = manga.totalChapters.toString()
         tvDescription.text  = manga.description
+
+        // Khôi phục trạng thái mô tả sau rotation
+        tvDescription.maxLines = if (viewModel.isDescExpanded) Int.MAX_VALUE else 4
+        tvReadMore.text = if (viewModel.isDescExpanded) "Thu gọn ‹" else "Xem thêm ›"
 
         if (manga.status == MangaStatus.ONGOING) {
             tvStatus.text = "Đang ra"
@@ -188,132 +209,62 @@ class DetailFragment : Fragment() {
 
         setupGenreTags(manga)
         tvReadMore.setOnClickListener {
-            isDescExpanded = !isDescExpanded
-            tvDescription.maxLines = if (isDescExpanded) Int.MAX_VALUE else 4
-            tvReadMore.text = if (isDescExpanded) "Thu gọn ‹" else "Xem thêm ›"
+            viewModel.isDescExpanded = !viewModel.isDescExpanded
+            tvDescription.maxLines = if (viewModel.isDescExpanded) Int.MAX_VALUE else 4
+            tvReadMore.text = if (viewModel.isDescExpanded) "Thu gọn ‹" else "Xem thêm ›"
         }
-
-        setupFavoriteFollowButtons(manga)
-        setupRating(manga)
     }
 
-    private fun loadChapters(manga: Manga) {
-        MangaRepository.getChaptersByMangaId(
-            firestoreId = firestoreId,
-            onSuccess = { chapters ->
-                if (!isAdded) return@getChaptersByMangaId
-                chapterList = chapters
-                tvChapterCount.text = chapters.size.toString()
+    private fun bindChapters(chapters: List<Chapter>) {
+        val manga = viewModel.manga.value ?: return
+        chapterList = chapters
+        tvChapterCount.text = chapters.size.toString()
 
-                btnReadFirst.setOnClickListener {
+        // Nút đọc từ đầu / mới nhất / đọc tiếp
+        val lastReadChap = com.example.mangaapp.utils.UserPreferences.getLastReadChapter(requireContext(), firestoreId)
+        if (lastReadChap != -1) {
+            btnReadFirst.text = "▶ Đọc tiếp C.$lastReadChap"
+            btnReadFirst.setOnClickListener {
+                val targetChapter = chapters.find { it.chapterNumber == lastReadChap }
+                if (targetChapter != null) {
+                    handleChapterClick(manga, targetChapter)
+                } else {
                     chapters.firstOrNull()?.let { handleChapterClick(manga, it) }
                 }
-                btnReadLatest.setOnClickListener {
-                    chapters.lastOrNull()?.let { handleChapterClick(manga, it) }
-                }
-
-                setupContinueReadingButton(manga, chapters)
-
-                chapterAdapter = ChapterAdapter(chapters) { chapter ->
-                    handleChapterClick(manga, chapter)
-                }
-                chapterAdapter.setStoryId(firestoreId)
-
-                rvChapters.layoutManager = LinearLayoutManager(requireContext())
-                rvChapters.isNestedScrollingEnabled = false
-                rvChapters.adapter = chapterAdapter
-
-                tvSortChapter.setOnClickListener {
-                    isChapterReversed = !isChapterReversed
-                    val sorted = if (isChapterReversed) chapters.sortedBy { it.chapterNumber }
-                    else chapters.sortedByDescending { it.chapterNumber }
-                    tvSortChapter.text = if (isChapterReversed) "Cũ nhất ↑" else "Mới nhất ↓"
-                    chapterAdapter.updateList(sorted)
-                }
-
-                setupComments()
-            },
-            onError = {
-                if (!isAdded) return@getChaptersByMangaId
-                Toast.makeText(requireContext(), "Không tải được danh sách chương", Toast.LENGTH_SHORT).show()
             }
-        )
-    }
-
-    private fun setupContinueReadingButton(manga: Manga, chapters: List<Chapter>) {
-        btnContinueReading.visibility = View.GONE
-
-        if (!UserSession.isLoggedIn) return
-
-        historyRepository.getHistoryItem(
-            storyId = firestoreId,
-            onSuccess = { history ->
-                if (!isAdded || history == null) return@getHistoryItem
-
-                // lastChapterId được lưu dạng "chapter_<số>"
-                val lastChapterNumber = history.lastChapterId
-                    .substringAfter("chapter_")
-                    .toIntOrNull() ?: return@getHistoryItem
-
-                val targetChapter = chapters.find { it.chapterNumber == lastChapterNumber }
-                    ?: return@getHistoryItem
-
-                btnContinueReading.visibility = View.VISIBLE
-                btnContinueReading.text = "📖 Đọc tiếp - Chương $lastChapterNumber"
-                btnContinueReading.setOnClickListener {
-                    handleChapterClick(manga, targetChapter)
-                }
-            },
-            onFailure = {
-                if (!isAdded) return@getHistoryItem
-                btnContinueReading.visibility = View.GONE
+        } else {
+            btnReadFirst.text = "▶ Đọc từ đầu"
+            btnReadFirst.setOnClickListener {
+                chapters.firstOrNull()?.let { handleChapterClick(manga, it) }
             }
-        )
-    }
-
-    private fun handleChapterClick(manga: Manga, chapter: Chapter) {
-        // Miễn phí → vào thẳng
-        if (chapter.isFree) {
-            navigateToRead(manga, chapter.chapterNumber)
-            return
         }
 
-        val user = UserSession.currentUser
-        if (user != null && user.hasUnlocked(firestoreId, chapter.chapterNumber)) {
-            navigateToRead(manga, chapter.chapterNumber)
-            return
+        btnReadLatest.setOnClickListener {
+            chapters.lastOrNull()?.let { handleChapterClick(manga, it) }
         }
 
-        // Chưa đăng nhập
-        if (!UserSession.isLoggedIn) {
-            Toast.makeText(
-                requireContext(),
-                "Vui lòng đăng nhập để mở khóa chương này",
-                Toast.LENGTH_LONG
-            ).show()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container, com.example.mangaapp.ui.auth.LoginFragment())
-                .addToBackStack(null)
-                .commit()
-            return
-        }
+        // Khôi phục trạng thái sort sau rotation
+        val sortedChapters = viewModel.getSortedChapters()
+        tvSortChapter.text = if (viewModel.isChapterReversed) "Cũ nhất ↑" else "Mới nhất ↓"
 
-        // Hiện dialog mở khóa bằng coin
-        UnlockChapterDialog.show(
-            fragmentManager = parentFragmentManager,
-            storyId         = firestoreId,
-            chapter         = chapter,
-            onUnlocked      = {
-                // Reload adapter để cập nhật icon khóa
-                chapterAdapter.notifyDataSetChanged()
-                navigateToRead(manga, chapter.chapterNumber)
-            }
-        )
+        chapterAdapter = ChapterAdapter(sortedChapters) { chapter ->
+            handleChapterClick(manga, chapter)
+        }
+        chapterAdapter.setStoryId(firestoreId)
+
+        rvChapters.layoutManager = LinearLayoutManager(requireContext())
+        rvChapters.isNestedScrollingEnabled = false
+        rvChapters.adapter = chapterAdapter
+
+        tvSortChapter.setOnClickListener {
+            viewModel.isChapterReversed = !viewModel.isChapterReversed
+            val sorted = viewModel.getSortedChapters()
+            tvSortChapter.text = if (viewModel.isChapterReversed) "Cũ nhất ↑" else "Mới nhất ↓"
+            chapterAdapter.updateList(sorted)
+        }
     }
 
-    private fun setupComments() {
-        MangaRepository.initComments(requireContext())
-        val commentList = MangaRepository.getCommentsByFirestoreId(firestoreId).toMutableList()
+    private fun bindComments(commentList: MutableList<Comment>) {
         tvCommentCount.text = "${commentList.size} bình luận"
         commentAdapter = CommentAdapter(commentList)
         rvComments.layoutManager = LinearLayoutManager(requireContext())
@@ -333,11 +284,51 @@ class DetailFragment : Fragment() {
                 content     = content,
                 timestamp   = System.currentTimeMillis()
             )
-            MangaRepository.addComment(requireContext(), newComment)
-            commentAdapter.addComment(newComment)
+            viewModel.addComment(requireContext(), newComment, firestoreId)
             etComment.setText("")
-            tvCommentCount.text = "${commentAdapter.itemCount} bình luận"
         }
+    }
+
+    /**
+     * Xử lý click vào chapter:
+     *  - Nếu miễn phí hoặc đã mở khóa → đọc ngay
+     *  - Nếu trả phí và chưa mở → hiện dialog xác nhận coin
+     *  - Nếu chưa đăng nhập → yêu cầu đăng nhập
+     */
+    private fun handleChapterClick(manga: Manga, chapter: Chapter) {
+        if (chapter.isFree) {
+            navigateToRead(manga, chapter.chapterNumber)
+            return
+        }
+
+        val user = UserSession.currentUser
+        if (user != null && user.hasUnlocked(firestoreId, chapter.chapterNumber)) {
+            navigateToRead(manga, chapter.chapterNumber)
+            return
+        }
+
+        if (!UserSession.isLoggedIn) {
+            Toast.makeText(
+                requireContext(),
+                "Vui lòng đăng nhập để mở khóa chương này",
+                Toast.LENGTH_LONG
+            ).show()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container, com.example.mangaapp.ui.auth.LoginFragment())
+                .addToBackStack(null)
+                .commit()
+            return
+        }
+
+        UnlockChapterDialog.show(
+            fragmentManager = parentFragmentManager,
+            storyId         = firestoreId,
+            chapter         = chapter,
+            onUnlocked      = {
+                chapterAdapter.notifyDataSetChanged()
+                navigateToRead(manga, chapter.chapterNumber)
+            }
+        )
     }
 
     private fun setupFavoriteFollowButtons(manga: Manga) {
@@ -433,8 +424,13 @@ class DetailFragment : Fragment() {
                 text = genre
                 textSize = 12f
                 setTextColor(resources.getColor(R.color.primary, null))
-                setPadding(24, 10, 24, 10)
-                setBackgroundResource(R.drawable.bg_chip_inactive)
+                setPadding(32, 16, 32, 16)
+
+                background = android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = 100f // Pill shape
+                    setColor(resources.getColor(R.color.color_background, null))
+                }
+
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -456,11 +452,12 @@ class DetailFragment : Fragment() {
             .commit()
     }
 
+    // ─── Rating ──────────────────────────────────────────────────────────────
+
     private fun setupRating(manga: Manga) {
         updateRatingDisplay(manga.averageRating, manga.ratingCount)
         buildInputStars(manga.firestoreId)
 
-        // Load số sao user đã rate trước đó
         MangaRepository.getUserRating(manga.firestoreId) { savedStar ->
             if (!isAdded) return@getUserRating
             userCurrentStar = savedStar

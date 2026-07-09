@@ -33,19 +33,6 @@
                 app:layout_constraintBottom_toBottomOf="parent" />
 
 
-            <TextView
-                android:id="@+id/btn_home_checkin"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:gravity="center"
-                android:text="🎁"
-                android:textSize="22sp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toStartOf="@id/btn_theme_toggle"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
             <ImageButton
                 android:id="@+id/btn_theme_toggle"
                 android:layout_width="50dp"
@@ -131,38 +118,16 @@
             android:paddingBottom="24dp" />
 
         <!-- BẢNG XẾP HẠNG -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_ranking_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:paddingHorizontal="16dp"
-            android:layout_marginBottom="8dp">
-
-            <TextView
-                android:id="@+id/tv_ranking_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bảng Xếp Hạng"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/color_text_primary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_ranking_see_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Xem Tất Cả >"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:paddingVertical="4dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="Bảng Xếp Hạng"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_primary" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_ranking"
@@ -173,6 +138,12 @@
             android:paddingTop="4dp"
             android:paddingBottom="120dp"
             android:clipToPadding="false" />
+
+        <TextView
+            android:id="@+id/tv_ranking_see_all"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

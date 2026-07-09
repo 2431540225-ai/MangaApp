@@ -12,27 +12,34 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.mangaapp.R
-import com.example.mangaapp.repository.MangaRepository
+import com.example.mangaapp.models.Manga
 import com.example.mangaapp.utils.ThemeManager
 import com.example.mangaapp.ui.detail.DetailFragment
 
 class HomeFragment : Fragment() {
-    private val handler = Handler(Looper.getMainLooper())
-    private var autoScrollRunnable: Runnable? = null
+
+    private val viewModel: HomeViewModel by viewModels()
+
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
     private lateinit var vpBanner: ViewPager2
     private lateinit var llDots: LinearLayout
     private lateinit var rvLatest: RecyclerView
     private lateinit var rvRanking: RecyclerView
     private lateinit var btnThemeToggle: ImageButton
-    private lateinit var btnHomeCheckin: TextView
     private lateinit var tvLatestSeeAll: TextView
     private lateinit var tvRankingSeeAll: TextView
 
     private var realBannerCount = 0
+
+    // Giữ list đầy đủ để truyền sang SeeAllFragment khi bấm "Xem Tất Cả"
+    private var fullLatestList: ArrayList<Manga> = arrayListOf()
+    private var fullRankingList: ArrayList<Manga> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,11 +52,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
-        setupBanner()
-        setupLatestManga()
-        setupRanking()
         setupClickListeners()
-        checkDailyCheckIn()
+        observeViewModel()
+        viewModel.loadHomeData()
     }
 
     private fun initViews(view: View) {
@@ -58,80 +63,158 @@ class HomeFragment : Fragment() {
         rvLatest        = view.findViewById(R.id.rv_latest)
         rvRanking       = view.findViewById(R.id.rv_ranking)
         btnThemeToggle  = view.findViewById(R.id.btn_theme_toggle)
-        btnHomeCheckin  = view.findViewById(R.id.btn_home_checkin)
         tvLatestSeeAll  = view.findViewById(R.id.tv_latest_see_all)
         tvRankingSeeAll = view.findViewById(R.id.tv_ranking_see_all)
     }
 
-    private fun checkDailyCheckIn() {
-        if (!com.example.mangaapp.utils.UserSession.isLoggedIn) return
-
-        com.example.mangaapp.repository.CheckInRepository.getCheckInStatus { status ->
-            if (isAdded && !status.alreadyCheckedInToday) {
-                com.example.mangaapp.ui.checkin.DailyCheckInDialog.show(parentFragmentManager)
+    // ─── Observe ViewModel ───
+    //  - Lần đầu mở app: gọi Firebase → LiveData cập nhật → UI render
+    //  - Xoay màn hình: ViewModel vẫn còn data → observe() nhận ngay → UI render KHÔNG gọi Firebase lại
+    private fun observeViewModel() {
+        viewModel.featuredList.observe(viewLifecycleOwner) { list ->
+            if (list != null && list.isNotEmpty()) setupBannerUI(list)
+        }
+        viewModel.latestList.observe(viewLifecycleOwner) { list ->
+            if (list != null) {
+                fullLatestList = ArrayList(list)
+                setupLatestUI(list)
+            }
+        }
+        viewModel.rankingList.observe(viewLifecycleOwner) { list ->
+            if (list != null) {
+                fullRankingList = ArrayList(list)
+                setupRankingUI(list)
             }
         }
     }
 
-    private fun setupBanner() {
-        MangaRepository.getFeaturedManga(
-            onSuccess = { featuredList ->
-                if (!isAdded) return@getFeaturedManga
-                realBannerCount = featuredList.size
-                if (realBannerCount == 0) return@getFeaturedManga
+    // ─── Banner ───────────────────────────────────────────────────────────────
 
-                val LOOP_MULTIPLIER = 100
-                val infiniteList = MutableList(realBannerCount * LOOP_MULTIPLIER) { i ->
-                    featuredList[i % realBannerCount]
+    private fun setupBannerUI(featuredList: List<Manga>) {
+        if (!isAdded) return
+        realBannerCount = featuredList.size
+        if (realBannerCount == 0) return
+
+        val LOOP_MULTIPLIER = 100
+        val infiniteList = MutableList(realBannerCount * LOOP_MULTIPLIER) { i ->
+            featuredList[i % realBannerCount]
+        }
+
+        val bannerAdapter = BannerAdapter(infiniteList) { manga ->
+            navigateToDetail(manga.firestoreId)
+        }
+
+        vpBanner.offscreenPageLimit = 3
+        vpBanner.setPageTransformer { page, position ->
+            val absPos = Math.abs(position)
+            val scale = 1f - (absPos * 0.12f)
+            page.scaleX = scale
+            page.scaleY = scale
+            page.alpha = 1f - (absPos * 0.4f)
+        }
+        vpBanner.adapter = bannerAdapter
+
+        val startPosition = (LOOP_MULTIPLIER / 2) * realBannerCount
+        vpBanner.setCurrentItem(startPosition, false)
+
+        setupDots(realBannerCount)
+        updateDots(0, realBannerCount)
+
+        vpBanner.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateDots(position % realBannerCount, realBannerCount)
+            }
+        })
+
+        if (::handler.isInitialized && ::runnable.isInitialized) {
+            handler.removeCallbacks(runnable)
+        }
+        handler = Handler(Looper.getMainLooper())
+        runnable = object : Runnable {
+            override fun run() {
+                if (!isAdded) return
+                val next = vpBanner.currentItem + 1
+                if (next >= realBannerCount * LOOP_MULTIPLIER - realBannerCount) {
+                    vpBanner.setCurrentItem((LOOP_MULTIPLIER / 2) * realBannerCount, false)
+                } else {
+                    vpBanner.setCurrentItem(next, true)
                 }
-
-                val bannerAdapter = BannerAdapter(infiniteList) { manga ->
-                    val fragment = DetailFragment.newInstance(manga.firestoreId)
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment)
-                        .addToBackStack(null)
-                        .commit()
-                }
-
-                vpBanner.offscreenPageLimit = 3
-                vpBanner.setPageTransformer { page, position ->
-                    val absPos = Math.abs(position)
-                    val scale = 1f - (absPos * 0.12f)
-                    page.scaleX = scale
-                    page.scaleY = scale
-                    page.alpha = 1f - (absPos * 0.4f)
-                }
-                vpBanner.adapter = bannerAdapter
-
-                val startPosition = (LOOP_MULTIPLIER / 2) * realBannerCount
-                vpBanner.setCurrentItem(startPosition, false)
-
-                setupDots(realBannerCount)
-                updateDots(0, realBannerCount)
-
-                vpBanner.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        updateDots(position % realBannerCount, realBannerCount)
-                    }
-                })
-
-                autoScrollRunnable = object : Runnable {
-                    override fun run() {
-                        if (!isAdded) return
-                        val next = vpBanner.currentItem + 1
-                        if (next >= realBannerCount * LOOP_MULTIPLIER - realBannerCount) {
-                            vpBanner.setCurrentItem((LOOP_MULTIPLIER / 2) * realBannerCount, false)
-                        } else {
-                            vpBanner.setCurrentItem(next, true)
-                        }
-                        handler.postDelayed(this, 3000)
-                    }
-                }
-                handler.postDelayed(autoScrollRunnable!!, 3000)
-            },
-            onError = { /* banner trống nếu lỗi */ }
-        )
+                handler.postDelayed(this, 3000)
+            }
+        }
+        handler.postDelayed(runnable, 3000)
     }
+
+    // ─── Mới Cập Nhật — ngang, giới hạn 5, dùng MangaCardAdapter như cũ ──────
+
+    private fun setupLatestUI(list: List<Manga>) {
+        if (!isAdded) return
+        val adapter = MangaCardAdapter(list.take(5)) { manga ->
+            navigateToDetail(manga.firestoreId)
+        }
+        rvLatest.layoutManager = LinearLayoutManager(
+            requireContext(), LinearLayoutManager.HORIZONTAL, false
+        )
+        rvLatest.adapter = adapter
+        tvLatestSeeAll.visibility = if (list.size > 5) View.VISIBLE else View.GONE
+    }
+
+    // ─── Bảng Xếp Hạng — dọc, giới hạn 5 ────────────────────────────────────
+
+    private fun setupRankingUI(list: List<Manga>) {
+        if (!isAdded) return
+        val adapter = RankingAdapter(list.take(5)) { manga ->
+            navigateToDetail(manga.firestoreId)
+        }
+        rvRanking.layoutManager = LinearLayoutManager(requireContext())
+        rvRanking.isNestedScrollingEnabled = false
+        rvRanking.adapter = adapter
+        tvRankingSeeAll.visibility = if (list.size > 5) View.VISIBLE else View.GONE
+    }
+
+    // ─── Click listeners ──────────────────────────────────────────────────────
+
+    private fun setupClickListeners() {
+        updateThemeIcon()
+        btnThemeToggle.setOnClickListener {
+            ThemeManager.toggle()
+            requireActivity().recreate()
+        }
+
+        // Bấm "Xem Tất Cả" → chuyển sang SeeAllFragment với toàn bộ list
+        tvLatestSeeAll.setOnClickListener {
+            navigateToSeeAll("Mới Cập Nhật", fullLatestList)
+        }
+        tvRankingSeeAll.setOnClickListener {
+            navigateToSeeAll("Bảng Xếp Hạng", fullRankingList)
+        }
+    }
+
+    private fun updateThemeIcon() {
+        val iconRes = if (ThemeManager.isDarkMode()) R.drawable.ic_light_mode
+        else R.drawable.ic_dark_mode
+        btnThemeToggle.setImageResource(iconRes)
+    }
+
+    // ─── Navigation ───────────────────────────────────────────────────────────
+
+    private fun navigateToDetail(firestoreId: String) {
+        val fragment = DetailFragment.newInstance(firestoreId)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun navigateToSeeAll(title: String, list: ArrayList<Manga>) {
+        val fragment = SeeAllFragment.newInstance(title, list)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    // ─── Dots ─────────────────────────────────────────────────────────────────
 
     private fun setupDots(count: Int) {
         llDots.removeAllViews()
@@ -180,81 +263,12 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupLatestManga() {
-        MangaRepository.getLatestManga(
-            onSuccess = { latestList ->
-                if (!isAdded) return@getLatestManga
-                val adapter = MangaCardAdapter(latestList) { manga ->
-                    val fragment = DetailFragment.newInstance(manga.firestoreId)
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment)
-                        .addToBackStack(null)
-                        .commit()
-                }
-                rvLatest.layoutManager = LinearLayoutManager(
-                    requireContext(), LinearLayoutManager.HORIZONTAL, false
-                )
-                rvLatest.adapter = adapter
-            },
-            onError = { }
-        )
-    }
-
-    private fun setupRanking() {
-        MangaRepository.getRankingManga(
-            onSuccess = { rankingList ->
-                if (!isAdded) return@getRankingManga
-                val adapter = RankingAdapter(rankingList) { manga ->
-                    val fragment = DetailFragment.newInstance(manga.firestoreId)
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment)
-                        .addToBackStack(null)
-                        .commit()
-                }
-                rvRanking.layoutManager = LinearLayoutManager(requireContext())
-                rvRanking.isNestedScrollingEnabled = false
-                rvRanking.adapter = adapter
-            },
-            onError = { }
-        )
-    }
-
-    private fun setupClickListeners() {
-        updateThemeIcon()
-        btnThemeToggle.setOnClickListener {
-            ThemeManager.toggle()
-            requireActivity().recreate()
-        }
-        btnHomeCheckin.setOnClickListener {
-            if (!com.example.mangaapp.utils.UserSession.isLoggedIn) {
-                android.widget.Toast.makeText(requireContext(), "Vui lòng đăng nhập để điểm danh", android.widget.Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            com.example.mangaapp.ui.checkin.DailyCheckInDialog.show(parentFragmentManager)
-        }
-        tvLatestSeeAll.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container, com.example.mangaapp.ui.list.ListFragment.newInstance("Mới nhất"))
-                .addToBackStack(null)
-                .commit()
-        }
-        tvRankingSeeAll.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container, com.example.mangaapp.ui.list.ListFragment.newInstance("Xem nhiều"))
-                .addToBackStack(null)
-                .commit()
-        }
-    }
-
-    private fun updateThemeIcon() {
-        val iconRes = if (ThemeManager.isDarkMode()) R.drawable.ic_light_mode
-        else R.drawable.ic_dark_mode
-        btnThemeToggle.setImageResource(iconRes)
-    }
+    // ─── Lifecycle ────────────────────────────────────────────────────────────
 
     override fun onDestroyView() {
         super.onDestroyView()
-        autoScrollRunnable?.let { handler.removeCallbacks(it) }
-        autoScrollRunnable = null
+        if (::handler.isInitialized && ::runnable.isInitialized) {
+            handler.removeCallbacks(runnable)
+        }
     }
 }
