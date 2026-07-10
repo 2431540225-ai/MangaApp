@@ -10,6 +10,7 @@ import com.example.mangaapp.ui.favorites.FavoritesFragment
 import com.example.mangaapp.ui.profile.ProfileFragment
 
 import com.example.mangaapp.ui.list.ListFragment
+import com.example.mangaapp.ui.search.SearchFragment
 
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home -> { loadFragment(HomeFragment()); true }
                 R.id.nav_list -> { loadFragment(ListFragment()); true }
                 R.id.nav_favorites -> { loadFragment(FavoritesFragment()); true }
-                R.id.nav_search -> { true }
+                R.id.nav_search -> { loadFragment(SearchFragment()); true }
                 R.id.nav_profile -> { loadFragment(ProfileFragment()); true }
                 else -> false
             }

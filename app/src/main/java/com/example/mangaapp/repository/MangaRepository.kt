@@ -6,7 +6,7 @@ import com.example.mangaapp.models.Comment
 import com.example.mangaapp.models.Manga
 import com.example.mangaapp.models.MangaCategory
 import com.example.mangaapp.models.MangaStatus
-import com.example.mangaapp.utils.CommentStorage
+import com.example.mangaapp.db.CommentDbHelper
 import com.example.mangaapp.utils.UserSession
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
@@ -379,8 +379,13 @@ object MangaRepository {
 
     fun initComments(context: Context) {
         if (isCommentsLoaded) return
-        val saved = CommentStorage.loadComments(context)
-        comments = if (saved.isEmpty()) defaultComments() else saved
+        val saved = CommentDbHelper.getInstance(context).getAllComments()
+        if (saved.isEmpty()) {
+            comments = defaultComments()
+            comments.forEach { CommentDbHelper.getInstance(context).insertComment(it) }
+        } else {
+            comments = saved
+        }
         isCommentsLoaded = true
     }
 
@@ -392,7 +397,7 @@ object MangaRepository {
 
     fun addComment(context: Context, comment: Comment) {
         comments.add(comment)
-        CommentStorage.saveComments(context, comments)
+        CommentDbHelper.getInstance(context).insertComment(comment)
     }
 
     // ─── FAVORITES & FOLLOWING ───────────────────────────────────────────────
